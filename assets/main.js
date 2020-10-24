@@ -53,6 +53,12 @@ const SHOW_SECONDS = false;
   const search = document.querySelector('.search');
   const input = search.querySelector('.search-input');
 
+  input.addEventListener('blur', () => {
+    if (input.value === '') {
+      search.classList.remove('active');
+    }
+  });
+
   input.addEventListener('keypress', (e) => {
     search.classList.add('active');
     const code = e.code || e.key;
@@ -62,5 +68,11 @@ const SHOW_SECONDS = false;
     } else if (code === 'Enter') {
       window.location.href = `https://www.google.com/search?q=${encodeURIComponent(input.value)}`;
     }
+    e.stopPropagation();
+  });
+
+  document.addEventListener('keypress', () => {
+    input.focus();
+    search.classList.add('active');
   });
 })();
