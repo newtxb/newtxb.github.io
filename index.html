@@ -7,11 +7,34 @@
     <title>Home</title>
 </head>
 <body>
-  <div class="app">
-    <h1 class="clock">
-      <span class="hours"></span>:<span class="minutes"></span><span class="show-seconds" style="display: none;">:<span class="seconds"></span></span>
-    </h1>
+  <div class="app columns">
+    <!-- Top bar -->
+    <div class="section section-bar">
+      <div class="rows">
+        <div></div>
+        <div class="calendar"></div>
+      </div>
+    </div>
+
+    <!-- Real stuff -->
+    <div class="section section-center">
+      <h1 class="clock">
+        <span class="hours">--</span>:<span class="minutes">--</span><span class="show-seconds" style="display: none;">:<span class="seconds">--</span></span>
+      </h1>
+      <h3 class="welcome-text">Hi!</h3>
+    </div>
+
+    <!-- Bottom things -->
+    <div class="section section-bar">
+      <div class="search">
+        &nbsp;
+        <div class="search-label">Type to search&hellip;</div>
+        <input type="text" class="search-input" autofocus placeholder="[esc] to cancel">
+      </div>
+    </div>
   </div>
+
+  <!-- Useless garbage -->
   <script src="assets/main.js"></script>
 </body>
 </html>

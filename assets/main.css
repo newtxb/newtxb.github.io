@@ -9,16 +9,29 @@ html {
   right: 0;
   bottom: 0;
   background: radial-gradient(ellipse at center -60px, #467fa5, #06273d);
+
+  color: #efefef;
+  font-weight: 300;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rows {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.section-center {
+  text-align: center;
 }
 
 .clock {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  color: #fafafa;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 100;
   font-size: 10rem;
   margin: 0;
@@ -27,4 +40,48 @@ html {
 .clock .show-seconds {
   font-size: 0.75em;
   opacity: 0.75;
+}
+
+.welcome-text {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1.75em;
+}
+
+.section-bar {
+  padding: 25px;
+}
+
+.search {
+  position: relative;
+}
+
+.search .search-input {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: 0;
+  z-index: -1;
+
+  background: transparent;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  border: 0;
+}
+
+.search .search-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.search.active .search-input {
+  z-index: initial;
+}
+
+.search.active .search-label {
+  z-index: -1;
 }
