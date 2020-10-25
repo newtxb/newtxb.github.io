@@ -51,7 +51,32 @@ const SHOW_SECONDS = false;
 
 (() => {
   const search = document.querySelector('.search');
+  const label = search.querySelector('.search-label');
   const input = search.querySelector('.search-input');
+  const form = search.querySelector('.search-form');
+
+  let cmdPressed = false;
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Meta') {
+      cmdPressed = true;
+      form.target = '_blank';
+    }
+    if (e.key === 'Enter') form.submit();
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'Meta') {
+      cmdPressed = false;
+      form.target = '';
+    }
+  });
+
+  label.addEventListener('click', (e) => {
+    search.classList.add('active');
+    e.preventDefault();
+    input.focus();
+  });
 
   input.addEventListener('blur', () => {
     if (input.value === '') {
@@ -61,17 +86,15 @@ const SHOW_SECONDS = false;
 
   input.addEventListener('keypress', (e) => {
     search.classList.add('active');
-    const code = e.code || e.key;
-    if (code === 'Escape') {
+    if (e.key === 'Escape') {
       input.value = '';
       search.classList.remove('active');
-    } else if (code === 'Enter') {
-      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(input.value)}`;
     }
     e.stopPropagation();
   });
 
   document.addEventListener('keypress', () => {
+    if (cmdPressed) return;
     input.focus();
     search.classList.add('active');
   });

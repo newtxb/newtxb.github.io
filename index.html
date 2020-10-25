@@ -11,13 +11,12 @@
   <div class="app columns">
     <!-- Top bar -->
     <div class="section section-bar">
-      <div class="rows">
-        <div class="search">
-          &nbsp;
+      <div class="search">
+        &nbsp;
+        <form action="https://www.google.com/search" class="search-form" method="GET">
           <div class="search-label">Type to search&hellip;</div>
-          <input type="text" class="search-input" autofocus placeholder="[esc] to cancel">
-        </div>
-        <div class="calendar"></div>
+          <input type="text" class="search-input" autofocus placeholder="[esc] to cancel" name="q">
+        </form>
       </div>
     </div>
 
@@ -31,6 +30,10 @@
 
     <!-- Bottom things -->
     <div class="section section-bar">
+      <div class="rows">
+        <div></div>
+        <div class="calendar"></div>
+      </div>
     </div>
   </div>
 
