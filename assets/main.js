@@ -89,6 +89,7 @@ const SHOW_SECONDS = false;
     if (e.key === 'Escape') {
       input.value = '';
       search.classList.remove('active');
+      input.blur();
     }
     e.stopPropagation();
   });

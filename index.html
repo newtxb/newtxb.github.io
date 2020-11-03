@@ -10,14 +10,16 @@
 <body>
   <div class="app columns">
     <!-- Top bar -->
-    <div class="section section-bar">
+    <div class="section section-bar rows">
+      <div></div>
       <div class="search">
         &nbsp;
         <form action="https://www.google.com/search" class="search-form" method="GET">
           <div class="search-label">Type to search&hellip;</div>
-          <input type="text" class="search-input" autofocus placeholder="[esc] to cancel" name="q">
+          <input type="text" class="search-input" placeholder="[esc] to cancel" name="q">
         </form>
       </div>
+      <div></div>
     </div>
 
     <!-- Real stuff -->
@@ -31,7 +33,11 @@
     <!-- Bottom things -->
     <div class="section section-bar">
       <div class="rows">
-        <div></div>
+        <div>
+          <p>
+            <a href="https://github.com/newtxb/newtxb.github.io" target="_blank" class="nolink">newtxb.github.io</a>
+          </p>
+        </div>
         <div class="calendar"></div>
       </div>
     </div>
@@ -40,7 +46,7 @@
   <!-- Useless garbage -->
   <script src="assets/main.js"></script>
   <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js');
+    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') navigator.serviceWorker.register('/service-worker.js');
   </script>
 </body>
 </html>

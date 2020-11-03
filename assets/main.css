@@ -77,6 +77,16 @@ html {
   justify-content: space-between;
 }
 
+.nolink {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.nolink:hover, .nolink:active, .nolink:visited {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .section-center {
   text-align: center;
 }
@@ -105,34 +115,41 @@ html {
 .search {
   position: relative;
   flex-grow: 1;
+  max-width: 600px;
 }
 
 .search .search-input {
   position: absolute;
-  top: -1px;
+  top: -9px;
   left: 0px;
   right: 0;
-  z-index: -1;
+  opacity: 0;
 
-  background: transparent;
+  background: white;
   outline: none;
-  color: inherit;
+  color: black;
   margin: 0;
   font: inherit;
-  padding: 0;
   border: 0;
+
+  padding: 8px 16px;
+  transition: opacity .3s;
+  border-radius: 80px;
+  box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.33);
 }
 
 .search .search-label {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
+  text-align: center;
 }
 
-.search.active .search-input {
-  z-index: initial;
+.search .search-input:hover {
+  opacity: 0.1;
 }
 
-.search.active .search-label {
-  z-index: -1;
+.search .search-input:focus {
+  opacity: 1;
 }
