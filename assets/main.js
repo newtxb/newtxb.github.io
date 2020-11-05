@@ -1,14 +1,8 @@
-// settings
-
-const SHOW_SECONDS = false;
-
 // clock
 
 (() => {
-  if (SHOW_SECONDS) document.querySelector('.clock .show-seconds').style.display = '';
-
-  const draw = () => {
-    ['Hours', 'Minutes', ...(SHOW_SECONDS ? ['Seconds'] : [])].forEach((x) => {
+  const draw = (onlySecond = false) => {
+    [...(onlySecond ? [] : ['Hours', 'Minutes']), 'Seconds'].forEach((x) => {
       const text = new Date()[`get${x}`]().toString().padStart(2, '0');
       document.querySelector(`.clock .${x.toLowerCase()}`).textContent = text;
     });
@@ -20,21 +14,38 @@ const SHOW_SECONDS = false;
     document.querySelector('.welcome-text').textContent = text;
   };
 
-  draw();
   window.addEventListener('focus', draw);
 
   // sync
 
-  const redraw = () => {
-    draw();
-    const nextDraw = SHOW_SECONDS
-      ? 1000 - (new Date().getTime() % 1000)
-      : new Date().setSeconds(60, 0) - Date.now();
-    // "big" timeout can be unprecise
-    setTimeout(redraw, nextDraw > 1500 ? nextDraw - 1000 : nextDraw);
+  const drawEveryMinute = () => {
+    draw(false);
+    const nextMinute = new Date().setSeconds(60, 0) - Date.now();
+    // Big timeout can be unprecise, so we will adjust to the millisecond one second before
+    setTimeout(drawEveryMinute, nextMinute > 1500 ? nextMinute - 1000 : nextMinute);
   };
 
-  redraw();
+  drawEveryMinute();
+
+  // seconds
+
+  let shouldDrawNextSecond = false;
+  const drawEverySecond = () => {
+    // Draw again, even if shouldDrawNextSecond = false, as mouse may left few millis before redraw
+    // So we want to update second during it's transition to opacity = 0
+    draw(true);
+    if (!shouldDrawNextSecond) return;
+    setTimeout(drawEverySecond, 1000 - (new Date().getTime() % 1000));
+  };
+
+  document.querySelector('.clock').addEventListener('mouseenter', () => {
+    shouldDrawNextSecond = true;
+    drawEverySecond();
+  });
+
+  document.querySelector('.clock').addEventListener('mouseleave', () => {
+    shouldDrawNextSecond = false;
+  });
 })();
 
 // calendar

@@ -92,14 +92,26 @@ html {
 }
 
 .clock {
+  display: inline-block;
+  position: relative;
   font-weight: 100;
   font-size: 10rem;
   margin: 0;
 }
 
 .clock .show-seconds {
+  position: absolute;
+  left: 100%;
+  bottom: 0.5rem;
   font-size: 0.5em;
-  opacity: 0.5;
+  word-break: keep-all;
+  opacity: 0;
+  transition: all .3s ease-in-out;
+}
+
+.clock:hover .show-seconds {
+  transition: all .15s ease-in-out;
+  opacity: 0.33;
 }
 
 .welcome-text {
