@@ -1,8 +1,11 @@
 // ---------------------------------------------------------------------------------------------- //
-// CLOCK
+// CLOCK & DATE
 // ---------------------------------------------------------------------------------------------- //
 
 (() => {
+  // To draw the date only once per day
+  let currentDate = -1;
+
   // Draw the clock digits
   const draw = (onlySecond = false) => {
     [...(onlySecond ? [] : ['Hours', 'Minutes']), 'Seconds'].forEach((x) => {
@@ -15,6 +18,13 @@
     else if (hours >= 12 && hours < 18) text = 'Good afternoon';
     else text = 'Good evening';
     document.querySelector('.welcome-text').textContent = text;
+
+    if (!onlySecond) {
+      if (new Date().getDate() === currentDate) return;
+      currentDate = new Date().getDate();
+      document.querySelector('.calendar').textContent = new Date()
+        .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+    }
   };
 
   // Keep it sync with real time
@@ -46,20 +56,6 @@
   document.querySelector('.clock').addEventListener('mouseleave', () => {
     shouldDrawNextSecond = false;
   });
-})();
-
-// ---------------------------------------------------------------------------------------------- //
-// CALENDAR
-// ---------------------------------------------------------------------------------------------- //
-
-(() => {
-  const draw = () => {
-    document.querySelector('.calendar').textContent = new Date()
-      .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
-  };
-  draw();
-
-  setInterval(draw, 60000);
 })();
 
 // ---------------------------------------------------------------------------------------------- //
