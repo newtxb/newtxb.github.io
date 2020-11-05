@@ -79,6 +79,11 @@ const SHOW_SECONDS = false;
     e.stopPropagation();
   });
 
+  document.addEventListener('paste', () => {
+    // Will paste directly in the search input
+    input.focus();
+  });
+
   document.addEventListener('keydown', (e) => {
     if (cleanup) {
       // If we press "Escape" then another key, clean input now (before keyup)
@@ -87,7 +92,7 @@ const SHOW_SECONDS = false;
       cleanup = null;
     }
     if (e.key.length === 1) {
-      // as length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
+      // As length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
       input.focus();
     }
   });
