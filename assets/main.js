@@ -3,11 +3,11 @@
 // ---------------------------------------------------------------------------------------------- //
 
 (() => {
-  // To draw the date only once per day
+  // To render the date only once per day
   let currentDate = -1;
 
-  // Draw the clock digits
-  const draw = (onlySecond = false) => {
+  // Render the clock digits
+  const render = (onlySecond = false) => {
     [...(onlySecond ? [] : ['Hours', 'Minutes']), 'Seconds'].forEach((x) => {
       const text = new Date()[`get${x}`]().toString().padStart(2, '0');
       document.querySelector(`.clock .${x.toLowerCase()}`).textContent = text;
@@ -28,33 +28,33 @@
   };
 
   // Keep it sync with real time
-  const drawEveryMinute = () => {
-    draw(false);
+  const renderEveryMinute = () => {
+    render(false);
     const nextMinute = new Date().setSeconds(60, 0) - Date.now();
     // Big timeout can be unprecise, so we will adjust to the millisecond one second before
-    setTimeout(drawEveryMinute, nextMinute > 1500 ? nextMinute - 1000 : nextMinute);
+    setTimeout(renderEveryMinute, nextMinute > 1500 ? nextMinute - 1000 : nextMinute);
   };
 
-  drawEveryMinute();
-  window.addEventListener('focus', draw);
+  renderEveryMinute();
+  window.addEventListener('focus', render);
 
   // Show seconds on hover
-  let shouldDrawNextSecond = false;
-  const drawEverySecond = () => {
-    // Draw again, even if shouldDrawNextSecond = false, as mouse may left few millis before redraw
+  let renderNextSecond = false;
+  const renderEverySecond = () => {
+    // Render again, even if renderNextSecond = false, as mouse may leave few millis before rerender
     // So we want to update second during it's transition to opacity = 0
-    draw(true);
-    if (!shouldDrawNextSecond) return;
-    setTimeout(drawEverySecond, 1000 - (new Date().getTime() % 1000));
+    render(true);
+    if (!renderNextSecond) return;
+    setTimeout(renderEverySecond, 1000 - (new Date().getTime() % 1000));
   };
 
   document.querySelector('.clock').addEventListener('mouseenter', () => {
-    shouldDrawNextSecond = true;
-    drawEverySecond();
+    renderNextSecond = true;
+    renderEverySecond();
   });
 
   document.querySelector('.clock').addEventListener('mouseleave', () => {
-    shouldDrawNextSecond = false;
+    renderNextSecond = false;
   });
 })();
 
