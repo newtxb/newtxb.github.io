@@ -25,7 +25,8 @@
     <!-- Real stuff -->
     <div class="section section-center">
       <h1 class="clock">
-        <span class="hours">--</span>:<span class="minutes">--</span><span class="show-seconds" style="display: none;">:<span class="seconds">--</span></span>
+        <span class="hours">--</span>:<span class="minutes">--</span><!--
+        --><span class="show-seconds" style="display: none;">:<span class="seconds">--</span></span>
       </h1>
       <h3 class="welcome-text">Hi!</h3>
     </div>
@@ -35,7 +36,9 @@
       <div class="rows">
         <div>
           <p>
-            <a href="https://github.com/newtxb/newtxb.github.io" target="_blank" class="nolink">newtxb.github.io</a>
+            <a href="https://github.com/newtxb/newtxb.github.io" target="_blank" class="nolink">
+              newtxb.github.io
+            </a>
           </p>
         </div>
         <div class="calendar"></div>
@@ -46,7 +49,9 @@
   <!-- Useless garbage -->
   <script src="assets/main.js"></script>
   <script>
-    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') navigator.serviceWorker.register('/service-worker.js');
+    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
   </script>
 </body>
 </html>

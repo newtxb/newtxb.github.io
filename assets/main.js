@@ -9,7 +9,8 @@ const SHOW_SECONDS = false;
 
   const draw = () => {
     ['Hours', 'Minutes', ...(SHOW_SECONDS ? ['Seconds'] : [])].forEach((x) => {
-      document.querySelector(`.clock .${x.toLowerCase()}`).textContent = new Date()[`get${x}`]().toString().padStart(2, '0');
+      const text = new Date()[`get${x}`]().toString().padStart(2, '0');
+      document.querySelector(`.clock .${x.toLowerCase()}`).textContent = text;
     });
     const hours = new Date().getHours();
     let text;
@@ -40,7 +41,8 @@ const SHOW_SECONDS = false;
 
 (() => {
   const draw = () => {
-    document.querySelector('.calendar').textContent = new Date().toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+    document.querySelector('.calendar').textContent = new Date()
+      .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
   };
   draw();
 
