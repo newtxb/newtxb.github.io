@@ -51,52 +51,42 @@ const SHOW_SECONDS = false;
 
 (() => {
   const search = document.querySelector('.search');
-  const label = search.querySelector('.search-label');
   const input = search.querySelector('.search-input');
   const form = search.querySelector('.search-form');
 
-  let cmdPressed = false;
-
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Meta') {
-      cmdPressed = true;
-      form.target = '_blank';
-    }
+    if (e.key === 'Meta') form.target = '_blank';
     if (e.key === 'Enter') form.submit();
   });
 
   window.addEventListener('keyup', (e) => {
-    if (e.key === 'Meta') {
-      cmdPressed = false;
-      form.target = '';
-    }
+    if (e.key === 'Meta') form.target = '';
   });
 
-  label.addEventListener('click', (e) => {
-    search.classList.add('active');
-    e.preventDefault();
-    input.focus();
-  });
+  let cleanup = null;
 
-  input.addEventListener('blur', () => {
-    if (input.value === '') {
-      search.classList.remove('active');
-    }
-  });
-
-  input.addEventListener('keypress', (e) => {
-    search.classList.add('active');
+  input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      input.value = '';
-      search.classList.remove('active');
       input.blur();
+      cleanup = setTimeout(() => {
+        // Clear input when it's hidden
+        input.value = '';
+        cleanup = null;
+      }, 150);
     }
     e.stopPropagation();
   });
 
-  document.addEventListener('keypress', () => {
-    if (cmdPressed) return;
-    input.focus();
-    search.classList.add('active');
+  document.addEventListener('keydown', (e) => {
+    if (cleanup) {
+      // If we press "Escape" then another key, clean input now (before keyup)
+      clearTimeout(cleanup);
+      input.value = '';
+      cleanup = null;
+    }
+    if (e.key.length === 1) {
+      // as length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
+      input.focus();
+    }
   });
 })();
