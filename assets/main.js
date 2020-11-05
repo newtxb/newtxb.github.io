@@ -102,8 +102,10 @@
       input.value = '';
       cleanup = null;
     }
+    // As length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
     if (e.key.length === 1) {
-      // As length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
+      // But ignore special action
+      if (e.metaKey) return;
       input.focus();
     }
   });
