@@ -1,6 +1,9 @@
-// clock
+// ---------------------------------------------------------------------------------------------- //
+// CLOCK
+// ---------------------------------------------------------------------------------------------- //
 
 (() => {
+  // Draw the clock digits
   const draw = (onlySecond = false) => {
     [...(onlySecond ? [] : ['Hours', 'Minutes']), 'Seconds'].forEach((x) => {
       const text = new Date()[`get${x}`]().toString().padStart(2, '0');
@@ -14,10 +17,7 @@
     document.querySelector('.welcome-text').textContent = text;
   };
 
-  window.addEventListener('focus', draw);
-
-  // sync
-
+  // Keep it sync with real time
   const drawEveryMinute = () => {
     draw(false);
     const nextMinute = new Date().setSeconds(60, 0) - Date.now();
@@ -26,9 +26,9 @@
   };
 
   drawEveryMinute();
+  window.addEventListener('focus', draw);
 
-  // seconds
-
+  // Show seconds on hover
   let shouldDrawNextSecond = false;
   const drawEverySecond = () => {
     // Draw again, even if shouldDrawNextSecond = false, as mouse may left few millis before redraw
@@ -48,7 +48,9 @@
   });
 })();
 
-// calendar
+// ---------------------------------------------------------------------------------------------- //
+// CALENDAR
+// ---------------------------------------------------------------------------------------------- //
 
 (() => {
   const draw = () => {
@@ -60,7 +62,9 @@
   setInterval(draw, 60000);
 })();
 
-// search
+// ---------------------------------------------------------------------------------------------- //
+// SEARCH
+// ---------------------------------------------------------------------------------------------- //
 
 (() => {
   const search = document.querySelector('.search');
