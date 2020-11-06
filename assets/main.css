@@ -130,26 +130,36 @@ html {
   max-width: 600px;
 }
 
-.search .search-input {
+.search .search-box {
   position: absolute;
+  /* -(.search-input's padding) -1px */
   top: -9px;
   left: 0px;
   right: 0;
   width: 100%;
+  overflow: hidden;
 
+  border-radius: 17px; /* input height/2, magic value :( */
+  box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.33);
+  opacity: 0;
+  transform-origin: 50% 0;
+  transform: scale(0.95);
+  transition: opacity .15s ease-in-out, transform .15s ease-in-out;
+}
+
+.search .search-input {
+  width: 100%;
   background: white;
   outline: none;
   color: black;
   margin: 0;
   font: inherit;
   border: 0;
-
   padding: 8px 16px;
-  opacity: 0;
-  transform: scale(0.95);
-  transition: all .15s ease-in-out;
-  border-radius: 80px;
-  box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.33);
+}
+
+.search.active.with-suggestions .search-input {
+  border-radius: 17px 17px 0 0;
 }
 
 .search .search-label {
@@ -160,11 +170,31 @@ html {
   text-align: center;
 }
 
-.search .search-input:hover {
+.search .search-box:hover {
   opacity: 0.1;
 }
 
-.search .search-input:focus {
+.search.active .search-box {
   opacity: 1;
   transform: scale(1);
+}
+
+.search .search-suggestions {
+  display: none;
+  width: 100%;
+  background: white;
+  padding: 8px 16px 8px;
+}
+
+.search.active.with-suggestions .search-suggestions {
+  display: block;
+}
+
+.search .search-suggestion {
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.search .search-suggestion b {
+  font-weight: 500;
 }

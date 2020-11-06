@@ -66,6 +66,7 @@
   const search = document.querySelector('.search');
   const input = search.querySelector('.search-input');
   const form = search.querySelector('.search-form');
+  const suggestions = search.querySelector('.search-suggestions');
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Meta') form.target = '_blank';
@@ -74,6 +75,14 @@
 
   window.addEventListener('keyup', (e) => {
     if (e.key === 'Meta') form.target = '';
+  });
+
+  input.addEventListener('focus', () => {
+    search.classList.add('active');
+  });
+
+  input.addEventListener('blur', () => {
+    search.classList.remove('active');
   });
 
   let cleanup = null;
@@ -87,7 +96,6 @@
         cleanup = null;
       }, 150);
     }
-    e.stopPropagation();
   });
 
   document.addEventListener('paste', () => {
@@ -96,17 +104,130 @@
   });
 
   document.addEventListener('keydown', (e) => {
-    if (cleanup) {
+    if (cleanup && e.key !== 'Escape') {
       // If we press "Escape" then another key, clean input now (before keyup)
       clearTimeout(cleanup);
       input.value = '';
       cleanup = null;
     }
     // As length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
-    if (e.key.length === 1) {
+    if (document.activeElement !== input && e.key.length === 1) {
       // But ignore special action
       if (e.metaKey) return;
       input.focus();
     }
   });
+
+  // Autocomplete
+  let suggestionsData = [];
+  let latestDataRendered = [null, null];
+  const refreshSuggestions = () => {
+    // No change, no render
+    if (input.value === latestDataRendered[0] && suggestionsData === latestDataRendered[1]) return;
+    latestDataRendered = [input.value, suggestionsData];
+
+    // No input or no suggestion => hide this stuff
+    if (input.value.length === 0 || !suggestionsData[1] || !suggestionsData[1].length) {
+      search.classList.remove('with-suggestions');
+      return;
+    }
+
+    // Now let's work
+    const suggestLines = suggestionsData[1].map((suggestion) => {
+      const div = document.createElement('div');
+      div.classList.add('search-suggestion');
+
+      // This needs to be re-generated for each suggestion (see REF_INPUT_WORDS)
+      const inputWords = input.value.toLowerCase().split(' ');
+      suggestion.split(' ')
+        .map((suggestWord) => {
+          const prefix = (first, last) => {
+            let index = 0;
+            while (index < first.length && first[index] === last[index]) index += 1;
+            return index;
+          };
+
+          const len = inputWords
+            .reduce((max, inputWord) => Math.max(max, prefix(inputWord, suggestWord)), 0);
+
+          // Common prefix = normal font
+          const span = document.createElement('span');
+          span.textContent = suggestWord.slice(0, len);
+
+          // Completion = bold font
+          const b = document.createElement('b');
+          b.textContent = `${suggestWord.slice(len)} `;
+
+          if (suggestWord.length === len) {
+            // [REF_INPUT_WORDS] Full match! Can't be used for next completions
+            inputWords.splice(inputWords.indexOf(suggestWord), 1);
+          }
+
+          return [span, b];
+        })
+        .filter(Boolean)
+        .reduce((a, b) => ([...a, ...b]), [])
+        .forEach(node => div.appendChild(node));
+
+      return div;
+    });
+
+    // Clear previous suggestions
+    [...suggestions.children].forEach(node => node.remove());
+
+    // Then add new ones
+    suggestLines.forEach(node => suggestions.appendChild(node));
+
+    // And show them to the world
+    search.classList.add('with-suggestions');
+  };
+
+  let latest = -1;
+  const cache = {};
+  const askSuggestions = (text) => {
+    // Too long text = too precise to be suggested
+    if (text.length === 0 || text.length > 32) return;
+
+    if (cache[text]) {
+      suggestionsData = cache[text];
+      refreshSuggestions();
+      return;
+    }
+    // Let's call Google
+    const script = document.createElement('script');
+    const q = encodeURIComponent(text);
+    const now = Date.now();
+    const callback = `_${Math.random().toString(36).slice(2)}_${now}`;
+    script.src = `https://www.google.com/complete/search?client=chrome&callback=${callback}&q=${q}`;
+    document.body.appendChild(script);
+    // And handle response
+    window[callback] = (args) => {
+      script.remove();
+      cache[text] = args;
+      if (now < latest) return; // Already outdated
+      latest = now;
+      suggestionsData = args;
+      refreshSuggestions();
+    };
+  };
+
+  let lastValue = '';
+  const inputChanged = () => {
+    setTimeout(() => {
+      if (lastValue === input.value) return;
+      lastValue = input.value;
+      askSuggestions(lastValue.toLowerCase());
+      // Immediate feedback
+      refreshSuggestions();
+    });
+  };
+
+  // Kind of duplicate of keydown, but will pressed (repeted) key
+  input.addEventListener('keypress', inputChanged);
+
+  // Kind of duplicate of keypress, but will handle backspace
+  input.addEventListener('keydown', inputChanged);
+
+  // As this will not trigger input.change or such
+  document.addEventListener('paste', inputChanged);
 })();
