@@ -87,6 +87,19 @@
     }
   });
 
+  form.addEventListener('submit', (e) => {
+    const link = suggestions.querySelector('a.search-suggestion.active');
+    if (link) {
+      // Follow selected suggestion
+      e.preventDefault();
+      link.click();
+    } else if (/^https?:\/\/./.test(input.value)) {
+      // Go to link directly
+      e.preventDefault();
+      window.location = input.value;
+    }
+  });
+
   let cleanup = null;
 
   input.addEventListener('keydown', (e) => {
@@ -124,6 +137,7 @@
   // Autocomplete
   let suggestionsData = [];
   let latestDataRendered = [null, null];
+  const cacheIcons = {};
   const refreshSuggestions = () => {
     // No change, no render
     if (input.value === latestDataRendered[0] && suggestionsData === latestDataRendered[1]) return;
@@ -186,12 +200,19 @@
       if (isLink) {
         a.href = suggestion.text;
         a.classList.add('suggest-navigation');
-        const img = document.createElement('img');
-        img.classList.add('suggest-icon');
         const fakeLink = document.createElement('a');
         fakeLink.setAttribute('href', suggestion.text);
-        img.src = `https://www.google.com/s2/favicons?sz=32&domain=${a.hostname}`;
-        a.appendChild(img);
+        if (!cacheIcons[a.hostname]) {
+          const img = document.createElement('img');
+          img.classList.add('suggest-icon');
+          img.src = `https://www.google.com/s2/favicons?sz=32&domain=${a.hostname}`;
+          img.addEventListener('error', () => {
+            img.remove();
+            a.classList.add('fallback-icon');
+          });
+          cacheIcons[a.hostname] = img;
+        }
+        a.appendChild(cacheIcons[a.hostname]);
       } else {
         a.href = '#';
         a.classList.add('suggest-query');
@@ -219,13 +240,13 @@
   };
 
   let latest = -1;
-  const cache = {};
+  const cacheSuggestions = {};
   const askSuggestions = (text) => {
     // Too long text = too precise to be suggested
     if (text.length === 0 || text.length > 32) return;
 
-    if (cache[text]) {
-      suggestionsData = cache[text];
+    if (cacheSuggestions[text]) {
+      suggestionsData = cacheSuggestions[text];
       refreshSuggestions();
       return;
     }
@@ -239,7 +260,7 @@
     // And handle response
     window[callback] = (args) => {
       script.remove();
-      cache[text] = args;
+      cacheSuggestions[text] = args;
       if (now < latest) return; // Already outdated
       latest = now;
       suggestionsData = args;
@@ -258,12 +279,43 @@
     });
   };
 
-  // Kind of duplicate of keydown, but will pressed (repeted) key
   input.addEventListener('keypress', inputChanged);
 
-  // Kind of duplicate of keypress, but will handle backspace
-  input.addEventListener('keydown', inputChanged);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace') inputChanged();
+  });
 
-  // As this will not trigger input.change or such
+  // As paste won't trigger input.change or such
   document.addEventListener('paste', inputChanged);
+
+  // We can choose autocomplete suggestion using arrows
+  let selected = -1;
+  document.addEventListener('keydown', (e) => {
+    let move = 0;
+    if (e.key === 'ArrowUp') move = -1;
+    if (e.key === 'ArrowDown') move = +1;
+    if (!move) return;
+
+    // We can go back to input, so it is selectable
+    const selectables = [
+      input,
+      ...suggestions.querySelectorAll('.search-suggestion'),
+    ];
+
+    selected = suggestions.querySelector('.search-suggestion.active');
+    if (!selected) selected = input;
+    selected.classList.remove('active');
+
+    selected = selectables.indexOf(selected);
+    if (selected === -1) selected = 0;
+
+    const toSelect = selectables[(selectables.length + selected + move) % selectables.length];
+    if (toSelect.classList.contains('search-suggestion')) {
+      toSelect.classList.add('active');
+      input.value = toSelect.textContent;
+    } else {
+      input.value = lastValue;
+    }
+    e.preventDefault();
+  });
 })();

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="never">
     <link rel="stylesheet" href="assets/main.css">
     <link rel="shortcut icon" type="image/png" href="assets/favicon.png" />
     <title>Home</title>
@@ -18,12 +19,16 @@
           <div class="search-label">Type to search&hellip;</div>
           <div class="search-box">
             <div class="search-input-wrapper">
-              <input type="text" class="search-input" placeholder="[esc] to cancel" name="q">
+              <input
+                type="text"
+                class="search-input"
+                placeholder="[esc] to cancel"
+                name="q"
+                autocomplete="off"
+              >
             </div>
             <div class="search-suggestions">
-              <div class="search-suggestion">AA</div>
-              <div class="search-suggestion">BB</div>
-              <div class="search-suggestion">CC</div>
+              <!-- This kind of node will be made in JS: <div class="search-suggestion"></div> -->
             </div>
           </div>
         </form>
