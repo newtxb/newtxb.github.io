@@ -81,8 +81,10 @@
     search.classList.add('active');
   });
 
-  input.addEventListener('blur', () => {
-    search.classList.remove('active');
+  document.addEventListener('click', (e) => {
+    if (!search.contains(e.target)) {
+      search.classList.remove('active');
+    }
   });
 
   let cleanup = null;
@@ -90,6 +92,7 @@
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       input.blur();
+      search.classList.remove('active');
       cleanup = setTimeout(() => {
         // Clear input when it's hidden
         input.value = '';
@@ -133,14 +136,26 @@
     }
 
     // Now let's work
-    const suggestLines = suggestionsData[1].map((suggestion) => {
-      const div = document.createElement('div');
-      div.classList.add('search-suggestion');
+    const suggestionsRows = suggestionsData[1].map((_, ix) => ({
+      text: suggestionsData[1][ix],
+      title: suggestionsData[2][ix],
+      type: suggestionsData[4]['google:suggesttype'][ix],
+    }));
+
+    const suggestLines = suggestionsRows.map((suggestion) => {
+      const a = document.createElement('a');
+      a.classList.add('search-suggestion');
+
+      const isLink = suggestion.type === 'NAVIGATION';
+      const separator = isLink ? '.' : ' ';
+      const suggestLine = isLink
+        ? suggestion.text.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+        : suggestion.text;
 
       // This needs to be re-generated for each suggestion (see REF_INPUT_WORDS)
-      const inputWords = input.value.toLowerCase().split(' ');
-      suggestion.split(' ')
-        .map((suggestWord) => {
+      const inputWords = input.value.toLowerCase().split(isLink ? /[ .]/ : ' ');
+      const nodes = suggestLine.split(separator)
+        .map((suggestWord, ix, all) => {
           const prefix = (first, last) => {
             let index = 0;
             while (index < first.length && first[index] === last[index]) index += 1;
@@ -156,7 +171,7 @@
 
           // Completion = bold font
           const b = document.createElement('b');
-          b.textContent = `${suggestWord.slice(len)} `;
+          b.textContent = `${suggestWord.slice(len)}${ix < all.length - 1 ? separator : ''}`;
 
           if (suggestWord.length === len) {
             // [REF_INPUT_WORDS] Full match! Can't be used for next completions
@@ -166,10 +181,31 @@
           return [span, b];
         })
         .filter(Boolean)
-        .reduce((a, b) => ([...a, ...b]), [])
-        .forEach(node => div.appendChild(node));
+        .reduce((x, y) => ([...x, ...y]), []);
 
-      return div;
+      if (isLink) {
+        a.href = suggestion.text;
+        a.classList.add('suggest-navigation');
+        const img = document.createElement('img');
+        img.classList.add('suggest-icon');
+        const fakeLink = document.createElement('a');
+        fakeLink.setAttribute('href', suggestion.text);
+        img.src = `https://www.google.com/s2/favicons?sz=32&domain=${a.hostname}`;
+        a.appendChild(img);
+      } else {
+        a.href = '#';
+        a.classList.add('suggest-query');
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          input.value = suggestion.text;
+          // Wait for the end of the event, otherwise we will close the search box
+          setTimeout(refreshSuggestions);
+        });
+      }
+
+      nodes.forEach(node => a.appendChild(node));
+
+      return a;
     });
 
     // Clear previous suggestions
