@@ -6,11 +6,13 @@
   // To render the date only once per day
   let currentDate = -1;
 
+  const clock = document.querySelector('.clock');
+
   // Render the clock digits
   const render = (onlySecond = false) => {
     [...(onlySecond ? [] : ['Hours', 'Minutes']), 'Seconds'].forEach((x) => {
       const text = new Date()[`get${x}`]().toString().padStart(2, '0');
-      document.querySelector(`.clock .${x.toLowerCase()}`).textContent = text;
+      clock.querySelector(`.${x.toLowerCase()}`).textContent = text;
     });
     const hours = new Date().getHours();
     let text;
@@ -48,13 +50,37 @@
     setTimeout(renderEverySecond, 1000 - (new Date().getTime() % 1000));
   };
 
-  document.querySelector('.clock').addEventListener('mouseenter', () => {
+  clock.addEventListener('mouseenter', () => {
     renderNextSecond = true;
     renderEverySecond();
   });
 
-  document.querySelector('.clock').addEventListener('mouseleave', () => {
+  clock.addEventListener('mouseleave', () => {
     renderNextSecond = false;
+  });
+
+  // And some milliseconds stuff
+  let shouldRenderMilliseconds = false;
+  let stopRenderingTimeout = null;
+
+  const millis = clock.querySelector('.milliseconds');
+  const renderMilliseconds = () => {
+    if (!shouldRenderMilliseconds) return;
+    window.requestAnimationFrame(renderMilliseconds);
+    millis.textContent = (Date.now() % 1000).toString().padStart(3, '0');
+  };
+
+  clock.querySelector('.show-seconds').addEventListener('mouseenter', () => {
+    clearTimeout(stopRenderingTimeout);
+    if (shouldRenderMilliseconds) return;
+    shouldRenderMilliseconds = true;
+    renderMilliseconds();
+  });
+
+  clock.querySelector('.show-seconds').addEventListener('mouseleave', () => {
+    stopRenderingTimeout = setTimeout(() => {
+      shouldRenderMilliseconds = false;
+    }, 200);
   });
 })();
 
