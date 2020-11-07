@@ -198,29 +198,42 @@
         .reduce((x, y) => ([...x, ...y]), []);
 
       if (isLink) {
+        // This whole thing is about adding favicon right next to the line
         a.href = suggestion.text;
         a.classList.add('suggest-navigation');
         const fakeLink = document.createElement('a');
         fakeLink.setAttribute('href', suggestion.text);
+        // HTTP cache will still take some ms and flicker each time we type a letter
+        // So let's cache some DOM
         if (!cacheIcons[a.hostname]) {
           const img = document.createElement('img');
           img.classList.add('suggest-icon');
           img.src = `https://www.google.com/s2/favicons?sz=32&domain=${a.hostname}`;
+          const cacheIcon = { img, failed: false, clones: [] };
+          cacheIcons[a.hostname] = cacheIcon;
           img.addEventListener('error', () => {
-            img.remove();
-            a.classList.add('fallback-icon');
+            cacheIcon.failed = true;
+            cacheIcon.clones.forEach((clone) => {
+              clone.parentNode.classList.add('fallback-icon');
+              clone.remove();
+            });
           });
-          cacheIcons[a.hostname] = img;
         }
-        a.appendChild(cacheIcons[a.hostname]);
+        const cacheIcon = cacheIcons[a.hostname];
+        if (cacheIcon.failed) {
+          a.classList.add('fallback-icon');
+        } else {
+          const clone = cacheIcon.img.cloneNode();
+          cacheIcon.clones.push(clone);
+          a.appendChild(clone);
+        }
       } else {
         a.href = '#';
         a.classList.add('suggest-query');
         a.addEventListener('click', (e) => {
           e.preventDefault();
           input.value = suggestion.text;
-          // Wait for the end of the event, otherwise we will close the search box
-          setTimeout(refreshSuggestions);
+          input.focus();
         });
       }
 
@@ -284,6 +297,8 @@
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') inputChanged();
   });
+
+  input.addEventListener('focus', inputChanged);
 
   // As paste won't trigger input.change or such
   document.addEventListener('paste', inputChanged);
