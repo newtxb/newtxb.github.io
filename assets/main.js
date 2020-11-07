@@ -87,7 +87,14 @@
     }
   });
 
+  window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    // Loaded from cache, so form is no longer submitted
+    search.classList.remove('submitted');
+  });
+
   form.addEventListener('submit', (e) => {
+    search.classList.add('submitted');
     const link = suggestions.querySelector('a.search-suggestion.active');
     if (link) {
       // Follow selected suggestion
@@ -159,6 +166,9 @@
     const suggestLines = suggestionsRows.map((suggestion) => {
       const a = document.createElement('a');
       a.classList.add('search-suggestion');
+      const div = document.createElement('div');
+      div.classList.add('suggestion-inner');
+      a.appendChild(div);
 
       const isLink = suggestion.type === 'NAVIGATION';
       const separator = isLink ? '.' : ' ';
@@ -237,7 +247,7 @@
         });
       }
 
-      nodes.forEach(node => a.appendChild(node));
+      nodes.forEach(node => div.appendChild(node));
 
       return a;
     });
@@ -292,13 +302,16 @@
     });
   };
 
-  input.addEventListener('keypress', inputChanged);
+  input.addEventListener('keypress', (e) => {
+    // Exclude Enter key, we don't want to change suggestions when submitting
+    if (e.key !== 'Enter') inputChanged();
+  });
 
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') inputChanged();
   });
 
-  input.addEventListener('focus', inputChanged);
+  input.addEventListener('mousedown', inputChanged);
 
   // As paste won't trigger input.change or such
   document.addEventListener('paste', inputChanged);
