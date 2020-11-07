@@ -1,3 +1,7 @@
+/* eslint-disable no-undef, no-restricted-globals */
+// The following come from here:
+// https://googlechrome.github.io/samples/service-worker/basic/
+
 const PRECACHE = 'precache-v1';
 const RUNTIME = 'runtime';
 
@@ -7,8 +11,6 @@ const PRECACHE_URLS = [
   'assets/main.css',
   'assets/main.js',
 ];
-
-/* eslint-disable no-undef, no-restricted-globals */
 
 // The install handler takes care of precaching the resources we always need.
 self.addEventListener('install', (event) => {
