@@ -106,11 +106,11 @@ html {
   font-size: 0.5em;
   word-break: keep-all;
   opacity: 0;
-  transition: all .3s ease-in-out;
+  transition: opacity .3s ease-in-out;
 }
 
 .clock:hover .show-seconds {
-  transition: all .15s ease-in-out;
+  transition: opacity .15s ease-in-out;
   opacity: 0.33;
 }
 
@@ -120,11 +120,11 @@ html {
   font-size: 0.5em;
   bottom: 0.3rem; /* Another magic value */
   opacity: 0;
-  transition: all .3s ease-in-out;
+  transition: opacity .3s ease-in-out;
 }
 
 .show-seconds:hover .show-milliseconds {
-  transition: all .15s ease-in-out;
+  transition: opacity .15s ease-in-out;
   opacity: 1;
 }
 
@@ -154,6 +154,7 @@ html {
   overflow: hidden;
   z-index: 1; /* Above clock */
 
+  background: white;
   border-radius: 17px; /* input height/2, magic value :( */
   box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.33);
   opacity: 0;
@@ -163,8 +164,10 @@ html {
 }
 
 .search .search-input {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  background: white;
+  background: transparent;
   outline: none;
   color: black;
   margin: 0;
@@ -178,6 +181,25 @@ html {
 }
 
 .search .search-input-wrapper::before {
+  content: ' ';
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.1);
+  transform-origin: 0 50%;
+  transform: translate(-100%);
+}
+
+.search.search.submitted-from-input:not(.with-suggestions) .search-input-wrapper::before {
+  transition: transform 5s cubic-bezier(0.1, 1, 0, 1);
+  transform: translate(-32px);
+}
+
+.search .search-input-wrapper::after {
   left: 8px;
   bottom: 0;
   top: 20%;
@@ -188,10 +210,10 @@ html {
   opacity: 0.33;
 }
 
-.search .search-input-wrapper::before, .search .search-suggestion.suggest-query::after {
+.search .search-input-wrapper::after, .search .search-suggestion.suggest-query::after {
   content: ' ';
   position: absolute;
-  display: inline-block;
+  display: block;
   pointer-events: none;
   /* Icon: magnifier */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'></path></svg>");
@@ -222,7 +244,6 @@ html {
   display: none;
   position: relative;
   width: 100%;
-  background: white;
   padding: 8px 0 8px;
 }
 
@@ -230,15 +251,27 @@ html {
   display: block;
 }
 
-.search .search-suggestions::after {
+.search .search-suggestions::before, .search .search-suggestions::after {
   content: ' ';
   position: absolute;
-  display: inline-block;
+  display: block;
   pointer-events: none;
   top: 0;
   left: 32px;
   right: 32px;
-  border-bottom: 1px solid #efefef;
+  height: 1px;
+  background: #efefef;
+}
+
+.search .search-suggestions::after {
+  transform: scaleX(0);
+  background: #cccccc;
+  transform-origin: 0 50%;
+}
+
+.search.submitted-from-input.with-suggestions .search-suggestions::after {
+  transition: transform 5s cubic-bezier(0.1, 1, 0, 1);
+  transform: scaleX(0.95);
 }
 
 .search .search-suggestion {
@@ -246,12 +279,12 @@ html {
   display: block;
   color: #333;
   padding: 6px 4px 6px 32px;
-  background: white;
   transition: background-color .15s;
   text-decoration: none;
 }
 
-.search .search-suggestion:hover, .search .search-suggestion.active {
+.search .search-suggestion:hover,
+.search .search-suggestions:not(:hover) .search-suggestion.active {
   background: #efefef;
   outline: none;
 }
@@ -265,6 +298,7 @@ html {
   content: ' ';
   display: block;
   position: absolute;
+  pointer-events: none;
   top: 0;
   bottom: 0;
   right: 0;
@@ -274,7 +308,7 @@ html {
   transform: translate(-100%);
 }
 
-.search.submitted .search-suggestion.active::before {
+.search.submitted-from-suggestion .search-suggestion.active::before {
   transition: transform 5s cubic-bezier(0.1, 1, 0, 1);
   transform: translate(-32px);
 }
@@ -299,7 +333,7 @@ html {
 .search .search-suggestion.suggest-navigation::after {
   content: ' ';
   position: absolute;
-  display: inline-block;
+  display: block;
   pointer-events: none;
   top: 4px;
   bottom: 4px;

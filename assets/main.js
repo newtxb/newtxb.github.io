@@ -116,17 +116,23 @@
   window.addEventListener('pageshow', (e) => {
     if (!e.persisted) return;
     // Loaded from cache, so form is no longer submitted
-    search.classList.remove('submitted');
+    search.classList.remove('submitted-from-suggestion');
+    search.classList.remove('submitted-from-input');
   });
 
   form.addEventListener('submit', (e) => {
-    search.classList.add('submitted');
     const link = suggestions.querySelector('a.search-suggestion.active');
     if (link) {
       // Follow selected suggestion
       e.preventDefault();
       link.click();
-    } else if (/^https?:\/\/./.test(input.value)) {
+      search.classList.add('submitted-from-suggestion');
+      return;
+    }
+
+    search.classList.add('submitted-from-input');
+
+    if (/^https?:\/\/./.test(input.value)) {
       // Go to link directly
       e.preventDefault();
       window.location = input.value;
@@ -292,13 +298,19 @@
   const cacheSuggestions = {};
   const askSuggestions = (text) => {
     // Too long text = too precise to be suggested
-    if (text.length === 0 || text.length > 32) return;
+    if (text.length === 0 || text.length > 32) {
+      suggestionsData = [];
+      refreshSuggestions();
+      return;
+    }
 
+    // We may have it in cache already
     if (cacheSuggestions[text]) {
       suggestionsData = cacheSuggestions[text];
       refreshSuggestions();
       return;
     }
+
     // Let's call Google
     const script = document.createElement('script');
     const q = encodeURIComponent(text);
@@ -341,6 +353,12 @@
 
   // As paste won't trigger input.change or such
   document.addEventListener('paste', inputChanged);
+
+  window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    // Loaded from cache, so input may be empty now
+    inputChanged();
+  });
 
   // We can choose autocomplete suggestion using arrows
   let selected = -1;
