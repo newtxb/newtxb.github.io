@@ -392,3 +392,36 @@
     e.preventDefault();
   });
 })();
+
+// ---------------------------------------------------------------------------------------------- //
+// WEATHER
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const weather = document.querySelector('.weather');
+  const storageKey = 'weather-forecast';
+
+  let forecast = window.localStorage.getItem(storageKey);
+  if (forecast) {
+    forecast = JSON.parse(forecast);
+    if (forecast.expire < Date.now()) forecast = null;
+    ({ forecast } = forecast);
+  }
+
+  if (!forecast) {
+    // TODO: handle errors
+    forecast = (await (await window.fetch('https://wttr.in/?format=%l|%c|%t')).text())
+      .split('|');
+    window.localStorage.setItem(storageKey, JSON.stringify({
+      forecast,
+      expire: Date.now() + 15 * 60 * 1000,
+    }));
+  }
+
+  weather.textContent = [
+    forecast[1],
+    forecast[2].replace(/(^\+|C$)/g, ''),
+    '–',
+    forecast[0].split(',')[0],
+  ].join(' ');
+})();
