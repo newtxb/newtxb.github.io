@@ -132,10 +132,11 @@
 
     search.classList.add('submitted-from-input');
 
-    if (/^https?:\/\/./.test(input.value)) {
+    const withProtocol = /^https?:\/\/\S+$/.test(input.value);
+    if (withProtocol || /^\S+\..{2,}\/\S*$/.test(input.value)) {
       // Go to link directly
       e.preventDefault();
-      window.location = input.value;
+      window.location = withProtocol ? input.value : `http://${input.value}`;
     }
   });
 
