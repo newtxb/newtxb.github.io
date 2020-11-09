@@ -405,7 +405,7 @@
   if (forecast) {
     forecast = JSON.parse(forecast);
     if (forecast.expire < Date.now()) forecast = null;
-    ({ forecast } = forecast);
+    else ({ forecast } = forecast);
   }
 
   if (!forecast) {
