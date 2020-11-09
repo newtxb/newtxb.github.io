@@ -343,7 +343,7 @@
 
   input.addEventListener('keypress', (e) => {
     // Exclude Enter key, we don't want to change suggestions when submitting
-    if (e.key !== 'Enter') inputChanged();
+    if (e.key !== 'Enter' && !e.metaKey && !e.ctrlKey) inputChanged();
   });
 
   input.addEventListener('keydown', (e) => {
@@ -351,6 +351,8 @@
   });
 
   input.addEventListener('mousedown', inputChanged);
+
+  input.addEventListener('cut', inputChanged);
 
   // As paste won't trigger input.change or such
   document.addEventListener('paste', inputChanged);
@@ -362,6 +364,12 @@
   });
 
   // We can choose autocomplete suggestion using arrows
+  const unactive = () => {
+    const selected = suggestions.querySelector('.search-suggestion.active');
+    if (selected) selected.classList.remove('active');
+    return selected;
+  };
+
   let selected = -1;
   document.addEventListener('keydown', (e) => {
     let move = 0;
@@ -375,10 +383,7 @@
       ...suggestions.querySelectorAll('.search-suggestion'),
     ];
 
-    selected = suggestions.querySelector('.search-suggestion.active');
-    if (!selected) selected = input;
-    selected.classList.remove('active');
-
+    selected = unactive() || input;
     selected = selectables.indexOf(selected);
     if (selected === -1) selected = 0;
 
@@ -390,6 +395,16 @@
       input.value = lastValue;
     }
     e.preventDefault();
+  });
+
+  suggestions.addEventListener('mouseout', unactive);
+
+  suggestions.addEventListener('mouseover', (e) => {
+    const toSelect = [...suggestions.querySelectorAll('.search-suggestion')]
+      .find(s => s.contains(e.target));
+    if (!toSelect) return;
+    unactive();
+    toSelect.classList.add('active');
   });
 })();
 

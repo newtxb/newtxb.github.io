@@ -283,8 +283,7 @@ html {
   text-decoration: none;
 }
 
-.search .search-suggestion:hover,
-.search .search-suggestions:not(:hover) .search-suggestion.active {
+.search .search-suggestion.active {
   background: #efefef;
   outline: none;
 }
