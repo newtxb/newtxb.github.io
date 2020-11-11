@@ -1,0 +1,6 @@
+---
+note: This is used to get some information from the source repository, such as the version.
+---
+{
+    "version": "{{ site.github.build_revision }}"
+}
