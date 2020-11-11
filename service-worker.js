@@ -1,9 +1,6 @@
 /* eslint-disable no-undef, no-restricted-globals */
-// The following come from here:
-// https://googlechrome.github.io/samples/service-worker/basic/
 
 const PRECACHE = 'precache-v1';
-const RUNTIME = 'runtime';
 
 const PRECACHE_URLS = [
   'index.html',
@@ -11,6 +8,17 @@ const PRECACHE_URLS = [
   'assets/main.css',
   'assets/main.js',
 ];
+
+self.addEventListener('message', async (event) => {
+  if (event.data && event.data.action === 'CLEAR_CACHE') {
+    await (await caches.open(PRECACHE)).addAll(PRECACHE_URLS);
+    (await self.clients.matchAll())
+      .forEach(client => client.postMessage({ action: 'CACHE_CLEARED' }));
+  }
+});
+
+// The following come from here (but I removed runtime cache):
+// https://googlechrome.github.io/samples/service-worker/basic/
 
 // The install handler takes care of precaching the resources we always need.
 self.addEventListener('install', (event) => {
@@ -23,7 +31,7 @@ self.addEventListener('install', (event) => {
 
 // The activate handler takes care of cleaning up old caches.
 self.addEventListener('activate', (event) => {
-  const currentCaches = [PRECACHE, RUNTIME];
+  const currentCaches = [PRECACHE];
   event.waitUntil(
     caches.keys()
       .then(cacheNames => cacheNames.filter(cacheName => !currentCaches.includes(cacheName)))
@@ -41,16 +49,7 @@ self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests, like those for Google Analytics.
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return caches.open(RUNTIME).then(cache => fetch(event.request).then(response => (
-          // Put a copy of the response in the runtime cache.
-          cache.put(event.request, response.clone()).then(() => (response))
-        )));
-      }),
+      caches.match(event.request).then(cachedResponse => cachedResponse || fetch(event.request)),
     );
   }
 });

@@ -1,4 +1,42 @@
 // ---------------------------------------------------------------------------------------------- //
+// UPDATER
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const VERSION_KEY = 'current-version';
+  const PRECACHE = 'precache-v1';
+
+  let github;
+  try {
+    // TODO: check every 30m
+    github = await (await window.fetch('github.json')).json();
+  } catch (e) {
+    console.warn('Failed to check for update', e);
+    return;
+  }
+
+  // We are up to date!
+  if (github.version === window.localStorage.getItem(VERSION_KEY)) return;
+
+  // We're not... delete the old
+  await window.caches.delete(PRECACHE);
+  window.localStorage.setItem(VERSION_KEY, github.version);
+
+  const sw = window.navigator.serviceWorker;
+  if (!sw || !sw.controller) return;
+
+  sw.addEventListener('message', (event) => {
+    if (event.data && event.data.action === 'CACHE_CLEARED') {
+      document.querySelector('.quote').style.display = 'none';
+      document.querySelector('.update').style.display = '';
+    }
+  });
+
+  // And update!
+  sw.controller.postMessage({ action: 'CLEAR_CACHE' });
+})();
+
+// ---------------------------------------------------------------------------------------------- //
 // BACKGROUND
 // ---------------------------------------------------------------------------------------------- //
 

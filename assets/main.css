@@ -400,22 +400,26 @@ html {
   white-space: nowrap;
 }
 
-.quote .text::before, .quote .text::after, .quote .author::after {
+.quote .text {
+  position: relative;
+}
+
+.quote .text::before, .quote .text::after {
+  position: absolute;
   font-family: "Times New Roman", Times, serif;
   font-size: 1.33em;
   opacity: 0.67;
+  top: -2px;
 }
 
 .quote .text::before {
   content: '“';
+  right: 100%;
 }
 
-.quote .text::after, .quote .author::after {
+.quote .text::after {
   content: '”';
-}
-
-.quote .author::after {
-  visibility: hidden;
+  left: 100%;
 }
 
 .quote .author::before {
