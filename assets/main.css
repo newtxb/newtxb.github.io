@@ -76,6 +76,14 @@ html {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.section-center {
+  text-align: center;
+}
+
+.section-bar {
+  padding: 25px;
+}
+
 .columns {
   display: flex;
   flex-direction: column;
@@ -84,8 +92,20 @@ html {
 
 .rows {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+}
+
+.rows > div {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.rows > div:first-child > div { margin-right: auto; }
+
+.rows > div:last-child  > div { margin-left: auto; }
+
+.section-bottom .rows > div {
+  align-self: flex-end;
 }
 
 .nolink {
@@ -98,9 +118,7 @@ html {
   text-decoration: underline;
 }
 
-.section-center {
-  text-align: center;
-}
+/* clock */
 
 .clock {
   display: inline-block;
@@ -145,9 +163,7 @@ html {
   font-size: 1.75em;
 }
 
-.section-bar {
-  padding: 25px;
-}
+/* search stuff o-o */
 
 .search {
   position: relative;
