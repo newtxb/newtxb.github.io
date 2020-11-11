@@ -52,14 +52,25 @@ html {
 
 /* my app :) */
 
-.app {
+.app, .background, .background .bg {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at center -60px, #467fa5, #06273d);
+}
 
+.background {
+  background: radial-gradient(ellipse at center -60px, #467fa5, #06273d);
+}
+
+.background .bg {
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: linear;
+}
+
+.app {
   color: #efefef;
   font-weight: 300;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;

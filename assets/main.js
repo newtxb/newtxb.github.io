@@ -1,4 +1,54 @@
 // ---------------------------------------------------------------------------------------------- //
+// BACKGROUND
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const PERIOD = 88500;
+  const CYCLE = 60000;
+
+  const background = document.querySelector('.background');
+
+  const gradient = hue => `radial-gradient(ellipse at center -60px, ${[
+    `hsl(${hue}, 35%, 50%)`, `hsl(${hue}, 80%, 20%)`,
+  ].join(', ')})`;
+
+  let opaqueLayer = null;
+
+  (function render() {
+    const from = Date.now() - (Date.now() % CYCLE);
+    const to = from + CYCLE;
+    const progress = (Date.now() % CYCLE) / CYCLE;
+
+    const fromColor = ((from % PERIOD) * 360 / PERIOD).toFixed();
+    const toColor = ((to % PERIOD) * 360 / PERIOD).toFixed();
+
+    if (!opaqueLayer) {
+      opaqueLayer = document.createElement('div');
+      opaqueLayer.classList.add('bg');
+      opaqueLayer.style.opacity = 1;
+      opaqueLayer.style.background = gradient(fromColor);
+      background.appendChild(opaqueLayer);
+    }
+
+    const bg = document.createElement('div');
+    bg.classList.add('bg');
+    bg.style.opacity = progress;
+    bg.style.background = gradient(toColor);
+    background.appendChild(bg);
+
+    setTimeout(() => {
+      bg.style.opacity = 1;
+      bg.style.transitionDuration = `${to - Date.now()}ms`;
+      bg.addEventListener('transitionend', () => {
+        render();
+        opaqueLayer.remove();
+        opaqueLayer = bg;
+      });
+    });
+  }());
+})();
+
+// ---------------------------------------------------------------------------------------------- //
 // CLOCK & DATE
 // ---------------------------------------------------------------------------------------------- //
 
