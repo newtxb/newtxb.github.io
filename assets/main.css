@@ -305,7 +305,7 @@ html {
   position: relative;
   display: block;
   color: #333;
-  padding: 6px 4px 6px 32px;
+  padding: 0 6px 0 32px;
   transition: background-color .15s;
   text-decoration: none;
 }
@@ -318,6 +318,13 @@ html {
 .search .search-suggestion .suggestion-inner {
   position: relative;
   z-index: 1;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  direction: rtl;
+  text-align: left;
+  padding: 6px 0;
 }
 
 .search .search-suggestion.active::before {
