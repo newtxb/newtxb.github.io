@@ -27,8 +27,7 @@
 
   sw.addEventListener('message', (event) => {
     if (event.data && event.data.action === 'CACHE_CLEARED') {
-      document.querySelector('.quote').style.display = 'none';
-      document.querySelector('.update').style.display = '';
+      document.querySelector('.update').classList.add('active');
     }
   });
 

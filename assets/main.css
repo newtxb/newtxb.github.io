@@ -391,6 +391,53 @@ html {
   opacity: 0.33;
 }
 
+/* update */
+
+.notification {
+  position: absolute;
+  display: block;
+  z-index: 2; /* Above search */
+  top: 10px;
+  right: 0; /* in transform */
+  min-width: 350px;
+  max-width: 100%;
+  background: rgba(50, 50, 50, 0.65);
+  border: 1px solid rgba(200, 200, 200, 0.25);
+  padding: 15px;
+  border-radius: 8px;
+  color: #efefef;
+  font-size: 0.85em;
+  text-decoration: none;
+
+  transition: all .5s ease-out;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  opacity: 0.3;
+
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.notification.active {
+  opacity: 0.9;
+  transform: translateX(-10px);
+}
+
+.notification:hover {
+  opacity: 1;
+  box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transition-duration: .15s;
+}
+
+.notification .title {
+  font-weight: 500;
+  margin-bottom: 0.5em;
+}
+
+.notification .content {
+  font-size: 0.9em;
+}
+
 /* section bottom */
 
 .quote {
