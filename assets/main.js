@@ -490,3 +490,38 @@
     forecast[0].split(',')[0],
   ].join(' ');
 })();
+
+// ---------------------------------------------------------------------------------------------- //
+// QUOTE
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const quote = document.querySelector('.quote');
+  const storageKey = 'quote-of-the-day';
+
+  let qotd = window.localStorage.getItem(storageKey);
+  if (qotd) {
+    qotd = JSON.parse(qotd);
+    if (qotd.expire < Date.now()) qotd = null;
+    else ({ qotd } = qotd);
+  }
+
+  if (!qotd) {
+    // TODO: handle errors
+    qotd = (await (
+      await window.fetch('https://raw.githubusercontent.com/dwyl/quotes/master/quotes.json')
+    ).json());
+    qotd = qotd.filter(({ text, author }) => author && text.length < 80);
+    qotd = qotd[Math.floor(qotd.length * Math.random())];
+    window.localStorage.setItem(storageKey, JSON.stringify({
+      qotd,
+      expire: Date.now() + 12 * 3600 * 1000,
+    }));
+  }
+
+  quote.textContent = [
+    `“${qotd.text}”`,
+    '—',
+    qotd.author,
+  ].join(' ');
+})();
