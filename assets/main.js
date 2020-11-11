@@ -497,6 +497,8 @@
 
 (async () => {
   const quote = document.querySelector('.quote');
+  const quoteText = quote.querySelector('.text');
+  const quoteAuthor = quote.querySelector('.author');
   const storageKey = 'quote-of-the-day';
 
   let qotd = window.localStorage.getItem(storageKey);
@@ -511,7 +513,7 @@
     qotd = (await (
       await window.fetch('https://raw.githubusercontent.com/dwyl/quotes/master/quotes.json')
     ).json());
-    qotd = qotd.filter(({ text, author }) => author && text.length < 80);
+    qotd = qotd.filter(({ text, author }) => author && text.length < 90);
     qotd = qotd[Math.floor(qotd.length * Math.random())];
     window.localStorage.setItem(storageKey, JSON.stringify({
       qotd,
@@ -519,9 +521,6 @@
     }));
   }
 
-  quote.textContent = [
-    `“${qotd.text}”`,
-    '—',
-    qotd.author,
-  ].join(' ');
+  quoteText.textContent = `${qotd.text.replace(/\.$/, '')}.`;
+  quoteAuthor.textContent = qotd.author;
 })();

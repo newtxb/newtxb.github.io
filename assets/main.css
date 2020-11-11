@@ -385,3 +385,57 @@ html {
 .search .search-suggestion.suggest-query::after {
   opacity: 0.33;
 }
+
+/* section bottom */
+
+.quote {
+  position: relative;
+  text-align: center;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+.quote .text::before, .quote .text::after, .quote .author::after {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.33em;
+  opacity: 0.67;
+}
+
+.quote .text::before {
+  content: '“';
+}
+
+.quote .text::after, .quote .author::after {
+  content: '”';
+}
+
+.quote .author::after {
+  visibility: hidden;
+}
+
+.quote .author::before {
+  content: '— ';
+  font-weight: initial;
+}
+
+.quote .author {
+  position: absolute;
+  right: 20px; /* Same as .quote padding */
+  bottom: 0;
+  opacity: 0;
+  font-weight: 600;
+  transform: translateY(0.2em);
+}
+
+.quote .text, .quote .author {
+  transition: transform .2s ease-in-out, opacity .2s ease-in-out;
+}
+
+.quote:hover .text {
+  transform: translateY(-0.6em);
+}
+
+.quote:hover .author {
+  transform: translateY(0.6em);
+  opacity: 0.67;
+}
