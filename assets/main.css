@@ -76,6 +76,11 @@ html {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.section-top {
+  display: flex;
+  justify-content: space-around;
+}
+
 .section-center {
   text-align: center;
 }
