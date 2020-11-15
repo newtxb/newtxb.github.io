@@ -86,6 +86,43 @@
 })();
 
 // ---------------------------------------------------------------------------------------------- //
+// PARTICLES
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const particles = document.querySelector('.particles');
+  const WEIGHT = [2, 12];
+  const OPACITY = [0.01, 0.4];
+
+  setInterval(() => {
+    const weight = WEIGHT[0] + Math.random() * (WEIGHT[1] - WEIGHT[0]);
+
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const position = Math.random > 0.75 ? Math.random() : Math.random() * 0.8 + 0.1;
+    particle.style.left = `${(position * 100).toFixed(2)}%`;
+
+    particle.style.width = `${weight}px`;
+    particle.style.height = `${weight}px`;
+    particle.style.transitionDuration = `${(10 + weight * 10).toFixed(2)}s`;
+    particle.style.opacity = (
+      OPACITY[0]
+      + (WEIGHT[1] - weight) / WEIGHT[1] * (OPACITY[1] - OPACITY[0])
+    ).toFixed(2);
+
+    particle.addEventListener('transitionend', () => {
+      particle.remove();
+    });
+
+    setTimeout(() => {
+      particle.style.transform = `translateY(${-WEIGHT[1]}px)`;
+    });
+
+    particles.appendChild(particle);
+  }, 5000);
+})();
+
+// ---------------------------------------------------------------------------------------------- //
 // CLOCK & DATE
 // ---------------------------------------------------------------------------------------------- //
 

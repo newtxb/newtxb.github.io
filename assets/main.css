@@ -52,7 +52,7 @@ html {
 
 /* my app :) */
 
-.app, .background, .background .bg {
+.app, .background, .background .bg, .particles {
   position: absolute;
   top: 0;
   left: 0;
@@ -121,6 +121,17 @@ html {
 .nolink:hover, .nolink:active, .nolink:visited {
   color: inherit;
   text-decoration: underline;
+}
+
+/* particles */
+
+.particles .particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transition: transform 10s linear;
+  transform: translateY(100vh);
 }
 
 /* clock */
