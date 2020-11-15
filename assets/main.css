@@ -403,6 +403,10 @@ html {
 
 /* update */
 
+.notifications {
+  position: absolute;
+}
+
 .notification {
   position: fixed;
   display: block;
