@@ -242,13 +242,22 @@ html {
   opacity: 0.33;
 }
 
-.search .search-input-wrapper::after, .search .search-suggestion.suggest-query::after {
+.search .search-input-wrapper:not(.has-icon)::after,
+.search .search-input-wrapper.fallback-icon::after,
+.search .search-suggestion.suggest-query::after {
   content: ' ';
   position: absolute;
   display: block;
   pointer-events: none;
   /* Icon: magnifier */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'></path></svg>");
+}
+
+.search .search-input-wrapper .suggest-icon {
+  position: absolute;
+  top: 20%;
+  left: 8px;
+  height: 60%;
 }
 
 .search.active.with-suggestions .search-input {
@@ -361,7 +370,7 @@ html {
   pointer-events: none;
   top: 0;
   bottom: 0;
-  left: 5px;
+  left: 4px;
   height: 100%;
   width: auto;
   padding: 6px;
@@ -375,13 +384,14 @@ html {
   pointer-events: none;
   top: 4px;
   bottom: 4px;
-  left: 10px;
+  left: 9px;
   width: 100%;
   background-repeat: no-repeat;
   background-position: 0 50%;
 }
 
-.search .search-suggestion.suggest-navigation.fallback-icon::after {
+.search .search-suggestion.suggest-navigation.fallback-icon::after,
+.search .search-input-wrapper.fallback-icon::after {
   background-position-x: 1px;
   /* Icon: globe */
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABs0lEQVR4AWL4//8/RRjO8Iucx+noO0O2qmlbUEnt5r3Juas+hsQD6KaG7dqCKPgx72Pe9GIY27btZBrbtm3btm0nO12D7tVXe63jqtqqU/iDw9K58sEruKkngH0DBljOE+T/qqx/Ln718RZOFasxyd3XRbWzlFMxRbgOTx9QWFzHtZlD+aqLb108sOAIAai6+NbHW7lUHaZkDFJt+wp1DG7R1d0b7Z88EOL08oXwjokcOvvUxYMjBFCamWP5KjKBjKOpZx2HEPj+Ieod26U+dpg6lK2CIwTQH0oECGT5eHj+IgSueJ5fPaPg6PZrz6DGHiGAISE7QPrIvIKVrSvCe2DNHSsehIDatOBna/+OEOgTQE6WAy1AAFiVcf6PhgCGxEvlA9QngLlAQCkLsNWhBZIDz/zg4ggmjHfYxoPGEMPZECW+zjwmFk6Ih194y7VHYGOPvEYlTAJlQwI4MEhgTOzZGiNalRpGgsOYFw5lEfTKybgfBtmuTNdI3MrOTAQmYf/DNcAwDeycVjROgZFt18gMso6V5Z8JpcEk2LPKpOAH0/4bKMCAYnuqm7cHOGHJTBRhAEJN9d/t5zCxAAAAAElFTkSuQmCC");
@@ -394,7 +404,7 @@ html {
 /* update */
 
 .notification {
-  position: absolute;
+  position: fixed;
   display: block;
   z-index: 2; /* Above search */
   top: 10px;

@@ -181,6 +181,9 @@
   const form = search.querySelector('.search-form');
   const suggestions = search.querySelector('.search-suggestions');
 
+  const URL_WITH_PROTOCOL = /^https?:\/\/\S+$/;
+  const LOOKS_LIKE_URL = /^\S+\.\S{2,}\/\S*$/;
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Meta') form.target = '_blank';
     if (e.key === 'Enter') form.submit();
@@ -219,11 +222,10 @@
 
     search.classList.add('submitted-from-input');
 
-    const withProtocol = /^https?:\/\/\S+$/.test(input.value);
-    if (withProtocol || /^\S+\..{2,}\/\S*$/.test(input.value)) {
+    if ([URL_WITH_PROTOCOL, LOOKS_LIKE_URL].some(re => re.test(input.value))) {
       // Go to link directly
       e.preventDefault();
-      window.location = withProtocol ? input.value : `http://${input.value}`;
+      window.location = URL_WITH_PROTOCOL.test(input.value) ? input.value : `http://${input.value}`;
     }
   });
 
@@ -262,9 +264,44 @@
   });
 
   // Autocomplete
+  const cacheIcons = {};
+  const addFavicon = (container, url) => {
+    // This whole thing is about adding favicon right next to the line
+    const a = document.createElement('a');
+    a.href = url;
+    const { hostname } = a;
+    if (!hostname) {
+      container.classList.add('fallback-icon');
+      return;
+    }
+    // HTTP cache will still take some ms and flicker each time we type a letter
+    // So let's cache some DOM
+    if (!cacheIcons[hostname]) {
+      const img = document.createElement('img');
+      img.classList.add('suggest-icon');
+      img.src = `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
+      const cacheIcon = { img, failed: false, clones: [] };
+      cacheIcons[hostname] = cacheIcon;
+      img.addEventListener('error', () => {
+        cacheIcon.failed = true;
+        cacheIcon.clones.forEach((clone) => {
+          clone.parentNode.classList.add('fallback-icon');
+          clone.remove();
+        });
+      });
+    }
+    const cacheIcon = cacheIcons[hostname];
+    if (cacheIcon.failed) {
+      container.classList.add('fallback-icon');
+    } else {
+      const clone = cacheIcon.img.cloneNode();
+      cacheIcon.clones.push(clone);
+      container.appendChild(clone);
+    }
+  };
+
   let suggestionsData = [];
   let latestDataRendered = [null, null];
-  const cacheIcons = {};
   const refreshSuggestions = () => {
     // No change, no render
     if (input.value === latestDataRendered[0] && suggestionsData === latestDataRendered[1]) return;
@@ -328,35 +365,9 @@
         .reduce((x, y) => ([...x, ...y]), []);
 
       if (isLink) {
-        // This whole thing is about adding favicon right next to the line
         a.href = suggestion.text;
         a.classList.add('suggest-navigation');
-        const fakeLink = document.createElement('a');
-        fakeLink.setAttribute('href', suggestion.text);
-        // HTTP cache will still take some ms and flicker each time we type a letter
-        // So let's cache some DOM
-        if (!cacheIcons[a.hostname]) {
-          const img = document.createElement('img');
-          img.classList.add('suggest-icon');
-          img.src = `https://www.google.com/s2/favicons?sz=32&domain=${a.hostname}`;
-          const cacheIcon = { img, failed: false, clones: [] };
-          cacheIcons[a.hostname] = cacheIcon;
-          img.addEventListener('error', () => {
-            cacheIcon.failed = true;
-            cacheIcon.clones.forEach((clone) => {
-              clone.parentNode.classList.add('fallback-icon');
-              clone.remove();
-            });
-          });
-        }
-        const cacheIcon = cacheIcons[a.hostname];
-        if (cacheIcon.failed) {
-          a.classList.add('fallback-icon');
-        } else {
-          const clone = cacheIcon.img.cloneNode();
-          cacheIcon.clones.push(clone);
-          a.appendChild(clone);
-        }
+        addFavicon(a, a.href);
       } else {
         a.href = '#';
         a.classList.add('suggest-query');
@@ -417,6 +428,19 @@
     };
   };
 
+  const updateSearchIcon = (value) => {
+    const isLink = [URL_WITH_PROTOCOL, LOOKS_LIKE_URL].some(re => re.test(value));
+
+    const wrapper = document.querySelector('.search-input-wrapper');
+    wrapper.classList.toggle('has-icon', isLink);
+    wrapper.classList.remove('fallback-icon');
+    [...wrapper.querySelectorAll('.suggest-icon')].forEach(x => x.remove());
+
+    if (isLink) {
+      addFavicon(wrapper, URL_WITH_PROTOCOL.test(value) ? value : `http://${value}`);
+    }
+  };
+
   let lastValue = '';
   const inputChanged = () => {
     setTimeout(() => {
@@ -425,6 +449,8 @@
       askSuggestions(lastValue.toLowerCase());
       // Immediate feedback
       refreshSuggestions();
+      // Show whether we gonna search or open that link
+      updateSearchIcon(lastValue);
     });
   };
 
@@ -482,6 +508,10 @@
       input.value = lastValue;
     }
     e.preventDefault();
+
+    updateSearchIcon(toSelect.classList.contains('suggest-navigation')
+      ? toSelect.href
+      : input.value);
   });
 
   suggestions.addEventListener('mouseout', unactive);
