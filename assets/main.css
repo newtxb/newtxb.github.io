@@ -68,6 +68,7 @@ html {
   opacity: 0;
   transition-property: opacity;
   transition-timing-function: linear;
+  transform: translateZ(0);
 }
 
 .app {
@@ -131,7 +132,7 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   transition: transform 10s linear;
-  transform: translateY(100vh);
+  transform: translateY(100vh) translateZ(0);
 }
 
 /* clock */

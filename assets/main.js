@@ -94,7 +94,13 @@
   const WEIGHT = [2, 12];
   const OPACITY = [0.01, 0.4];
 
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) particles.innerHTML = '';
+  });
+
   setInterval(() => {
+    if (document.hidden) return;
+
     const weight = WEIGHT[0] + Math.random() * (WEIGHT[1] - WEIGHT[0]);
 
     const particle = document.createElement('div');
@@ -102,8 +108,9 @@
     const position = Math.random > 0.75 ? Math.random() : Math.random() * 0.8 + 0.1;
     particle.style.left = `${(position * 100).toFixed(2)}%`;
 
-    particle.style.width = `${weight}px`;
-    particle.style.height = `${weight}px`;
+    const size = `${Math.round(weight)}px`;
+    particle.style.width = size;
+    particle.style.height = size;
     particle.style.transitionDuration = `${(10 + weight * 10).toFixed(2)}s`;
     particle.style.opacity = (
       OPACITY[0]
@@ -115,8 +122,8 @@
     });
 
     setTimeout(() => {
-      particle.style.transform = `translateY(${-WEIGHT[1]}px)`;
-    });
+      particle.style.transform = `translateY(${-WEIGHT[1]}px) translateZ(0)`;
+    }, 50);
 
     particles.appendChild(particle);
   }, 5000);
@@ -126,7 +133,7 @@
 // CLOCK & DATE
 // ---------------------------------------------------------------------------------------------- //
 
-(() => {
+(async () => {
   // To render the date only once per day
   let currentDate = -1;
 
@@ -212,7 +219,7 @@
 // SEARCH
 // ---------------------------------------------------------------------------------------------- //
 
-(() => {
+(async () => {
   const search = document.querySelector('.search');
   const input = search.querySelector('.search-input');
   const form = search.querySelector('.search-form');
