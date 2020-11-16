@@ -7,20 +7,19 @@ const PRECACHE_URLS = [
   './',
   'assets/main.css',
   'assets/main.js',
-];
+].map(url => new Request(url, { cache: 'no-cache' }));
 
+// Clear everything we have, cache again, and we are ready!
 self.addEventListener('message', async (event) => {
   if (event.data && event.data.action === 'CLEAR_CACHE') {
-    await (await caches.open(PRECACHE)).addAll(PRECACHE_URLS);
-    (await self.clients.matchAll())
-      .forEach(client => client.postMessage({ action: 'CACHE_CLEARED' }));
+    const precache = await caches.open(PRECACHE);
+    await precache.addAll(PRECACHE_URLS);
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => client.postMessage({ action: 'CACHE_CLEARED' }));
   }
 });
 
-// The following come from here (but I removed runtime cache):
-// https://googlechrome.github.io/samples/service-worker/basic/
-
-// The install handler takes care of precaching the resources we always need.
+// The install handler takes care of precaching the resources we always need
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(PRECACHE)
@@ -29,7 +28,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// The activate handler takes care of cleaning up old caches.
+// The activate handler takes care of cleaning up old caches if any
 self.addEventListener('activate', (event) => {
   const currentCaches = [PRECACHE];
   event.waitUntil(
@@ -42,11 +41,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// The fetch handler serves responses for same-origin resources from a cache.
-// If no response is found, it populates the runtime cache with the response
-// from the network before returning it to the page.
+// Serve from cache if we have it, otherwise go live
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin requests, like those for Google Analytics.
+  // Skip cross-origin requests, like those for Google Analytics
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
       caches.match(event.request).then(cachedResponse => cachedResponse || fetch(event.request)),

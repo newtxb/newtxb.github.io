@@ -8,8 +8,9 @@
 
   let github;
   try {
-    // TODO: check every 30m
-    github = await (await window.fetch('github.json')).json();
+    // TODO: cache and check every 30m
+    const req = await window.fetch('github.json', { cache: 'no-cache' });
+    github = await req.json();
   } catch (e) {
     console.warn('Failed to check for update', e);
     return;
