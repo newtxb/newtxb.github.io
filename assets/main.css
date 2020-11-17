@@ -485,12 +485,12 @@ html {
   top: -2px;
 }
 
-.quote .text::before {
+.quote .text:not(:empty)::before {
   content: '“';
   right: 100%;
 }
 
-.quote .text::after {
+.quote .text:not(:empty)::after {
   content: '”';
   left: 100%;
 }

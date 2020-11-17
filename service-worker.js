@@ -7,6 +7,7 @@ const PRECACHE_URLS = [
   './',
   'assets/main.css',
   'assets/main.js',
+  'assets/favicon.png',
 ].map(url => new Request(url, { cache: 'no-cache' }));
 
 // Clear everything we have, cache again, and we are ready!

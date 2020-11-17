@@ -78,6 +78,7 @@
       bg.style.opacity = 1;
       bg.style.transitionDuration = `${to - Date.now()}ms`;
       bg.addEventListener('transitionend', () => {
+      // FIXME: sometimes this event seems to be never fired
         render();
         opaqueLayer.remove();
         opaqueLayer = bg;
@@ -324,7 +325,7 @@
     if (!cacheIcons[hostname]) {
       const img = document.createElement('img');
       img.classList.add('suggest-icon');
-      img.src = `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
+      img.src = `https://www.google.com/s2/favicons?sz=64&domain=${hostname}`;
       const cacheIcon = { img, failed: false, clones: [] };
       cacheIcons[hostname] = cacheIcon;
       img.addEventListener('error', () => {
