@@ -634,6 +634,6 @@
     }));
   }
 
-  quoteText.textContent = `${qotd.text.replace(/\.$/, '')}.`;
+  quoteText.textContent = /\w$/.test(qotd.text) ? `${qotd.text}.` : qotd.text;
   quoteAuthor.textContent = qotd.author;
 })();
