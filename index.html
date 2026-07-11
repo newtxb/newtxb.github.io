@@ -13,6 +13,34 @@
     <!-- JS will make stuff like <div class="bg"></div> -->
   </div>
   <div class="particles"></div>
+  <button class="settings-trigger" type="button" aria-label="Open settings" title="Settings">⚙</button>
+  <div class="settings-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="settings-title">
+    <div class="settings-backdrop" data-close-settings></div>
+    <div class="settings-panel" role="document">
+      <div class="settings-header">
+        <h2 id="settings-title">Settings</h2>
+        <button class="settings-close" type="button" aria-label="Close settings" data-close-settings>×</button>
+      </div>
+      <div class="settings-content">
+        <label class="settings-toggle">
+          <input type="checkbox" name="showDate" checked>
+          <span>Show date</span>
+        </label>
+        <label class="settings-toggle">
+          <input type="checkbox" name="showQuote" checked>
+          <span>Show quote</span>
+        </label>
+        <label class="settings-toggle">
+          <input type="checkbox" name="showWeather" checked>
+          <span>Show weather</span>
+        </label>
+        <label class="settings-location">
+          <span>Weather location override</span>
+          <input type="text" name="weatherLocation" placeholder="Leave empty for auto location" autocomplete="off">
+        </label>
+      </div>
+    </div>
+  </div>
   <div class="app columns">
     <!-- Notifications -->
     <div class="notifications">
