@@ -226,13 +226,37 @@
   const input = search.querySelector('.search-input');
   const form = search.querySelector('.search-form');
   const suggestions = search.querySelector('.search-suggestions');
+  const providerHint = search.querySelector('.search-provider-hint');
+  const providerHintText = search.querySelector('.search-provider-text');
+  const chatgptButton = search.querySelector('.search-chatgpt-button');
+
+  const GOOGLE_HINT = 'search with Google';
+  const CHATGPT_HINT = 'ask ChatGPT';
 
   const URL_WITH_PROTOCOL = /^https?:\/\/\S+$/;
   const LOOKS_LIKE_URL = /^\S+\.\S{2,}\/\S*$/;
 
+  const updateProviderHint = () => {
+    providerHintText.textContent = document.activeElement === chatgptButton
+      ? CHATGPT_HINT
+      : GOOGLE_HINT;
+  };
+
+  const askChatGPT = () => {
+    const query = encodeURIComponent(input.value.trim());
+    window.location = `https://chatgpt.com/?q=${query}`;
+  };
+
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Meta') form.target = '_blank';
-    if (e.key === 'Enter') form.submit();
+    if (e.key === 'Enter') {
+      if (document.activeElement === chatgptButton) {
+        e.preventDefault();
+        askChatGPT();
+        return;
+      }
+      form.submit();
+    }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -241,11 +265,33 @@
 
   input.addEventListener('focus', () => {
     search.classList.add('active');
+    updateProviderHint();
+  });
+
+  chatgptButton.addEventListener('focus', () => {
+    search.classList.add('active');
+    updateProviderHint();
+  });
+
+  chatgptButton.addEventListener('blur', () => {
+    setTimeout(updateProviderHint);
+  });
+
+  chatgptButton.addEventListener('click', () => {
+    askChatGPT();
+  });
+
+  chatgptButton.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab' && !e.shiftKey) {
+      e.preventDefault();
+      input.focus();
+    }
   });
 
   document.addEventListener('click', (e) => {
     if (!search.contains(e.target)) {
       search.classList.remove('active');
+      updateProviderHint();
     }
   });
 
@@ -569,6 +615,8 @@
     unactive();
     toSelect.classList.add('active');
   });
+
+  updateProviderHint();
 })();
 
 // ---------------------------------------------------------------------------------------------- //
