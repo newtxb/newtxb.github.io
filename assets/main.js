@@ -293,6 +293,13 @@ const UnsplashBg = {
     if (storedColor) ThemeColor.set(storedColor);
   },
 
+  notifySwCacheImage(url) {
+    if (!url) return;
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ action: 'CACHE_UNSPLASH_IMAGE', url });
+    }
+  },
+
   setCurrentInfo(info) {
     this.currentInfo = info;
     document.dispatchEvent(new CustomEvent('unsplash:imageInfoChanged', {
@@ -417,6 +424,7 @@ const UnsplashBg = {
         ThemeColor.set(imageData.themeColor);
         this.setStoredThemeColor(imageData.themeColor);
       }
+      this.notifySwCacheImage(imageData.url);
       const themeColor = await this.preloadAndDisplay(imageData.url);
       if (themeColor && themeColor !== imageData.themeColor) {
         imageData.themeColor = themeColor;
@@ -432,6 +440,7 @@ const UnsplashBg = {
     // Use the full photo URL
     const imageUrl = image.urls.full;
     const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
+    this.notifySwCacheImage(imageUrl);
     const themeColor = await this.preloadAndDisplay(imageUrl);
 
     // Cache it
