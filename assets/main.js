@@ -11,6 +11,134 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function clampByte(value) {
+  return Math.max(0, Math.min(255, Math.round(value)));
+}
+
+function rgbToHex(r, g, b) {
+  return `#${[r, g, b]
+    .map(channel => clampByte(channel).toString(16).padStart(2, '0'))
+    .join('')}`;
+}
+
+function hexToRgb(hex) {
+  const normalized = hex.replace(/^#/, '').trim();
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+
+  return {
+    r: parseInt(normalized.slice(0, 2), 16),
+    g: parseInt(normalized.slice(2, 4), 16),
+    b: parseInt(normalized.slice(4, 6), 16),
+  };
+}
+
+function rgbLuma(r, g, b) {
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function lowerColorToMaxLuma(hexColor, maxLuma = 100) {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) return hexColor;
+
+  const currentLuma = rgbLuma(rgb.r, rgb.g, rgb.b);
+  if (currentLuma <= maxLuma) return hexColor;
+
+  const mix = 1 - (maxLuma / currentLuma);
+  return rgbToHex(
+    rgb.r * (1 - mix),
+    rgb.g * (1 - mix),
+    rgb.b * (1 - mix),
+  );
+}
+
+function hslToHex(hue, saturation, lightness) {
+  const normalizedHue = ((hue % 360) + 360) % 360;
+  const s = Math.max(0, Math.min(100, saturation)) / 100;
+  const l = Math.max(0, Math.min(100, lightness)) / 100;
+
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const hp = normalizedHue / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  if (hp >= 0 && hp < 1) {
+    r = c; g = x;
+  } else if (hp < 2) {
+    r = x; g = c;
+  } else if (hp < 3) {
+    g = c; b = x;
+  } else if (hp < 4) {
+    g = x; b = c;
+  } else if (hp < 5) {
+    r = x; b = c;
+  } else {
+    r = c; b = x;
+  }
+
+  const m = l - c / 2;
+  return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
+}
+
+function mixHexColors(fromHex, toHex, amount) {
+  const from = hexToRgb(fromHex);
+  const to = hexToRgb(toHex);
+  if (!from || !to) return fromHex;
+
+  const t = Math.max(0, Math.min(1, amount));
+  return rgbToHex(
+    from.r + (to.r - from.r) * t,
+    from.g + (to.g - from.g) * t,
+    from.b + (to.b - from.b) * t,
+  );
+}
+
+const ThemeColor = {
+  set(color) {
+    if (!color) return;
+    document.body.style.backgroundColor = lowerColorToMaxLuma(color);
+  }
+};
+
+function averageImageColor(image) {
+  const size = 24;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) return null;
+
+  const cropHeight = Math.min(500, image.naturalHeight || image.height);
+  context.drawImage(image, 0, 0, image.naturalWidth || image.width, cropHeight, 0, 0, size, size);
+
+  try {
+    const { data } = context.getImageData(0, 0, size, size);
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    let alphaTotal = 0;
+
+    for (let index = 0; index < data.length; index += 4) {
+      const alpha = data[index + 3];
+      if (!alpha) continue;
+
+      red += data[index] * alpha;
+      green += data[index + 1] * alpha;
+      blue += data[index + 2] * alpha;
+      alphaTotal += alpha;
+    }
+
+    if (!alphaTotal) return null;
+
+    return rgbToHex(red / alphaTotal, green / alphaTotal, blue / alphaTotal);
+  } catch (e) {
+    return null;
+  }
+}
+
 // Encryption utilities for Unsplash credentials
 const CryptoUtils = {
   // Decrypt password-protected payload using AES-256-GCM with PBKDF2
@@ -136,7 +264,11 @@ const UnsplashBg = {
   async preloadAndDisplay(imageUrl) {
     return new Promise((resolve) => {
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.onload = () => {
+        const themeColor = averageImageColor(img);
+        if (themeColor) ThemeColor.set(themeColor);
+
         document.querySelector('.background').style.backgroundImage = `url('${imageUrl}')`;
         document.querySelector('.background').style.backgroundSize = 'cover';
         document.querySelector('.background').style.backgroundPosition = 'center';
@@ -149,7 +281,7 @@ const UnsplashBg = {
           bgEl.style.opacity = '1';
         }, 10);
 
-        resolve();
+        resolve(themeColor);
       };
       img.onerror = resolve;
       img.src = imageUrl;
@@ -165,7 +297,12 @@ const UnsplashBg = {
     if (cached) {
       const imageData = JSON.parse(cached);
       if (imageData.info) this.setCurrentInfo(imageData.info);
-      await this.preloadAndDisplay(imageData.url);
+      if (imageData.themeColor) ThemeColor.set(imageData.themeColor);
+      const themeColor = await this.preloadAndDisplay(imageData.url);
+      if (themeColor && themeColor !== imageData.themeColor) {
+        imageData.themeColor = themeColor;
+        localStorage.setItem(cacheKey, JSON.stringify(imageData));
+      }
       return;
     }
 
@@ -176,18 +313,20 @@ const UnsplashBg = {
     // Use the full photo URL
     const imageUrl = image.urls.full;
     const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
+    const themeColor = await this.preloadAndDisplay(imageUrl);
 
     // Cache it
     localStorage.setItem(cacheKey, JSON.stringify({
       url: imageUrl,
       date: today,
       info,
+      themeColor,
     }));
 
     this.setCurrentInfo(info);
 
     // Display it
-    await this.preloadAndDisplay(imageUrl);
+    if (themeColor) ThemeColor.set(themeColor);
   }
 };
 
@@ -525,11 +664,37 @@ const UnsplashBg = {
     `hsl(${hue}, 35%, 50%)`, `hsl(${hue}, 80%, 20%)`,
   ].join(', ')})`;
 
+  const gradientThemeColor = hue => hslToHex(hue, 35, 50);
+
   let opaqueLayer = null;
   let usingUnsplash = false;
+  let themeColorInterval = null;
+
+  const updateGradientThemeColor = () => {
+    const from = Date.now() - (Date.now() % CYCLE);
+    const to = from + CYCLE;
+    const progress = (Date.now() % CYCLE) / CYCLE;
+    const fromHex = gradientThemeColor(((from % PERIOD) * 360 / PERIOD).toFixed());
+    const toHex = gradientThemeColor(((to % PERIOD) * 360 / PERIOD).toFixed());
+    ThemeColor.set(mixHexColors(fromHex, toHex, progress));
+  };
+
+  const startGradientThemeColorInterval = () => {
+    if (themeColorInterval) return;
+    themeColorInterval = setInterval(updateGradientThemeColor, 1000);
+  };
+
+  const stopGradientThemeColorInterval = () => {
+    if (!themeColorInterval) return;
+    clearInterval(themeColorInterval);
+    themeColorInterval = null;
+  };
 
   const setUnsplashModeState = (enabled) => {
     usingUnsplash = enabled;
+    if (enabled) {
+      stopGradientThemeColorInterval();
+    }
     document.body.classList.toggle('unsplash-mode', enabled);
     document.dispatchEvent(new CustomEvent('unsplash:modeChanged', {
       detail: { enabled },
@@ -596,6 +761,11 @@ const UnsplashBg = {
 
     const fromColor = ((from % PERIOD) * 360 / PERIOD).toFixed();
     const toColor = ((to % PERIOD) * 360 / PERIOD).toFixed();
+    const fromHex = gradientThemeColor(fromColor);
+    const toHex = gradientThemeColor(toColor);
+
+    ThemeColor.set(mixHexColors(fromHex, toHex, progress));
+    startGradientThemeColorInterval();
 
     if (!opaqueLayer) {
       opaqueLayer = document.createElement('div');
