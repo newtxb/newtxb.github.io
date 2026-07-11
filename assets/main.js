@@ -851,10 +851,15 @@ const UnsplashBg = {
   const suggestions = search.querySelector('.search-suggestions');
   const providerHint = search.querySelector('.search-provider-hint');
   const providerHintText = search.querySelector('.search-provider-text');
+  const cancelHintKey = search.querySelector('.search-cancel-key');
+  const actionHintKey = search.querySelector('.search-action-key');
   const chatgptButton = search.querySelector('.search-chatgpt-button');
 
   const GOOGLE_HINT = 'search with Google';
   const CHATGPT_HINT = 'ask ChatGPT';
+  const ESCAPE_KEY_HINT = 'Esc';
+  const TAB_KEY_HINT = 'Tab';
+  const ENTER_KEY_HINT = 'Enter';
 
   const URL_WITH_PROTOCOL = /^https?:\/\/\S+$/;
   const LOOKS_LIKE_URL = /^\S+\.\S{2,}\/\S*$/;
@@ -868,26 +873,45 @@ const UnsplashBg = {
   };
 
   const updateProviderHint = () => {
-    providerHintText.textContent = document.activeElement === chatgptButton
-      ? CHATGPT_HINT
-      : GOOGLE_HINT;
+    const chatGPTSelected = document.activeElement === chatgptButton;
+
+    providerHintText.textContent = chatGPTSelected ? CHATGPT_HINT : GOOGLE_HINT;
+    cancelHintKey.textContent = chatGPTSelected ? TAB_KEY_HINT : ESCAPE_KEY_HINT;
+    actionHintKey.textContent = chatGPTSelected ? ENTER_KEY_HINT : TAB_KEY_HINT;
   };
 
-  const askChatGPT = () => {
+  const askChatGPT = ({ openInNewTab = false } = {}) => {
     const query = encodeURIComponent(input.value.trim());
-    window.location = `https://chatgpt.com/?q=${query}`;
+    const url = `https://chatgpt.com/?q=${query}`;
+    if (openInNewTab) {
+      window.open(url, '_blank', 'noopener');
+      return;
+    }
+    window.location = url;
   };
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Meta') form.target = '_blank';
     if (e.key === 'Enter') {
       if (document.activeElement !== input && document.activeElement !== chatgptButton) return;
+
+      const shouldOpenInNewTab = e.shiftKey || e.metaKey;
+
       if (document.activeElement === chatgptButton) {
         e.preventDefault();
-        askChatGPT();
+        askChatGPT({ openInNewTab: shouldOpenInNewTab });
         return;
       }
+
+      if (shouldOpenInNewTab) form.target = '_blank';
       form.submit();
+
+      if (shouldOpenInNewTab && !e.metaKey) {
+        // Shift-triggered new tab should not persist for the next regular submit.
+        setTimeout(() => {
+          form.target = '';
+        }, 0);
+      }
     }
   });
 
