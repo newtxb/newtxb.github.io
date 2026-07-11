@@ -77,6 +77,10 @@ html {
   font-weight: 300;
 }
 
+.unsplash-mode .app {
+  text-shadow: 0px 1px 5px rgba(0, 0, 0, .1);
+}
+
 .settings-trigger {
   position: fixed;
   top: 16px;
@@ -796,4 +800,47 @@ html {
 .quote:hover .author {
   transform: translateY(0.6em);
   opacity: 0.67;
+}
+
+/* Unsplash settings */
+
+.settings-unsplash-auth {
+  display: none;
+}
+
+.settings-unlock-btn {
+  border: 1px solid #80b5f2;
+  border-radius: 12px;
+  height: 40px;
+  background: #0071e3;
+  color: white;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color .12s ease-in-out, box-shadow .12s ease-in-out;
+  outline: none;
+  margin-top: 8px;
+}
+
+.settings-unlock-btn:hover:not(:disabled) {
+  background-color: #0560d1;
+}
+
+.settings-unlock-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.18);
+}
+
+.settings-unlock-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+code {
+  font-family: monospace;
+  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 4px;
+  border-radius: 4px;
 }
