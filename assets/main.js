@@ -1,6 +1,15 @@
 // ---------------------------------------------------------------------------------------------- //
 // UTILITIES
 // ---------------------------------------------------------------------------------------------- //
+function title(str) {
+  // capitalize first letter of each word
+  return str.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function capitalize(str) {
+  // capitalize first letter
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 // Encryption utilities for Unsplash credentials
 const CryptoUtils = {
@@ -63,6 +72,32 @@ const CryptoUtils = {
 const UnsplashBg = {
   ENCRYPTED_CREDS: '0y6Z5ETQz4XPKoWlmPVnY599mr6IfKDfb6SaDtVOat+Q9wI2LpmIDv/DSb78cn/Xoc0DWJKIt9Al7Paf\nEjRhyRJMuwSet9zVGS+x9qojmnnf6HrxUPYZo3gTzN2zlfY+M/KCZd8z0ymjVPfwY9vyg6MVPNiT48TZ\n1gnPJu2r8AKRGDuvJKyAy/pERfz8sY4xrZNOZ/fJsV1wHFDf9cupJBk2Yw=='.replace(/\n/g, ''),
 
+  currentInfo: null,
+
+  setCurrentInfo(info) {
+    this.currentInfo = info;
+    document.dispatchEvent(new CustomEvent('unsplash:imageInfoChanged', {
+      detail: { info },
+    }));
+  },
+
+  buildImageInfo(image, imageUrl, keyword = '') {
+    const description = (image.description || image.alt_description || '').toString().trim();
+    const photographer = (image.user?.name || '').toString().trim();
+
+    const queryPart = keyword ? `Searched: ${title(keyword)}. ` : '';
+    const descPart = description ? `${capitalize(description)}. ` : '';
+    const byPart = photographer ? `By ${photographer}.` : 'From Unsplash.';
+
+    return {
+      description: `${queryPart}${descPart}${byPart}`.trim(),
+      unsplashUrl: image.links?.html || imageUrl,
+      photographer,
+      keyword,
+      imageUrl,
+    };
+  },
+
   async getUnsplashImage(keywords, accessKey) {
     if (!keywords || keywords.length === 0) {
       keywords = ['china', 'japan', 'korea', 'taiwan'];
@@ -89,7 +124,9 @@ const UnsplashBg = {
         throw new Error('No images found');
       }
 
-      return data.results[Math.floor(Math.random() * data.results.length)];
+      const result = data.results[Math.floor(Math.random() * data.results.length)];
+      result._searchKeyword = keyword;
+      return result;
     } catch (e) {
       console.warn('Unsplash fetch failed:', e);
       return null;
@@ -127,6 +164,7 @@ const UnsplashBg = {
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
       const imageData = JSON.parse(cached);
+      if (imageData.info) this.setCurrentInfo(imageData.info);
       await this.preloadAndDisplay(imageData.url);
       return;
     }
@@ -137,12 +175,16 @@ const UnsplashBg = {
 
     // Use the full photo URL
     const imageUrl = image.urls.full;
+    const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
 
     // Cache it
     localStorage.setItem(cacheKey, JSON.stringify({
       url: imageUrl,
-      date: today
+      date: today,
+      info,
     }));
+
+    this.setCurrentInfo(info);
 
     // Display it
     await this.preloadAndDisplay(imageUrl);
@@ -404,16 +446,17 @@ const UnsplashBg = {
     }
   });
 
-  buttons.resetUnsplashPhoto?.addEventListener('click', async () => {
+  const reloadUnsplashToday = async () => {
     if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
 
     const today = new Date().toDateString();
     const cacheKey = `unsplash-bg-${today}`;
     window.localStorage.removeItem(cacheKey);
+    UnsplashBg.setCurrentInfo(null);
 
-    buttons.resetUnsplashPhoto.disabled = true;
-    const originalLabel = buttons.resetUnsplashPhoto.textContent;
-    buttons.resetUnsplashPhoto.textContent = 'Resetting...';
+    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.disabled = true;
+    const originalLabel = buttons.resetUnsplashPhoto?.textContent || 'Reset photo';
+    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = 'Resetting...';
 
     const keywords = (settings.unsplashKeywords || defaults.unsplashKeywords)
       .split(';')
@@ -425,9 +468,18 @@ const UnsplashBg = {
     } catch (e) {
       console.warn('Failed to reset Unsplash daily image:', e);
     } finally {
-      buttons.resetUnsplashPhoto.textContent = originalLabel;
+      if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = originalLabel;
       syncInputs();
+      document.dispatchEvent(new CustomEvent('unsplash:reloadFinished'));
     }
+  };
+
+  buttons.resetUnsplashPhoto?.addEventListener('click', async () => {
+    await reloadUnsplashToday();
+  });
+
+  document.addEventListener('unsplash:reloadToday', async () => {
+    await reloadUnsplashToday();
   });
 
   inputs.unsplashKeywords?.addEventListener('change', () => {
@@ -479,6 +531,9 @@ const UnsplashBg = {
   const setUnsplashModeState = (enabled) => {
     usingUnsplash = enabled;
     document.body.classList.toggle('unsplash-mode', enabled);
+    document.dispatchEvent(new CustomEvent('unsplash:modeChanged', {
+      detail: { enabled },
+    }));
   };
 
   // Listen for Unsplash toggle
@@ -567,6 +622,72 @@ const UnsplashBg = {
       });
     });
   }
+})();
+
+// ---------------------------------------------------------------------------------------------- //
+// UNSPLASH BADGE
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const container = document.querySelector('.unsplash-info');
+  const textNode = container?.querySelector('.unsplash-info-text');
+  const linkNode = container?.querySelector('.unsplash-info-link');
+  const reloadNode = container?.querySelector('.unsplash-info-reload');
+
+  if (!container || !textNode || !linkNode || !reloadNode) return;
+
+  const setFromInfo = (info) => {
+    if (!info) {
+      textNode.textContent = 'Image details not yet available...';
+      linkNode.href = '#';
+      linkNode.setAttribute('aria-disabled', 'true');
+      reloadNode.disabled = true;
+      return;
+    }
+
+    textNode.textContent = info.description || 'Image from Unsplash';
+    linkNode.href = info.unsplashUrl || '#';
+    linkNode.removeAttribute('aria-disabled');
+    reloadNode.disabled = false;
+  };
+
+  const syncEnabledState = () => {
+    const settings = window.homeSettings?.get?.() || {};
+    const enabled = !!(
+      document.body.classList.contains('unsplash-mode')
+      || (settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)
+    );
+    container.classList.toggle('is-enabled', enabled);
+    if (!enabled) reloadNode.disabled = true;
+  };
+
+  linkNode.addEventListener('click', (e) => {
+    if (linkNode.getAttribute('aria-disabled') === 'true') e.preventDefault();
+  });
+
+  reloadNode.addEventListener('click', () => {
+    if (reloadNode.disabled) return;
+    reloadNode.disabled = true;
+    document.dispatchEvent(new CustomEvent('unsplash:reloadToday'));
+  });
+
+  document.addEventListener('unsplash:imageInfoChanged', (e) => {
+    setFromInfo(e.detail?.info || null);
+    syncEnabledState();
+  });
+
+  document.addEventListener('unsplash:modeChanged', () => {
+    syncEnabledState();
+    if (UnsplashBg.currentInfo) setFromInfo(UnsplashBg.currentInfo);
+  });
+
+  document.addEventListener('unsplash:reloadFinished', () => {
+    syncEnabledState();
+    if (UnsplashBg.currentInfo) setFromInfo(UnsplashBg.currentInfo);
+  });
+
+  setFromInfo(UnsplashBg.currentInfo);
+  syncEnabledState();
 })();
 
 // ---------------------------------------------------------------------------------------------- //

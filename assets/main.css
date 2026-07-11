@@ -87,6 +87,132 @@ html {
   font-weight: 200;
 }
 
+.unsplash-mode .search-box {
+  text-shadow: none;
+}
+
+.unsplash-info {
+  position: fixed;
+  top: 16px;
+  left: 18px;
+  z-index: 22;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .18s ease-in-out, transform .18s ease-in-out;
+}
+
+.unsplash-mode .unsplash-info {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.unsplash-info-trigger {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: transform .12s ease-in-out, opacity .12s ease-in-out;
+}
+
+.unsplash-info-trigger::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8l1.7 4.5 4.5 1.7-4.5 1.7-1.7 4.5-1.7-4.5-4.5-1.7 4.5-1.7L12 2.8z'/%3E%3Cpath d='M18.5 13.6l.95 2.5 2.5.95-2.5.95-.95 2.5-.95-2.5-2.5-.95 2.5-.95.95-2.5z'/%3E%3C/svg%3E");
+  opacity: 0.9;
+}
+
+.unsplash-info-trigger:hover,
+.unsplash-info-trigger:focus-visible {
+  outline: none;
+  transform: rotate(20deg);
+  opacity: 1;
+}
+
+.unsplash-info-trigger:hover::before,
+.unsplash-info-trigger:focus-visible::before {
+  opacity: 1;
+}
+
+.unsplash-info-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0;
+  width: min(310px, calc(100vw - 36px));
+  padding: 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(12, 18, 29, 0.72);
+  color: #f5f8ff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.unsplash-info:hover .unsplash-info-menu,
+.unsplash-info:focus-within .unsplash-info-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.unsplash-info-text {
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.93);
+}
+
+.unsplash-info-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.unsplash-info-link,
+.unsplash-info-reload {
+  height: 31px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 0.82rem;
+  padding: 0 10px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.unsplash-info-link:hover,
+.unsplash-info-reload:hover,
+.unsplash-info-link:focus-visible,
+.unsplash-info-reload:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.23);
+}
+
+.unsplash-info-reload[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .settings-trigger {
   position: fixed;
   top: 16px;
