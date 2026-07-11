@@ -23,6 +23,7 @@ time, mark, audio, video {
 body {
 	line-height: 1;
   background-color: #06273d;
+  transition: background-color 0.5s ease-in-out;
 }
 ol, ul {
 	list-style: none;

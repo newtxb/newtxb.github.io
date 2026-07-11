@@ -267,8 +267,31 @@ const PhotoBlacklist = {
 
 const UnsplashBg = {
   ENCRYPTED_CREDS: '0y6Z5ETQz4XPKoWlmPVnY599mr6IfKDfb6SaDtVOat+Q9wI2LpmIDv/DSb78cn/Xoc0DWJKIt9Al7Paf\nEjRhyRJMuwSet9zVGS+x9qojmnnf6HrxUPYZo3gTzN2zlfY+M/KCZd8z0ymjVPfwY9vyg6MVPNiT48TZ\n1gnPJu2r8AKRGDuvJKyAy/pERfz8sY4xrZNOZ/fJsV1wHFDf9cupJBk2Yw=='.replace(/\n/g, ''),
+  THEME_COLOR_KEY: 'unsplash-theme-color',
 
   currentInfo: null,
+
+  setStoredThemeColor(color) {
+    if (!color) return;
+    try {
+      localStorage.setItem(this.THEME_COLOR_KEY, color);
+    } catch (e) {
+      console.warn('Failed to store Unsplash theme color:', e);
+    }
+  },
+
+  getStoredThemeColor() {
+    try {
+      return localStorage.getItem(this.THEME_COLOR_KEY);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  applyStoredThemeColor() {
+    const storedColor = this.getStoredThemeColor();
+    if (storedColor) ThemeColor.set(storedColor);
+  },
 
   setCurrentInfo(info) {
     this.currentInfo = info;
@@ -340,23 +363,39 @@ const UnsplashBg = {
 
   async preloadAndDisplay(imageUrl) {
     return new Promise((resolve) => {
+      const bgEl = document.querySelector('.background');
+      if (bgEl) {
+        // Keep background hidden while the new image is loading.
+        bgEl.style.transition = 'none';
+        bgEl.style.opacity = '0';
+      }
+
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const themeColor = averageImageColor(img);
-        if (themeColor) ThemeColor.set(themeColor);
+        if (themeColor) {
+          ThemeColor.set(themeColor);
+          this.setStoredThemeColor(themeColor);
+        }
 
-        document.querySelector('.background').style.backgroundImage = `url('${imageUrl}')`;
-        document.querySelector('.background').style.backgroundSize = 'cover';
-        document.querySelector('.background').style.backgroundPosition = 'center';
+        if (bgEl) {
+          bgEl.style.backgroundImage = `url('${imageUrl}')`;
+          bgEl.style.backgroundSize = 'cover';
+          bgEl.style.backgroundPosition = 'center';
 
-        // Fade in with opacity transition
-        const bgEl = document.querySelector('.background');
-        bgEl.style.opacity = '0';
-        bgEl.style.transition = 'opacity 1s ease-in-out';
-        setTimeout(() => {
-          bgEl.style.opacity = '1';
-        }, 10);
+          // Force a style flush before re-enabling transition so fade-in always runs.
+          void bgEl.offsetHeight;
+
+          setTimeout(() => {
+            // bgEl.style.transition = 'opacity 0.3s ease-in-out';
+            bgEl.style.opacity = '0.1';
+            requestAnimationFrame(() => {
+              bgEl.style.transition = 'opacity 0.67s ease-in-out';
+              bgEl.style.opacity = '1';
+            });
+          }, 100);
+        }
 
         resolve(themeColor);
       };
@@ -374,7 +413,10 @@ const UnsplashBg = {
     if (cached) {
       const imageData = JSON.parse(cached);
       if (imageData.info) this.setCurrentInfo(imageData.info);
-      if (imageData.themeColor) ThemeColor.set(imageData.themeColor);
+      if (imageData.themeColor) {
+        ThemeColor.set(imageData.themeColor);
+        this.setStoredThemeColor(imageData.themeColor);
+      }
       const themeColor = await this.preloadAndDisplay(imageData.url);
       if (themeColor && themeColor !== imageData.themeColor) {
         imageData.themeColor = themeColor;
@@ -407,7 +449,10 @@ const UnsplashBg = {
     this.setCurrentInfo(info);
 
     // Display it
-    if (themeColor) ThemeColor.set(themeColor);
+    if (themeColor) {
+      ThemeColor.set(themeColor);
+      this.setStoredThemeColor(themeColor);
+    }
   }
 };
 
@@ -792,6 +837,7 @@ const UnsplashBg = {
 
     if (e.detail.enabled && settings.unsplashAuthenticated && settings.unsplashAccessKey) {
       setUnsplashModeState(true);
+      UnsplashBg.applyStoredThemeColor();
       // Stop gradient animation
       if (opaqueLayer) opaqueLayer.remove();
 
@@ -825,6 +871,7 @@ const UnsplashBg = {
 
       try {
         setUnsplashModeState(true);
+        UnsplashBg.applyStoredThemeColor();
         await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
       } catch (e) {
         console.warn('Failed to load initial Unsplash image:', e);
