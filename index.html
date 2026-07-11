@@ -38,6 +38,21 @@
           <span>Weather location override</span>
           <input type="text" name="weatherLocation" placeholder="Leave empty for auto location" autocomplete="off">
         </label>
+        <label class="settings-toggle">
+          <input type="checkbox" name="useUnsplash">
+          <span>Use Unsplash backgrounds</span>
+        </label>
+        <div class="settings-unsplash-auth" data-auth-section>
+          <label class="settings-location">
+            <span>Enter password to unlock</span>
+            <input type="password" name="unsplashPassword" placeholder="Enter password" autocomplete="off">
+            <button type="button" class="settings-unlock-btn" data-unlock-unsplash>Unlock</button>
+          </label>
+        </div>
+        <label class="settings-location" data-keywords-section>
+          <span>Search keywords (separated by <code>;</code>)</span>
+          <input type="text" name="unsplashKeywords" placeholder="e.g. nature;space;city">
+        </label>
       </div>
     </div>
   </div>
