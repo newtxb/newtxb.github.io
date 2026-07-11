@@ -194,6 +194,74 @@ const CryptoUtils = {
 };
 
 // ---------------------------------------------------------------------------------------------- //
+// PHOTO BLACKLIST MANAGEMENT
+// ---------------------------------------------------------------------------------------------- //
+
+const PhotoBlacklist = {
+  STORAGE_KEY: 'unsplash-photo-blacklist',
+  MAX_SIZE: 30,
+
+  /**
+   * Get the current blacklist
+   * @returns {string[]} Array of photo IDs
+   */
+  getList() {
+    try {
+      const data = localStorage.getItem(this.STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.warn('Failed to load blacklist:', e);
+      return [];
+    }
+  },
+
+  /**
+   * Check if a photo ID is blacklisted
+   * @param {string} photoId - The Unsplash photo ID
+   * @returns {boolean}
+   */
+  isBlacklisted(photoId) {
+    return this.getList().includes(photoId);
+  },
+
+  /**
+   * Add a photo ID to the blacklist
+   * @param {string} photoId - The Unsplash photo ID
+   */
+  add(photoId) {
+    const list = this.getList();
+
+    // Avoid duplicates
+    if (list.includes(photoId)) return;
+
+    // Add to beginning of list
+    list.unshift(photoId);
+
+    // Keep only the most recent 30 items
+    if (list.length > this.MAX_SIZE) {
+      list.pop();
+    }
+
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn('Failed to save blacklist:', e);
+    }
+  },
+
+  /**
+   * Clear the entire blacklist
+   */
+  clear() {
+    try {
+      localStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      console.warn('Failed to clear blacklist:', e);
+    }
+  }
+};
+
+// ---------------------------------------------------------------------------------------------- //
 // UNSPLASH INTEGRATION
 // ---------------------------------------------------------------------------------------------- //
 
@@ -252,7 +320,16 @@ const UnsplashBg = {
         throw new Error('No images found');
       }
 
-      const result = data.results[Math.floor(Math.random() * data.results.length)];
+      // Get the blacklist
+      const blacklist = PhotoBlacklist.getList();
+
+      // Filter out blacklisted photos
+      const filteredResults = data.results.filter(photo => !blacklist.includes(photo.id));
+
+      // Select from filtered results if available, otherwise from all results
+      const selectedResults = filteredResults.length > 0 ? filteredResults : data.results;
+      const result = selectedResults[Math.floor(Math.random() * selectedResults.length)];
+
       result._searchKeyword = keyword;
       return result;
     } catch (e) {
@@ -321,7 +398,11 @@ const UnsplashBg = {
       date: today,
       info,
       themeColor,
+      photoId: image.id,
     }));
+
+    // Add to blacklist to avoid showing it again
+    PhotoBlacklist.add(image.id);
 
     this.setCurrentInfo(info);
 
@@ -585,27 +666,31 @@ const UnsplashBg = {
     }
   });
 
-  const reloadUnsplashToday = async () => {
+  const resetBlacklistHistory = async () => {
     if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
 
-    const today = new Date().toDateString();
-    const cacheKey = `unsplash-bg-${today}`;
-    window.localStorage.removeItem(cacheKey);
-    UnsplashBg.setCurrentInfo(null);
-
     if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.disabled = true;
-    const originalLabel = buttons.resetUnsplashPhoto?.textContent || 'Reset photo';
-    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = 'Resetting...';
-
-    const keywords = (settings.unsplashKeywords || defaults.unsplashKeywords)
-      .split(';')
-      .map(k => k.trim())
-      .filter(k => k);
+    const originalLabel = buttons.resetUnsplashPhoto?.textContent || 'Reset history';
+    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = 'Clearing...';
 
     try {
+      // Clear the photo blacklist history
+      PhotoBlacklist.clear();
+
+      // Reload today's image with the cleared history
+      const keywords = (settings.unsplashKeywords || defaults.unsplashKeywords)
+        .split(';')
+        .map(k => k.trim())
+        .filter(k => k);
+
+      const today = new Date().toDateString();
+      const cacheKey = `unsplash-bg-${today}`;
+      window.localStorage.removeItem(cacheKey);
+      UnsplashBg.setCurrentInfo(null);
+
       await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
     } catch (e) {
-      console.warn('Failed to reset Unsplash daily image:', e);
+      console.warn('Failed to reset blacklist history:', e);
     } finally {
       if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = originalLabel;
       syncInputs();
@@ -614,11 +699,11 @@ const UnsplashBg = {
   };
 
   buttons.resetUnsplashPhoto?.addEventListener('click', async () => {
-    await reloadUnsplashToday();
+    await resetBlacklistHistory();
   });
 
   document.addEventListener('unsplash:reloadToday', async () => {
-    await reloadUnsplashToday();
+    await resetBlacklistHistory();
   });
 
   inputs.unsplashKeywords?.addEventListener('change', () => {
