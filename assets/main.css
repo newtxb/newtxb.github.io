@@ -78,7 +78,13 @@ html {
 }
 
 .unsplash-mode .app {
-  text-shadow: 0px 1px 5px rgba(0, 0, 0, .1);
+  text-shadow: 0px 1px 15px rgba(0, 0, 0, .15), 0px 1px 5px rgba(0, 0, 0, .15);
+  color: white;
+}
+
+.unsplash-mode .app .clock {
+  text-shadow: 0px 1px 5px rgba(0, 0, 0, .1), 0px 1px 15px rgba(0, 0, 0, .05);
+  font-weight: 200;
 }
 
 .settings-trigger {
@@ -209,6 +215,51 @@ html {
   color: #111827;
 }
 
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-toggle-row .settings-toggle {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-secondary-btn {
+  border: 1px solid #ccd4df;
+  border-radius: 9px;
+  background: #f4f7fb;
+  color: #445063;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 0.76rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .12s ease-in-out, background-color .12s ease-in-out, color .12s ease-in-out;
+}
+
+.settings-secondary-btn:hover,
+.settings-secondary-btn:focus-visible {
+  outline: none;
+  border-color: #a8b5c7;
+  background: #eaf0f7;
+  color: #283245;
+}
+
+.settings-secondary-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.settings-toggle-hint {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: #a0a8b5;
+  letter-spacing: 0.01em;
+}
+
 .settings-toggle input[type="checkbox"] {
   width: 17px;
   height: 17px;
@@ -226,6 +277,32 @@ html {
 .settings-location span {
   font-weight: 500;
   color: #273142;
+}
+
+.settings-inline-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 248px);
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-inline-field span {
+  white-space: nowrap;
+}
+
+.settings-location[data-keywords-section] {
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.settings-location[data-keywords-section] span {
+  white-space: normal;
+}
+
+.settings-location[data-keywords-section] input {
+  width: 100%;
+  justify-self: stretch;
+  margin-top: 3px;
 }
 
 .settings-location input {
@@ -247,6 +324,12 @@ html {
 
 .settings-location input::placeholder {
   color: #9ba4b4;
+}
+
+.settings-separator {
+  height: 1px;
+  margin: 2px 0;
+  background: rgba(16, 24, 38, 0.12);
 }
 
 .is-hidden {
@@ -487,6 +570,23 @@ html {
 @media (max-width: 640px) {
   .settings-panel {
     margin-top: 56px;
+  }
+
+  .settings-inline-field {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .settings-toggle-row {
+    align-items: flex-start;
+  }
+
+  .settings-secondary-btn {
+    margin-top: 6px;
+  }
+
+  .settings-inline-field span {
+    white-space: normal;
   }
 
   .search .search-input {

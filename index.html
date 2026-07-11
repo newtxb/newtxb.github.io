@@ -25,23 +25,34 @@
         <label class="settings-toggle">
           <input type="checkbox" name="showDate" checked>
           <span>Show date</span>
+          <span class="settings-toggle-hint">bottom left</span>
         </label>
         <label class="settings-toggle">
           <input type="checkbox" name="showQuote" checked>
           <span>Show quote</span>
+          <span class="settings-toggle-hint">center</span>
         </label>
         <label class="settings-toggle">
           <input type="checkbox" name="showWeather" checked>
           <span>Show weather</span>
+          <span class="settings-toggle-hint">right</span>
         </label>
-        <label class="settings-location">
-          <span>Weather location override</span>
+        <label class="settings-location settings-inline-field">
+          <span>Weather location</span>
           <input type="text" name="weatherLocation" placeholder="Leave empty for auto location" autocomplete="off">
         </label>
-        <label class="settings-toggle">
-          <input type="checkbox" name="useUnsplash">
-          <span>Use Unsplash backgrounds</span>
+        <label class="settings-location settings-inline-field">
+          <span>Username</span>
+          <input type="text" name="username" placeholder="Leave empty for generic greeting" autocomplete="off">
         </label>
+        <div class="settings-separator" aria-hidden="true"></div>
+        <div class="settings-toggle-row">
+          <label class="settings-toggle">
+            <input type="checkbox" name="useUnsplash">
+            <span>Use Unsplash backgrounds</span>
+          </label>
+          <button type="button" class="settings-secondary-btn" data-reset-unsplash-photo>Reset photo</button>
+        </div>
         <div class="settings-unsplash-auth" data-auth-section>
           <label class="settings-location">
             <span>Enter password to unlock</span>
