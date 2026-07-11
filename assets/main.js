@@ -198,10 +198,11 @@ const UnsplashBg = {
     showDate: true,
     showQuote: true,
     showWeather: true,
+    username: '',
     weatherLocation: '',
     useUnsplash: false,
     unsplashAuthenticated: false,
-    unsplashKeywords: 'china;japan;korea;taiwan',
+    unsplashKeywords: 'china;korea;taiwan;taipei;hong kong;seoul;busan;shanghai;guangzhou;chongqing;chengdu;tainan',
   };
 
   const modal = document.querySelector('.settings-modal');
@@ -216,6 +217,7 @@ const UnsplashBg = {
     showDate: modal?.querySelector('input[name="showDate"]'),
     showQuote: modal?.querySelector('input[name="showQuote"]'),
     showWeather: modal?.querySelector('input[name="showWeather"]'),
+    username: modal?.querySelector('input[name="username"]'),
     weatherLocation: modal?.querySelector('input[name="weatherLocation"]'),
     useUnsplash: modal?.querySelector('input[name="useUnsplash"]'),
     unsplashPassword: modal?.querySelector('input[name="unsplashPassword"]'),
@@ -224,6 +226,7 @@ const UnsplashBg = {
 
   const buttons = {
     unlockUnsplash: modal?.querySelector('[data-unlock-unsplash]'),
+    resetUnsplashPhoto: modal?.querySelector('[data-reset-unsplash-photo]'),
   };
 
   const sections = {
@@ -239,6 +242,7 @@ const UnsplashBg = {
       settings = {
         ...defaults,
         ...saved,
+        username: (saved.username || '').toString().trim(),
         weatherLocation: (saved.weatherLocation || '').toString().trim(),
         unsplashKeywords: (saved.unsplashKeywords || defaults.unsplashKeywords).toString().trim(),
       };
@@ -256,6 +260,7 @@ const UnsplashBg = {
     inputs.showDate.checked = !!settings.showDate;
     inputs.showQuote.checked = !!settings.showQuote;
     inputs.showWeather.checked = !!settings.showWeather;
+    inputs.username.value = settings.username || '';
     inputs.weatherLocation.value = settings.weatherLocation || '';
     inputs.useUnsplash.checked = !!settings.useUnsplash;
     inputs.unsplashKeywords.value = settings.unsplashKeywords || defaults.unsplashKeywords;
@@ -266,6 +271,9 @@ const UnsplashBg = {
     }
     if (sections.keywordsSection) {
       sections.keywordsSection.style.display = settings.useUnsplash ? 'block' : 'none';
+    }
+    if (buttons.resetUnsplashPhoto) {
+      buttons.resetUnsplashPhoto.disabled = !(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey);
     }
   };
 
@@ -311,6 +319,19 @@ const UnsplashBg = {
     applyVisibility();
     save();
   });
+
+  const updateUsername = () => {
+    const nextValue = inputs.username.value.trim();
+    if (nextValue === settings.username) return;
+    settings.username = nextValue;
+    save();
+    document.dispatchEvent(new CustomEvent('settings:usernameChanged', {
+      detail: { username: settings.username },
+    }));
+  };
+
+  inputs.username?.addEventListener('change', updateUsername);
+  inputs.username?.addEventListener('blur', updateUsername);
 
   const updateWeatherLocation = () => {
     const nextValue = inputs.weatherLocation.value.trim();
@@ -380,6 +401,32 @@ const UnsplashBg = {
       alert('Error: ' + e.message);
       buttons.unlockUnsplash.disabled = false;
       buttons.unlockUnsplash.textContent = 'Unlock';
+    }
+  });
+
+  buttons.resetUnsplashPhoto?.addEventListener('click', async () => {
+    if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
+
+    const today = new Date().toDateString();
+    const cacheKey = `unsplash-bg-${today}`;
+    window.localStorage.removeItem(cacheKey);
+
+    buttons.resetUnsplashPhoto.disabled = true;
+    const originalLabel = buttons.resetUnsplashPhoto.textContent;
+    buttons.resetUnsplashPhoto.textContent = 'Resetting...';
+
+    const keywords = (settings.unsplashKeywords || defaults.unsplashKeywords)
+      .split(';')
+      .map(k => k.trim())
+      .filter(k => k);
+
+    try {
+      await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
+    } catch (e) {
+      console.warn('Failed to reset Unsplash daily image:', e);
+    } finally {
+      buttons.resetUnsplashPhoto.textContent = originalLabel;
+      syncInputs();
     }
   });
 
@@ -587,6 +634,17 @@ const UnsplashBg = {
   let currentDate = -1;
 
   const clock = document.querySelector('.clock');
+  const welcome = document.querySelector('.welcome-text');
+
+  const formatWelcomeText = (hours) => {
+    let text;
+    if (hours >= 5 && hours < 12) text = 'Good morning';
+    else if (hours >= 12 && hours < 18) text = 'Good afternoon';
+    else text = 'Good evening';
+
+    const username = (window.homeSettings?.get?.().username || '').toString().trim();
+    return username ? `${text}, ${username}` : text;
+  };
 
   // Render the clock digits
   const render = (onlySecond = false) => {
@@ -595,11 +653,7 @@ const UnsplashBg = {
       clock.querySelector(`.${x.toLowerCase()}`).textContent = text;
     });
     const hours = new Date().getHours();
-    let text;
-    if (hours >= 5 && hours < 12) text = 'Good morning';
-    else if (hours >= 12 && hours < 18) text = 'Good afternoon';
-    else text = 'Good evening';
-    document.querySelector('.welcome-text').textContent = text;
+    welcome.textContent = formatWelcomeText(hours);
 
     if (!onlySecond) {
       if (new Date().getDate() === currentDate) return;
@@ -619,6 +673,7 @@ const UnsplashBg = {
 
   renderEveryMinute();
   window.addEventListener('focus', render);
+  document.addEventListener('settings:usernameChanged', () => render(false));
 
   // Show seconds on hover
   let renderNextSecond = false;
