@@ -579,28 +579,47 @@
   const weather = document.querySelector('.weather');
   const storageKey = 'weather-forecast';
 
+  const isValidForecast = (f) => Array.isArray(f) && f.length === 3
+    && f.every((x) => typeof x === 'string' && x.length < 100 && !x.includes('<'));
+
   let forecast = window.localStorage.getItem(storageKey);
   if (forecast) {
-    forecast = JSON.parse(forecast);
-    if (forecast.expire < Date.now()) forecast = null;
-    else ({ forecast } = forecast);
+    try {
+      forecast = JSON.parse(forecast);
+      if (forecast.expire < Date.now() || !isValidForecast(forecast.forecast)) {
+        forecast = null;
+      } else {
+        ({ forecast } = forecast);
+      }
+    } catch (e) {
+      forecast = null;
+    }
   }
 
   if (!forecast) {
-    // TODO: handle errors
-    forecast = (await (await window.fetch('https://wttr.in/?format=%l|%c|%t')).text())
-      .split('|');
-    window.localStorage.setItem(storageKey, JSON.stringify({
-      forecast,
-      expire: Date.now() + 15 * 60 * 1000,
-    }));
+    try {
+      const res = await window.fetch('https://wttr.in/?format=osef|%l|%c|%t|');
+      if (!res.ok) throw new Error('Weather API error');
+      const text = await res.text();
+      forecast = text.split('|');
+      if (!isValidForecast(forecast)) throw new Error('Invalid weather format');
+      window.localStorage.setItem(storageKey, JSON.stringify({
+        forecast,
+        expire: Date.now() + 15 * 60 * 1000,
+      }));
+    } catch (e) {
+      console.warn('Failed to fetch weather', e);
+      window.localStorage.removeItem(storageKey);
+      weather.textContent = '';
+      return;
+    }
   }
 
   weather.textContent = [
-    forecast[1],
-    forecast[2].replace(/(^\+|C$)/g, ''),
+    forecast[2],
+    forecast[3].replace(/(^\+|C$)/g, ''),
     '–',
-    forecast[0].split(',')[0],
+    forecast[1].split(',')[0],
   ].join(' ');
 })();
 
