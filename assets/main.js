@@ -579,14 +579,11 @@
   const weather = document.querySelector('.weather');
   const storageKey = 'weather-forecast';
 
-  const isValidForecast = (f) => Array.isArray(f) && f.length === 3
-    && f.every((x) => typeof x === 'string' && x.length < 100 && !x.includes('<'));
-
   let forecast = window.localStorage.getItem(storageKey);
   if (forecast) {
     try {
       forecast = JSON.parse(forecast);
-      if (forecast.expire < Date.now() || !isValidForecast(forecast.forecast)) {
+      if (forecast.expire < Date.now()) {
         forecast = null;
       } else {
         ({ forecast } = forecast);
@@ -602,7 +599,7 @@
       if (!res.ok) throw new Error('Weather API error');
       const text = await res.text();
       forecast = text.split('|');
-      if (!isValidForecast(forecast)) throw new Error('Invalid weather format');
+      if (forecast.length < 4) throw new Error('Invalid weather format, got ' + forecast.length + ' parts');
       window.localStorage.setItem(storageKey, JSON.stringify({
         forecast,
         expire: Date.now() + 15 * 60 * 1000,
