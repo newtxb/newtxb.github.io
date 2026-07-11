@@ -37,6 +37,132 @@
 })();
 
 // ---------------------------------------------------------------------------------------------- //
+// SETTINGS
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const storageKey = 'home-settings';
+
+  const defaults = {
+    showDate: true,
+    showQuote: true,
+    showWeather: true,
+    weatherLocation: '',
+  };
+
+  const modal = document.querySelector('.settings-modal');
+  const trigger = document.querySelector('.settings-trigger');
+  const closeButtons = modal ? modal.querySelectorAll('[data-close-settings]') : [];
+
+  const dateNode = document.querySelector('.calendar')?.parentNode;
+  const quoteNode = document.querySelector('.quote')?.parentNode;
+  const weatherNode = document.querySelector('.weather')?.parentNode;
+
+  const inputs = {
+    showDate: modal?.querySelector('input[name="showDate"]'),
+    showQuote: modal?.querySelector('input[name="showQuote"]'),
+    showWeather: modal?.querySelector('input[name="showWeather"]'),
+    weatherLocation: modal?.querySelector('input[name="weatherLocation"]'),
+  };
+
+  let settings = { ...defaults };
+
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(storageKey));
+    if (saved && typeof saved === 'object') {
+      settings = {
+        ...defaults,
+        ...saved,
+        weatherLocation: (saved.weatherLocation || '').toString().trim(),
+      };
+    }
+  } catch (e) {
+    settings = { ...defaults };
+  }
+
+  const save = () => {
+    window.localStorage.setItem(storageKey, JSON.stringify(settings));
+  };
+
+  const syncInputs = () => {
+    if (!modal) return;
+    inputs.showDate.checked = !!settings.showDate;
+    inputs.showQuote.checked = !!settings.showQuote;
+    inputs.showWeather.checked = !!settings.showWeather;
+    inputs.weatherLocation.value = settings.weatherLocation || '';
+  };
+
+  const applyVisibility = () => {
+    if (dateNode) dateNode.classList.toggle('is-hidden', !settings.showDate);
+    if (quoteNode) quoteNode.classList.toggle('is-hidden', !settings.showQuote);
+    if (weatherNode) weatherNode.classList.toggle('is-hidden', !settings.showWeather);
+  };
+
+  const openModal = () => {
+    if (!modal) return;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeModal = () => {
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  syncInputs();
+  applyVisibility();
+  save();
+
+  trigger?.addEventListener('click', openModal);
+  closeButtons.forEach(button => button.addEventListener('click', closeModal));
+
+  inputs.showDate?.addEventListener('change', () => {
+    settings.showDate = inputs.showDate.checked;
+    applyVisibility();
+    save();
+  });
+
+  inputs.showQuote?.addEventListener('change', () => {
+    settings.showQuote = inputs.showQuote.checked;
+    applyVisibility();
+    save();
+  });
+
+  inputs.showWeather?.addEventListener('change', () => {
+    settings.showWeather = inputs.showWeather.checked;
+    applyVisibility();
+    save();
+  });
+
+  const updateWeatherLocation = () => {
+    const nextValue = inputs.weatherLocation.value.trim();
+    if (nextValue === settings.weatherLocation) return;
+    settings.weatherLocation = nextValue;
+    save();
+    document.dispatchEvent(new CustomEvent('settings:weatherLocationChanged', {
+      detail: { weatherLocation: settings.weatherLocation },
+    }));
+  };
+
+  inputs.weatherLocation?.addEventListener('change', updateWeatherLocation);
+  inputs.weatherLocation?.addEventListener('blur', updateWeatherLocation);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('open')) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+
+  window.homeSettings = {
+    get() {
+      return { ...settings };
+    },
+  };
+})();
+
+// ---------------------------------------------------------------------------------------------- //
 // BACKGROUND
 // ---------------------------------------------------------------------------------------------- //
 
@@ -236,6 +362,14 @@
   const URL_WITH_PROTOCOL = /^https?:\/\/\S+$/;
   const LOOKS_LIKE_URL = /^\S+\.\S{2,}\/\S*$/;
 
+  const isEditableTarget = (target) => {
+    if (!target) return false;
+    const element = target.nodeType === Node.ELEMENT_NODE ? target : target.parentElement;
+    if (!element) return false;
+    if (element.isContentEditable) return true;
+    return !!element.closest('input, textarea, select, [contenteditable="true"]');
+  };
+
   const updateProviderHint = () => {
     providerHintText.textContent = document.activeElement === chatgptButton
       ? CHATGPT_HINT
@@ -250,6 +384,7 @@
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Meta') form.target = '_blank';
     if (e.key === 'Enter') {
+      if (document.activeElement !== input && document.activeElement !== chatgptButton) return;
       if (document.activeElement === chatgptButton) {
         e.preventDefault();
         askChatGPT();
@@ -335,7 +470,8 @@
     }
   });
 
-  document.addEventListener('paste', () => {
+  document.addEventListener('paste', (e) => {
+    if (isEditableTarget(e.target) && e.target !== input) return;
     // Will paste directly in the search input
     input.focus();
   });
@@ -347,6 +483,9 @@
       input.value = '';
       cleanup = null;
     }
+
+    if (isEditableTarget(e.target) && e.target !== input) return;
+
     // As length of `A` `É` = 1, and `Meta` `ShiftLeft` > 1
     if (document.activeElement !== input && e.key.length === 1) {
       // But ignore special action
@@ -627,45 +766,73 @@
   const weather = document.querySelector('.weather');
   const storageKey = 'weather-forecast';
 
-  let forecast = window.localStorage.getItem(storageKey);
-  if (forecast) {
-    try {
-      forecast = JSON.parse(forecast);
-      if (forecast.expire < Date.now()) {
+  const getWeatherLocation = () => window.homeSettings?.get?.().weatherLocation || '';
+
+  const cacheKey = (location) => [storageKey, location || 'auto'].join(':');
+
+  const renderForecast = (forecast) => {
+    weather.textContent = [
+      forecast[2],
+      forecast[3].replace(/(^\+|C$)/g, ''),
+      '–',
+      forecast[1].split(',')[0],
+    ].join(' ');
+  };
+
+  const fetchForecast = async (location) => {
+    const target = location ? encodeURIComponent(location) : '';
+    const endpoint = `https://wttr.in/${target}?format=osef|%l|%c|%t|`;
+    const res = await window.fetch(endpoint);
+    if (!res.ok) throw new Error('Weather API error');
+    const text = await res.text();
+    const forecast = text.split('|');
+    if (forecast.length < 4) {
+      throw new Error(`Invalid weather format, got ${forecast.length} parts`);
+    }
+    return forecast;
+  };
+
+  const loadWeather = async () => {
+    const location = getWeatherLocation().trim();
+    const key = cacheKey(location);
+
+    let forecast = window.localStorage.getItem(key);
+    if (forecast) {
+      try {
+        forecast = JSON.parse(forecast);
+        if (forecast.expire < Date.now()) {
+          forecast = null;
+        } else {
+          ({ forecast } = forecast);
+        }
+      } catch (e) {
         forecast = null;
-      } else {
-        ({ forecast } = forecast);
       }
-    } catch (e) {
-      forecast = null;
     }
-  }
 
-  if (!forecast) {
-    try {
-      const res = await window.fetch('https://wttr.in/?format=osef|%l|%c|%t|');
-      if (!res.ok) throw new Error('Weather API error');
-      const text = await res.text();
-      forecast = text.split('|');
-      if (forecast.length < 4) throw new Error('Invalid weather format, got ' + forecast.length + ' parts');
-      window.localStorage.setItem(storageKey, JSON.stringify({
-        forecast,
-        expire: Date.now() + 15 * 60 * 1000,
-      }));
-    } catch (e) {
-      console.warn('Failed to fetch weather', e);
-      window.localStorage.removeItem(storageKey);
-      weather.textContent = '';
-      return;
+    if (!forecast) {
+      try {
+        forecast = await fetchForecast(location);
+        window.localStorage.setItem(key, JSON.stringify({
+          forecast,
+          expire: Date.now() + 15 * 60 * 1000,
+        }));
+      } catch (e) {
+        console.warn('Failed to fetch weather', e);
+        window.localStorage.removeItem(key);
+        weather.textContent = '';
+        return;
+      }
     }
-  }
 
-  weather.textContent = [
-    forecast[2],
-    forecast[3].replace(/(^\+|C$)/g, ''),
-    '–',
-    forecast[1].split(',')[0],
-  ].join(' ');
+    renderForecast(forecast);
+  };
+
+  document.addEventListener('settings:weatherLocationChanged', () => {
+    loadWeather();
+  });
+
+  loadWeather();
 })();
 
 // ---------------------------------------------------------------------------------------------- //
