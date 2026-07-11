@@ -605,6 +605,10 @@ html {
   padding: 8px 296px 8px 32px;
 }
 
+.search .search-input::placeholder {
+  color: rgba(0, 0, 0, 0.1);
+}
+
 .search .search-input-wrapper {
   position: relative;
 }
