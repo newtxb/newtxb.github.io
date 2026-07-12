@@ -1596,32 +1596,220 @@ const UnsplashBg = {
 
 (async () => {
   const weather = document.querySelector('.weather');
-  const storageKey = 'weather-forecast';
+  if (!weather) return;
+
+  const storageKey = 'weather-forecast-v2';
 
   const getWeatherLocation = () => window.homeSettings?.get?.().weatherLocation || '';
 
   const cacheKey = (location) => [storageKey, location || 'auto'].join(':');
+  const PERIOD_ORDER = ['Morning', 'Afternoon', 'Evening', 'Night'];
+
+  const weatherLabel = (entry) => {
+    const hourly = Array.isArray(entry?.hourly) ? entry.hourly : [];
+    const sample = hourly[Math.floor(hourly.length / 2)] || hourly[0] || {};
+    return (sample?.weatherDesc?.[0]?.value || '').toString().trim() || 'Unknown';
+  };
+
+  const parseTemp = (value) => {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+
+  const weatherEmoji = (label = '') => {
+    const text = label.toLowerCase();
+    if (!text) return '🌤️';
+    if (/thunder|storm|lightning/.test(text)) return '⛈️';
+    if (/snow|blizzard|sleet|ice/.test(text)) return '❄️';
+    if (/rain|drizzle|shower/.test(text)) return '🌧️';
+    if (/fog|mist|haze|smoke/.test(text)) return '🌫️';
+    if (/wind|gust/.test(text)) return '💨';
+    if (/cloud|overcast/.test(text)) return '☁️';
+    if (/sun|clear/.test(text)) return '☀️';
+    return '🌤️';
+  };
+
+  const toPartName = (timeValue) => {
+    if (timeValue <= 300) return 'Night';
+    if (timeValue <= 900) return 'Morning';
+    if (timeValue <= 1500) return 'Afternoon';
+    return 'Evening';
+  };
+
+  const dayParts = (entry) => {
+    const hourly = Array.isArray(entry?.hourly) ? entry.hourly : [];
+    const parts = hourly
+      .map((slot) => {
+        const timeValue = Number.parseInt(slot?.time || '0', 10);
+        return {
+          name: toPartName(Number.isNaN(timeValue) ? 0 : timeValue),
+          temp: parseTemp(slot?.tempC),
+          label: (slot?.weatherDesc?.[0]?.value || '').toString().trim() || '',
+        };
+      })
+      .filter((part) => part.temp != null);
+
+    const merged = {};
+    parts.forEach((part) => {
+      if (!merged[part.name]) merged[part.name] = part;
+      else merged[part.name] = { ...merged[part.name], temp: part.temp };
+    });
+
+    return PERIOD_ORDER
+      .map((name) => merged[name])
+      .filter(Boolean);
+  };
+
+  const normalizeWeather = (payload) => {
+    const current = payload?.current_condition?.[0] || {};
+    const currentTemp = Number.parseInt(current?.temp_C, 10);
+    const currentLabel = (current?.weatherDesc?.[0]?.value || '').toString().trim() || 'Unknown';
+    const currentLocation = (payload?.nearest_area?.[0]?.areaName?.[0]?.value || '').toString().trim();
+    const days = Array.isArray(payload?.weather) ? payload.weather : [];
+
+    return {
+      current: {
+        tempC: Number.isNaN(currentTemp) ? null : currentTemp,
+        label: currentLabel,
+        emoji: weatherEmoji(currentLabel),
+        location: currentLocation,
+      },
+      today: days[0]
+        ? {
+            day: 'Today',
+            label: weatherLabel(days[0]),
+            emoji: weatherEmoji(weatherLabel(days[0])),
+            min: parseTemp(days[0]?.mintempC),
+            max: parseTemp(days[0]?.maxtempC),
+            parts: dayParts(days[0]),
+          }
+        : null,
+      nextDays: days.slice(1, 4).map((day) => {
+        const max = parseTemp(day?.maxtempC);
+        const min = parseTemp(day?.mintempC);
+        const date = new Date(`${day?.date || ''}T12:00:00`);
+        const weekday = Number.isNaN(date.getTime())
+          ? (day?.date || '').toString()
+          : date.toLocaleDateString('default', { weekday: 'long' });
+
+        const label = weatherLabel(day);
+
+        return {
+          day: weekday,
+          label,
+          emoji: weatherEmoji(label),
+          min,
+          max,
+          parts: dayParts(day),
+        };
+      }),
+    };
+  };
 
   const renderForecast = (forecast) => {
-    weather.textContent = [
-      forecast[2],
-      forecast[3].replace(/(^\+|C$)/g, ''),
-      '–',
-      forecast[1].split(',')[0],
-    ].join(' ');
+    weather.textContent = '';
+
+    const current = document.createElement('div');
+    current.className = 'weather-current';
+    current.setAttribute('tabindex', '0');
+
+    const temp = forecast.current?.tempC;
+    const location = forecast.current?.location || 'Local weather';
+    const label = forecast.current?.label || 'Unknown';
+    const emoji = forecast.current?.emoji || '🌤️';
+
+    current.textContent = `${emoji} ${temp == null ? '--' : `${temp}°`} – ${location}`;
+    current.title = label;
+
+    const menu = document.createElement('div');
+    menu.className = 'weather-menu';
+    menu.setAttribute('role', 'group');
+    menu.setAttribute('aria-label', 'Next days weather');
+
+    const header = document.createElement('div');
+    header.className = 'weather-menu-title';
+    header.textContent = 'Detailed forecast';
+    menu.appendChild(header);
+
+    const rows = document.createElement('div');
+    rows.className = 'weather-menu-rows';
+
+    const makePartRow = (parts = []) => {
+      const table = document.createElement('table');
+      table.className = 'weather-menu-table';
+
+      const headRow = document.createElement('tr');
+      const valueRow = document.createElement('tr');
+
+      const byName = Object.fromEntries(parts.map((part) => [part.name, part]));
+
+      PERIOD_ORDER.forEach((name) => {
+        const head = document.createElement('th');
+        head.scope = 'col';
+        head.textContent = name;
+        headRow.appendChild(head);
+
+        const value = document.createElement('td');
+        const part = byName[name];
+        value.textContent = part ? `${part.temp}°` : '--';
+        if (part?.label) value.title = part.label;
+        valueRow.appendChild(value);
+      });
+
+      table.append(headRow, valueRow);
+      return table;
+    };
+
+    const addDayBlock = (day, extraClass = '') => {
+      const block = document.createElement('div');
+      block.className = `weather-menu-day-block${extraClass ? ` ${extraClass}` : ''}`;
+
+      const row = document.createElement('div');
+      row.className = 'weather-menu-row';
+
+      const dayNode = document.createElement('span');
+      dayNode.className = 'weather-menu-day';
+      dayNode.textContent = day.day || '--';
+
+      const labelNode = document.createElement('span');
+      labelNode.className = 'weather-menu-label';
+      labelNode.textContent = `${day.emoji || '🌤️'} ${day.label || 'Unknown'}`;
+
+      const tempNode = document.createElement('span');
+      tempNode.className = 'weather-menu-temp';
+      const min = day.min == null ? '--' : `${day.min}°`;
+      const max = day.max == null ? '--' : `${day.max}°`;
+      tempNode.textContent = `${min} / ${max}`;
+
+      row.append(dayNode, labelNode, tempNode);
+      block.append(row, makePartRow(day.parts));
+      rows.appendChild(block);
+    };
+
+    if (forecast.today) {
+      addDayBlock(forecast.today, 'is-today');
+    }
+
+    if (!forecast.nextDays.length) {
+      const empty = document.createElement('div');
+      empty.className = 'weather-menu-empty';
+      empty.textContent = 'Forecast unavailable';
+      rows.appendChild(empty);
+    } else {
+      forecast.nextDays.forEach((day) => addDayBlock(day));
+    }
+
+    menu.appendChild(rows);
+    weather.append(current, menu);
   };
 
   const fetchForecast = async (location) => {
     const target = location ? encodeURIComponent(location) : '';
-    const endpoint = `https://wttr.in/${target}?format=osef|%l|%c|%t|`;
+    const endpoint = `https://wttr.in/${target}?format=j1`;
     const res = await window.fetch(endpoint);
     if (!res.ok) throw new Error('Weather API error');
-    const text = await res.text();
-    const forecast = text.split('|');
-    if (forecast.length < 4) {
-      throw new Error(`Invalid weather format, got ${forecast.length} parts`);
-    }
-    return forecast;
+    const data = await res.json();
+    return normalizeWeather(data);
   };
 
   const loadWeather = async () => {
