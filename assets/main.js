@@ -1880,7 +1880,7 @@ const UnsplashBg = {
 
     const header = document.createElement('div');
     header.className = 'weather-menu-title';
-    header.textContent = 'Detailed forecast';
+    header.textContent = '3 days forecast';
     menu.appendChild(header);
 
     const rows = document.createElement('div');
