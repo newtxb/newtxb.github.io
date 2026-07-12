@@ -178,6 +178,101 @@ html {
   position: relative;
 }
 
+.calendar {
+  position: relative;
+}
+
+.calendar-current {
+  cursor: default;
+  white-space: nowrap;
+  outline: none;
+}
+
+.calendar-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  width: min(300px, calc(100vw - 32px));
+  padding: 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(249, 252, 255, 0.94);
+  color: #243145;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+  text-shadow: none;
+}
+
+.calendar:hover .calendar-menu,
+.calendar:focus-within .calendar-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.calendar-menu-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #5a6a81;
+}
+
+.calendar-menu-weekdays,
+.calendar-menu-days {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-menu-weekdays span {
+  text-align: center;
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #65748a;
+  text-transform: uppercase;
+}
+
+.calendar-menu-day {
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: #34465d;
+  border: 1px solid rgba(103, 122, 145, 0.18);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.calendar-menu-day.is-weekend {
+  border-width: 2px;
+}
+
+.calendar-menu-day.is-neighbor {
+  color: rgba(52, 70, 93, 0.45);
+  border-color: rgba(103, 122, 145, 0.1);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.calendar-menu-day.is-holiday {
+  background: rgba(255, 214, 214, 0.62);
+  border-color: rgba(205, 126, 126, 0.42);
+}
+
+.calendar-menu-day.is-today {
+  font-weight: 700;
+  color: #1d3f66;
+  border-color: rgba(61, 121, 187, 0.48);
+  background: rgba(203, 229, 255, 0.86);
+}
+
 .weather-current {
   cursor: default;
   white-space: nowrap;
@@ -301,6 +396,11 @@ html {
 
 .unsplash-mode .weather-menu,
 .unsplash-mode .weather-menu * {
+  text-shadow: none;
+}
+
+.unsplash-mode .calendar-menu,
+.unsplash-mode .calendar-menu * {
   text-shadow: none;
 }
 

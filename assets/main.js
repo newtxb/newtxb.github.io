@@ -1064,9 +1064,151 @@ const UnsplashBg = {
 (async () => {
   // To render the date only once per day
   let currentDate = -1;
+  let currentMonthKey = '';
 
   const clock = document.querySelector('.clock');
   const welcome = document.querySelector('.welcome-text');
+  const calendar = document.querySelector('.calendar');
+
+  let calendarSummary = null;
+  let calendarMenu = null;
+
+  const buildCalendarMenu = () => {
+    if (!calendar) return;
+
+    calendar.textContent = '';
+
+    calendarSummary = document.createElement('div');
+    calendarSummary.className = 'calendar-current';
+    calendarSummary.setAttribute('tabindex', '0');
+
+    calendarMenu = document.createElement('div');
+    calendarMenu.className = 'calendar-menu';
+    calendarMenu.setAttribute('role', 'group');
+    calendarMenu.setAttribute('aria-label', 'Current month calendar');
+
+    calendar.append(calendarSummary, calendarMenu);
+  };
+
+  const toDateKey = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const easterSunday = (year) => {
+    // Meeus/Jones/Butcher algorithm for Gregorian Easter.
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+  };
+
+  const frenchHolidays = (year) => {
+    const holidays = new Map();
+    const addHoliday = (date, name) => {
+      holidays.set(toDateKey(date), name);
+    };
+
+    addHoliday(new Date(year, 0, 1), 'New Year\'s Day');
+    addHoliday(new Date(year, 4, 1), 'Labour Day');
+    addHoliday(new Date(year, 4, 8), 'Victory in Europe Day');
+    addHoliday(new Date(year, 6, 14), 'Bastille Day');
+    addHoliday(new Date(year, 7, 15), 'Assumption of Mary');
+    addHoliday(new Date(year, 10, 1), 'All Saints\' Day');
+    addHoliday(new Date(year, 10, 11), 'Armistice Day');
+    addHoliday(new Date(year, 11, 25), 'Christmas Day');
+
+    const easter = easterSunday(year);
+    addHoliday(new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 1), 'Easter Monday');
+    addHoliday(new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 39), 'Ascension Day');
+    addHoliday(new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 50), 'Whit Monday');
+
+    return holidays;
+  };
+
+  const renderMonthGrid = (now) => {
+    if (!calendarMenu) return;
+
+    calendarMenu.textContent = '';
+
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const firstDayOffset = (firstDay.getDay() + 6) % 7;
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cellsCount = Math.ceil((firstDayOffset + daysInMonth) / 7) * 7;
+    const holidaysThisYear = frenchHolidays(year);
+    const holidaysPrevYear = frenchHolidays(year - 1);
+    const holidaysNextYear = frenchHolidays(year + 1);
+
+    const title = document.createElement('div');
+    title.className = 'calendar-menu-title';
+    title.textContent = now.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+
+    const weekdays = document.createElement('div');
+    weekdays.className = 'calendar-menu-weekdays';
+    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach((name) => {
+      const node = document.createElement('span');
+      node.textContent = name;
+      weekdays.appendChild(node);
+    });
+
+    const days = document.createElement('div');
+    days.className = 'calendar-menu-days';
+
+    for (let index = 0; index < cellsCount; index += 1) {
+      const dayOfMonth = index - firstDayOffset + 1;
+      const cell = document.createElement('span');
+      cell.className = 'calendar-menu-day';
+
+      if (index % 7 >= 5) {
+        cell.classList.add('is-weekend');
+      }
+
+      if (dayOfMonth < 1 || dayOfMonth > daysInMonth) {
+        const neighborDay = dayOfMonth < 1
+          ? daysInPrevMonth + dayOfMonth
+          : dayOfMonth - daysInMonth;
+        cell.classList.add('is-neighbor');
+        cell.textContent = String(neighborDay);
+      } else {
+        cell.textContent = String(dayOfMonth);
+        if (dayOfMonth === now.getDate()) {
+          cell.classList.add('is-today');
+        }
+      }
+
+      const cellDate = new Date(year, month, dayOfMonth);
+      const holidayKey = toDateKey(cellDate);
+      const holidayName = holidaysThisYear.get(holidayKey)
+        || holidaysPrevYear.get(holidayKey)
+        || holidaysNextYear.get(holidayKey);
+      if (holidayName) {
+        cell.classList.add('is-holiday');
+        cell.title = holidayName;
+      }
+
+      days.appendChild(cell);
+    }
+
+    calendarMenu.append(title, weekdays, days);
+  };
+
+  buildCalendarMenu();
 
   const formatWelcomeText = (hours) => {
     let text;
@@ -1088,10 +1230,20 @@ const UnsplashBg = {
     welcome.textContent = formatWelcomeText(hours);
 
     if (!onlySecond) {
-      if (new Date().getDate() === currentDate) return;
-      currentDate = new Date().getDate();
-      document.querySelector('.calendar').textContent = new Date()
-        .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+      const now = new Date();
+      const dateChanged = now.getDate() !== currentDate;
+
+      if (calendarSummary && dateChanged) {
+        currentDate = now.getDate();
+        calendarSummary.textContent = now
+          .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+      }
+
+      const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
+      if (calendarMenu && (monthKey !== currentMonthKey || dateChanged)) {
+        currentMonthKey = monthKey;
+        renderMonthGrid(now);
+      }
     }
   };
 
