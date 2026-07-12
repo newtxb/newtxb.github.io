@@ -215,6 +215,10 @@ html {
   cursor: not-allowed;
 }
 
+.button-trigger {
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.067) 0%, rgba(255, 255, 255, 0) 75%);
+}
+
 .settings-trigger {
   position: fixed;
   top: 16px;
@@ -224,7 +228,6 @@ html {
   height: 36px;
   border: 0;
   border-radius: 0;
-  background: transparent;
   color: transparent;
   font-size: 0;
   line-height: 0;
@@ -491,6 +494,26 @@ html {
   flex: 1;
   display: flex;
   justify-content: center;
+}
+
+.rows .row {
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.0);
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.0);
+  transition: all .15s ease-in-out;
+}
+
+.rows .row:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(12, 18, 29, 0.72);
+  color: #f5f8ff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+}
+
+.section-bottom {
+  padding: 10px;
 }
 
 .rows > div:first-child > div { margin-right: auto; }
@@ -1025,11 +1048,11 @@ html {
   transition: transform .2s ease-in-out, opacity .2s ease-in-out;
 }
 
-.quote:hover .text {
+.row-quote:hover .text {
   transform: translateY(-0.6em);
 }
 
-.quote:hover .author {
+.row-quote:hover .author {
   transform: translateY(0.6em);
   opacity: 0.67;
 }
