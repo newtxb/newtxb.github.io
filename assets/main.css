@@ -1192,6 +1192,10 @@ html {
 }
 
 @media (max-width: 640px) {
+  .clock {
+    font-size: 8rem;
+  }
+
   .settings-panel {
     margin-top: 56px;
   }
