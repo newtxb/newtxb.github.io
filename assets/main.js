@@ -1284,6 +1284,30 @@ const UnsplashBg = {
 
   buildCalendarMenu();
 
+  const teddyFaces = [
+    'ʕ´❛ᴥ❛`ʔ',
+    'ʕ ·ᴥ· ʔ',
+    'ʕ•ᴥ•ʔ',
+    'ʕᵕᴥᵕʔ',
+    '◝ʕ •ᴥ• ʔ◜',
+    'ʕ•ᴗ•ʔ',
+    'ʕᵔᴥᵔʔ',
+    '◝ʕ •ᴥ• ʔ◜',
+    'ʕ•ᴥ•ʔ',
+    'ʕ´•ᴥ•`ʔ',
+    'ʕ ᵔᴥᵔ ʔ',
+    'ʕ •ᴥ•ʔ',
+    'ʕっ•ᴥ•ʔっ',
+    'ʕ⁀ᴥ⁀ʔ',
+    'ʕ•ᴥ•ʔ',
+  ];
+
+  const getDailyTeddyFace = () => {
+    const dayNumber = Math.floor(new Date().setHours(0, 0, 0, 0) / 86400000);
+    const index = ((dayNumber % teddyFaces.length) + teddyFaces.length) % teddyFaces.length;
+    return teddyFaces[index];
+  };
+
   const formatWelcomeText = (hours) => {
     let text;
     if (hours >= 5 && hours < 12) text = 'Good morning';
@@ -1291,7 +1315,8 @@ const UnsplashBg = {
     else text = 'Good evening';
 
     const username = (window.homeSettings?.get?.().username || '').toString().trim();
-    return username ? `${text}, ${username}` : text;
+    const displayName = username || getDailyTeddyFace();
+    return `${text}, ${displayName}`;
   };
 
   // Render the clock digits
