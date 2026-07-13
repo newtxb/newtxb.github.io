@@ -1065,6 +1065,7 @@ const UnsplashBg = {
   // To render the date only once per day
   let currentDate = -1;
   let currentMonthKey = '';
+  let currentMonthOffset = 0;
 
   const clock = document.querySelector('.clock');
   const welcome = document.querySelector('.welcome-text');
@@ -1072,6 +1073,31 @@ const UnsplashBg = {
 
   let calendarSummary = null;
   let calendarMenu = null;
+  let calendarPrevButton = null;
+  let calendarNextButton = null;
+
+  const getViewedMonth = (baseDate, offset) => {
+    const viewedMonth = new Date(baseDate);
+    viewedMonth.setDate(1);
+    viewedMonth.setHours(0, 0, 0, 0);
+    viewedMonth.setMonth(viewedMonth.getMonth() + offset);
+    return viewedMonth;
+  };
+
+  const renderCalendar = (offset = currentMonthOffset, direction = null, force = false) => {
+    const now = new Date();
+    const viewedMonth = getViewedMonth(now, offset);
+    const monthKey = `${viewedMonth.getFullYear()}-${viewedMonth.getMonth()}`;
+
+    if (!force && monthKey === currentMonthKey) {
+      return;
+    }
+
+    currentMonthOffset = offset;
+    currentMonthKey = monthKey;
+
+    renderMonthGrid(viewedMonth, direction);
+  };
 
   const buildCalendarMenu = () => {
     if (!calendar) return;
@@ -1086,6 +1112,18 @@ const UnsplashBg = {
     calendarMenu.className = 'calendar-menu';
     calendarMenu.setAttribute('role', 'group');
     calendarMenu.setAttribute('aria-label', 'Current month calendar');
+
+    calendarPrevButton = document.createElement('button');
+    calendarPrevButton.type = 'button';
+    calendarPrevButton.className = 'calendar-menu-nav';
+    calendarPrevButton.setAttribute('aria-label', 'Show previous month');
+    calendarPrevButton.textContent = '‹';
+
+    calendarNextButton = document.createElement('button');
+    calendarNextButton.type = 'button';
+    calendarNextButton.className = 'calendar-menu-nav';
+    calendarNextButton.setAttribute('aria-label', 'Show next month');
+    calendarNextButton.textContent = '›';
 
     const calendarMenuWrapper = document.createElement('div');
     calendarMenuWrapper.className = 'calendar-menu-wrapper';
@@ -1143,10 +1181,12 @@ const UnsplashBg = {
     return holidays;
   };
 
-  const renderMonthGrid = (now) => {
+  const renderMonthGrid = (now, direction = null) => {
     if (!calendarMenu) return;
 
     calendarMenu.textContent = '';
+
+    const today = new Date();
 
     const year = now.getFullYear();
     const month = now.getMonth();
@@ -1159,9 +1199,21 @@ const UnsplashBg = {
     const holidaysPrevYear = frenchHolidays(year - 1);
     const holidaysNextYear = frenchHolidays(year + 1);
 
+    const titleBar = document.createElement('div');
+    titleBar.className = 'calendar-menu-header';
+
     const title = document.createElement('div');
     title.className = 'calendar-menu-title';
     title.textContent = now.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+
+    const navButtons = document.createElement('div');
+    navButtons.className = 'calendar-menu-navs';
+
+    if (calendarPrevButton) navButtons.appendChild(calendarPrevButton);
+    navButtons.appendChild(title);
+    if (calendarNextButton) navButtons.appendChild(calendarNextButton);
+
+    titleBar.appendChild(navButtons);
 
     const weekdays = document.createElement('div');
     weekdays.className = 'calendar-menu-weekdays';
@@ -1191,7 +1243,7 @@ const UnsplashBg = {
         cell.textContent = String(neighborDay);
       } else {
         cell.textContent = String(dayOfMonth);
-        if (dayOfMonth === now.getDate()) {
+        if (dayOfMonth === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
           cell.classList.add('is-today');
         }
       }
@@ -1209,7 +1261,25 @@ const UnsplashBg = {
       days.appendChild(cell);
     }
 
-    calendarMenu.append(title, weekdays, days);
+    const body = document.createElement('div');
+    body.className = 'calendar-menu-body';
+    if (direction === 'prev') body.classList.add('is-slide-prev');
+    else if (direction === 'next') body.classList.add('is-slide-next');
+
+    body.append(titleBar, weekdays, days);
+    calendarMenu.appendChild(body);
+
+    if (calendarPrevButton) {
+      calendarPrevButton.onclick = () => {
+        renderCalendar(currentMonthOffset - 1, 'prev');
+      };
+    }
+
+    if (calendarNextButton) {
+      calendarNextButton.onclick = () => {
+        renderCalendar(currentMonthOffset + 1, 'next');
+      };
+    }
   };
 
   buildCalendarMenu();
@@ -1243,11 +1313,7 @@ const UnsplashBg = {
           .toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric' });
       }
 
-      const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
-      if (calendarMenu && (monthKey !== currentMonthKey || dateChanged)) {
-        currentMonthKey = monthKey;
-        renderMonthGrid(now);
-      }
+      renderCalendar(currentMonthOffset, null, dateChanged && currentMonthOffset === 0);
     }
   };
 
