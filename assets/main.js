@@ -1863,13 +1863,40 @@ const UnsplashBg = {
     return 'Evening';
   };
 
+  const formatPartTime = (timeValue) => {
+    const normalized = Number.isFinite(timeValue) ? timeValue : 0;
+    const hours = Math.max(0, Math.min(23, Math.floor(normalized / 100)));
+    const minutes = Math.max(0, Math.min(59, normalized % 100));
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  };
+
+  const currentDayPercent = () => {
+    const CHART_START_MINUTES = 9 * 60;
+    const CHART_END_MINUTES = (24 + 3) * 60;
+    const CHART_LEFT_PERCENT = 12.5;
+    const CHART_RIGHT_PERCENT = 87.5;
+    const now = new Date();
+    let minutes = (now.getHours() * 60) + now.getMinutes();
+
+    if (minutes < 3 * 60) minutes += 24 * 60;
+
+    const clamped = Math.max(CHART_START_MINUTES, Math.min(CHART_END_MINUTES, minutes));
+    const domainPercent = (clamped - CHART_START_MINUTES) / (CHART_END_MINUTES - CHART_START_MINUTES);
+    return CHART_LEFT_PERCENT + (domainPercent * (CHART_RIGHT_PERCENT - CHART_LEFT_PERCENT));
+  };
+
   const dayParts = (entry) => {
     const hourly = Array.isArray(entry?.hourly) ? entry.hourly : [];
     const parts = hourly
       .map((slot) => {
         const timeValue = Number.parseInt(slot?.time || '0', 10);
+        const safeTimeValue = Number.isNaN(timeValue) ? 0 : timeValue;
         return {
-          name: toPartName(Number.isNaN(timeValue) ? 0 : timeValue),
+          name: toPartName(safeTimeValue),
+          timeValue: safeTimeValue,
+          timeLabel: formatPartTime(safeTimeValue),
           temp: parseTemp(slot?.tempC),
           label: (slot?.weatherDesc?.[0]?.value || '').toString().trim() || '',
         };
@@ -1879,7 +1906,7 @@ const UnsplashBg = {
     const merged = {};
     parts.forEach((part) => {
       if (!merged[part.name]) merged[part.name] = part;
-      else merged[part.name] = { ...merged[part.name], temp: part.temp };
+      else merged[part.name] = { ...merged[part.name], temp: part.temp, timeValue: part.timeValue, timeLabel: part.timeLabel };
     });
 
     return PERIOD_ORDER
@@ -2097,7 +2124,7 @@ const UnsplashBg = {
     const rows = document.createElement('div');
     rows.className = 'weather-menu-rows';
 
-    const makePartRow = (parts = []) => {
+    const makePartRow = (parts = [], options = {}) => {
       const chart = document.createElement('div');
       chart.className = 'weather-menu-temp-chart';
 
@@ -2159,6 +2186,14 @@ const UnsplashBg = {
       const plot = document.createElement('div');
       plot.className = 'weather-menu-temp-plot';
       plot.appendChild(svg);
+
+      if (options.showCurrentTime) {
+        const nowMarker = document.createElement('span');
+        nowMarker.className = 'weather-menu-temp-now';
+        nowMarker.style.left = `${currentDayPercent()}%`;
+        nowMarker.title = 'Current time';
+        plot.appendChild(nowMarker);
+      }
 
       if (points.length) {
         const defs = document.createElementNS(SVG_NS, 'defs');
@@ -2226,7 +2261,7 @@ const UnsplashBg = {
         const caption = document.createElement('span');
         caption.className = 'weather-menu-temp-caption';
         if (!hasTemp) caption.classList.add('is-empty');
-        caption.textContent = name;
+        caption.textContent = hasTemp ? (part.timeLabel || name) : '--';
         captions.appendChild(caption);
       });
 
@@ -2257,7 +2292,11 @@ const UnsplashBg = {
       tempNode.textContent = `${min} / ${max}`;
 
       row.append(dayNode, labelNode, tempNode);
-      block.append(row, createMetricRow(day.metrics, 'weather-menu-metrics', { includeFeels: false, includeAstronomy: false }), makePartRow(day.parts));
+      block.append(
+        row,
+        createMetricRow(day.metrics, 'weather-menu-metrics', { includeFeels: false, includeAstronomy: false }),
+        makePartRow(day.parts, { showCurrentTime: extraClass.includes('is-today') }),
+      );
       rows.appendChild(block);
     };
 
