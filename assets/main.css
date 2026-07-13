@@ -342,7 +342,7 @@ html {
   background: rgba(255, 255, 255, 0.34);
 }
 
-.calendar-menu-day.is-holiday {
+.calendar-menu-day.is-holiday:not(.is-neighbor) {
   background: rgba(255, 214, 214, 0.62);
   border-color: rgba(205, 126, 126, 0.42);
 }
