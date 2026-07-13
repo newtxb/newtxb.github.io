@@ -194,6 +194,8 @@ html {
   bottom: 100%;
   width: min(300px, calc(100vw - 32px));
   padding-bottom: 8px;
+  padding-top: 50px;
+  padding-right: 30px;
   opacity: 0;
   pointer-events: none;
   transform: translateY(4px);
@@ -347,6 +349,11 @@ html {
   border-color: rgba(205, 126, 126, 0.42);
 }
 
+.calendar-menu-day.is-holiday.is-neighbor {
+  background: rgba(255, 244, 244, 0.34);
+  border-color: rgba(199, 52, 52, 0.1);
+}
+
 .calendar-menu-day.is-today {
   font-weight: 700;
   color: #1d3f66;
@@ -367,6 +374,8 @@ html {
   width: min(720px, calc(100vw - 20px));
   max-height: min(680px, calc(100vh - 24px));
   padding-bottom: 8px;
+  padding-top: 30px;
+  padding-left: 30px;
   opacity: 0;
   pointer-events: none;
   transform: translateY(4px);
@@ -976,9 +985,11 @@ html {
 
 .rows .row:hover {
   border-color: rgba(255, 255, 255, 0.42);
-  background: rgba(12, 18, 29, 0.72);
+  /* background: rgba(12, 18, 29, 0.72); */
+  background: rgba(100, 100, 100, 0.2);
   color: #f5f8ff;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(3px);
 }
 
 .section-bottom {
@@ -1519,6 +1530,11 @@ html {
 
 .quote .text, .quote .author {
   transition: transform .2s ease-in-out, opacity .2s ease-in-out;
+}
+
+.row.row-quote {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 .row-quote:hover .text {
