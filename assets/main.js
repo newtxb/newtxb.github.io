@@ -1914,7 +1914,13 @@ const UnsplashBg = {
 
     const header = document.createElement('div');
     header.className = 'weather-menu-title';
-    header.textContent = 'Currently';
+    const feelsLike = forecast.current?.metrics?.feelsLikeC;
+    const currentText = `Currently ${temp == null ? '--' : `${temp}°`}`;
+    const feelsText = `, feels like ${feelsLike == null ? '--' : `${feelsLike}°`}`;
+    const feels = document.createElement('span');
+    feels.className = 'weather-menu-title-subtle';
+    feels.textContent = feelsText;
+    header.append(currentText, feels);
     menu.appendChild(header);
 
     const formatMetricValue = (metric) => {
@@ -1931,7 +1937,10 @@ const UnsplashBg = {
       return String(metric.value);
     };
 
-    const toMetricList = (metrics = {}, options = { includeFeels: true, includeAstronomy: false }) => {
+    const toMetricList = (
+      metrics = {},
+      options = { includeFeels: true, includeAstronomy: false, includeUv: true },
+    ) => {
       const list = [
         {
           key: 'rain',
@@ -1959,11 +1968,13 @@ const UnsplashBg = {
         );
       }
 
-      list.push({ key: 'uv', label: 'UV', value: metrics.uvIndex ?? null });
+      if (options.includeUv !== false) {
+        list.push({ key: 'uv', label: 'UV', value: metrics.uvIndex ?? null });
+      }
 
       if (options.includeAstronomy) {
         list.push(
-          { key: 'moon', label: 'Moon', value: metrics.moonPhase ?? null, wide: true },
+          { key: 'moon', label: 'Moon', value: metrics.moonPhase ?? null },
         );
       }
 
@@ -1973,7 +1984,7 @@ const UnsplashBg = {
     const createMetricRow = (
       metrics = {},
       className = 'weather-menu-metrics',
-      options = { includeFeels: true },
+      options = { includeFeels: true, includeUv: true },
     ) => {
       const node = document.createElement('div');
       node.className = className;
@@ -2002,7 +2013,7 @@ const UnsplashBg = {
     menu.appendChild(createMetricRow(
       forecast.current?.metrics,
       'weather-menu-current-metrics',
-      { includeFeels: true, includeAstronomy: true },
+      { includeFeels: false, includeAstronomy: true, includeUv: false },
     ));
 
     const forecastHeader = document.createElement('div');
