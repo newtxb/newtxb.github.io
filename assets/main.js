@@ -2014,29 +2014,141 @@ const UnsplashBg = {
     rows.className = 'weather-menu-rows';
 
     const makePartRow = (parts = []) => {
-      const table = document.createElement('table');
-      table.className = 'weather-menu-table';
+      const chart = document.createElement('div');
+      chart.className = 'weather-menu-temp-chart';
 
-      const headRow = document.createElement('tr');
-      const valueRow = document.createElement('tr');
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const VIEW_W = 100;
+      const VIEW_H = 100;
+      const TOP = 20;
+      const BOTTOM = 82;
+      const gradientId = `temp-grad-${Math.random().toString(36).slice(2)}`;
 
       const byName = Object.fromEntries(parts.map((part) => [part.name, part]));
+      const columnCenter = (index) => (VIEW_W / PERIOD_ORDER.length) * (index + 0.5);
+
+      const allPoints = PERIOD_ORDER.map((name, index) => ({
+        name,
+        temp: byName[name]?.temp,
+        label: byName[name]?.label || '',
+        x: columnCenter(index),
+      }));
+
+      const availableTemps = allPoints
+        .map((point) => point.temp)
+        .filter((temp) => Number.isFinite(temp));
+
+      const minTemp = availableTemps.length ? Math.min(...availableTemps) : null;
+      const maxTemp = availableTemps.length ? Math.max(...availableTemps) : null;
+      const tempRange = minTemp != null && maxTemp != null
+        ? Math.max(1, maxTemp - minTemp)
+        : 1;
+
+      const points = allPoints
+        .filter((point) => Number.isFinite(point.temp))
+        .map((point) => ({
+          ...point,
+          y: minTemp == null
+            ? (TOP + BOTTOM) / 2
+            : BOTTOM - ((point.temp - minTemp) / tempRange) * (BOTTOM - TOP),
+        }));
+
+      const smoothPath = (pathPoints) => {
+        if (!pathPoints.length) return '';
+        if (pathPoints.length === 1) return `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+
+        let d = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+        for (let i = 0; i < pathPoints.length - 1; i += 1) {
+          const current = pathPoints[i];
+          const next = pathPoints[i + 1];
+          const midX = (current.x + next.x) / 2;
+          d += ` C ${midX} ${current.y}, ${midX} ${next.y}, ${next.x} ${next.y}`;
+        }
+        return d;
+      };
+
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'weather-menu-temp-svg');
+      svg.setAttribute('viewBox', `0 0 ${VIEW_W} ${VIEW_H}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+
+      const plot = document.createElement('div');
+      plot.className = 'weather-menu-temp-plot';
+      plot.appendChild(svg);
+
+      if (points.length) {
+        const defs = document.createElementNS(SVG_NS, 'defs');
+        const gradient = document.createElementNS(SVG_NS, 'linearGradient');
+        gradient.setAttribute('id', gradientId);
+        gradient.setAttribute('x1', '0');
+        gradient.setAttribute('y1', '0');
+        gradient.setAttribute('x2', '0');
+        gradient.setAttribute('y2', '1');
+        [
+          ['0%', 'rgba(74, 132, 216, 0.32)'],
+          ['100%', 'rgba(74, 132, 216, 0)'],
+        ].forEach(([offset, color]) => {
+          const stop = document.createElementNS(SVG_NS, 'stop');
+          stop.setAttribute('offset', offset);
+          stop.setAttribute('stop-color', color);
+          gradient.appendChild(stop);
+        });
+        defs.appendChild(gradient);
+        svg.appendChild(defs);
+
+        const linePath = smoothPath(points);
+
+        const area = document.createElementNS(SVG_NS, 'path');
+        area.setAttribute('class', 'weather-menu-temp-area');
+        area.setAttribute(
+          'd',
+          `${linePath} L ${points[points.length - 1].x} ${VIEW_H} L ${points[0].x} ${VIEW_H} Z`,
+        );
+        area.setAttribute('fill', `url(#${gradientId})`);
+        svg.appendChild(area);
+
+        const line = document.createElementNS(SVG_NS, 'path');
+        line.setAttribute('class', 'weather-menu-temp-line');
+        line.setAttribute('d', linePath);
+        line.setAttribute('vector-effect', 'non-scaling-stroke');
+        svg.appendChild(line);
+
+        points.forEach((point) => {
+          const dot = document.createElement('span');
+          dot.className = 'weather-menu-temp-dot';
+          dot.style.left = `${point.x}%`;
+          dot.style.top = `${(point.y / VIEW_H) * 100}%`;
+          if (point.label) dot.title = point.label;
+          plot.appendChild(dot);
+        });
+      }
+
+      const values = document.createElement('div');
+      values.className = 'weather-menu-temp-values';
+      const captions = document.createElement('div');
+      captions.className = 'weather-menu-temp-labels';
 
       PERIOD_ORDER.forEach((name) => {
-        const head = document.createElement('th');
-        head.scope = 'col';
-        head.textContent = name;
-        headRow.appendChild(head);
-
-        const value = document.createElement('td');
         const part = byName[name];
-        value.textContent = part ? `${part.temp}°` : '--';
+        const hasTemp = part && Number.isFinite(part.temp);
+
+        const value = document.createElement('span');
+        value.className = 'weather-menu-temp-value';
+        if (!hasTemp) value.classList.add('is-empty');
+        value.textContent = hasTemp ? `${part.temp}°` : '--';
         if (part?.label) value.title = part.label;
-        valueRow.appendChild(value);
+        values.appendChild(value);
+
+        const caption = document.createElement('span');
+        caption.className = 'weather-menu-temp-caption';
+        if (!hasTemp) caption.classList.add('is-empty');
+        caption.textContent = name;
+        captions.appendChild(caption);
       });
 
-      table.append(headRow, valueRow);
-      return table;
+      chart.append(values, plot, captions);
+
+      return chart;
     };
 
     const addDayBlock = (day, extraClass = '') => {

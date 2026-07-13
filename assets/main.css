@@ -413,35 +413,93 @@ html {
   color: #526178;
 }
 
-.weather-menu-table {
-  width: 100%;
+.weather-menu-temp-chart {
   margin-top: 7px;
-  border-collapse: collapse;
-  border-spacing: 0;
-  table-layout: fixed;
-  overflow: hidden;
-  border-radius: 7px;
-  border: 1px solid rgba(103, 122, 145, 0.24);
-  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(103, 122, 145, 0.2);
+  border-radius: 9px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 246, 253, 0.86));
+  padding: 7px 4px 6px;
 }
 
-.weather-menu-table th,
-.weather-menu-table td {
+.weather-menu-temp-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 2px;
+}
+
+.weather-menu-temp-value {
   text-align: center;
-  padding: 4px 3px;
-  font-size: 0.7rem;
-  color: #34465d;
+  font-size: 0.68rem;
+  color: #2f4159;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.weather-menu-table th {
+.weather-menu-temp-value.is-empty {
+  color: #9aa6b6;
   font-weight: 600;
-  color: #526178;
-  background: rgba(220, 231, 247, 0.5);
-  border-bottom: 1px solid rgba(103, 122, 145, 0.2);
 }
 
-.weather-menu-table td {
-  font-weight: 600;
+.weather-menu-temp-svg {
+  width: 100%;
+  height: 40px;
+  display: block;
+  overflow: visible;
+}
+
+.weather-menu-temp-plot {
+  position: relative;
+  width: 100%;
+  height: 40px;
+}
+
+.weather-menu-temp-line {
+  fill: none;
+  stroke: #4a84d8;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.weather-menu-temp-area {
+  stroke: none;
+}
+
+.weather-menu-temp-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #4a84d8;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.weather-menu-temp-labels {
+  margin-top: 3px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.weather-menu-temp-caption {
+  text-align: center;
+  font-size: 0.6rem;
+  color: #748498;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weather-menu-temp-caption.is-empty {
+  opacity: 0.6;
 }
 
 .unsplash-mode .weather-menu,
