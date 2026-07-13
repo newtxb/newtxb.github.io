@@ -283,7 +283,8 @@ html {
   position: absolute;
   right: 0;
   bottom: calc(100% + 8px);
-  width: min(330px, calc(100vw - 32px));
+  width: min(720px, calc(100vw - 20px));
+  max-height: min(680px, calc(100vh - 24px));
   padding: 11px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -297,6 +298,8 @@ html {
   transform: translateY(4px);
   transition: opacity .16s ease-in-out, transform .16s ease-in-out;
   text-shadow: none;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .weather:hover .weather-menu,
@@ -312,6 +315,10 @@ html {
   letter-spacing: 0.06em;
   font-weight: 700;
   color: #5a6a81;
+}
+
+.weather-menu-title-subtle {
+  color: #7a889c;
 }
 
 .weather-menu-rows {
@@ -342,6 +349,10 @@ html {
 }
 
 .weather-menu-metric {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
   border: 1px solid rgba(103, 122, 145, 0.2);
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.66);
@@ -351,6 +362,8 @@ html {
 
 .weather-menu-metric-key {
   display: block;
+  flex: 0 1 auto;
+  min-width: 0;
   font-size: 0.65rem;
   color: #65748a;
   text-transform: uppercase;
@@ -359,16 +372,23 @@ html {
 
 .weather-menu-metric-value {
   display: block;
-  margin-top: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 0.73rem;
   color: #2f4159;
   font-weight: 600;
+  text-align: right;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .weather-menu-day-block {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 8px;
+  row-gap: 6px;
+  align-items: start;
   padding: 7px 8px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.5);
@@ -385,6 +405,12 @@ html {
   align-items: center;
   gap: 6px;
   font-size: 0.84rem;
+  grid-column: 1;
+}
+
+.weather-menu-day-block .weather-menu-metrics {
+  margin-top: 0;
+  grid-column: 1;
 }
 
 .weather-menu-day {
@@ -414,7 +440,10 @@ html {
 }
 
 .weather-menu-temp-chart {
-  margin-top: 7px;
+  margin-top: 0;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
   border: 1px solid rgba(103, 122, 145, 0.2);
   border-radius: 9px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 246, 253, 0.86));
@@ -500,6 +529,23 @@ html {
 
 .weather-menu-temp-caption.is-empty {
   opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  .weather-menu {
+    width: min(560px, calc(100vw - 20px));
+    max-height: min(640px, calc(100vh - 24px));
+  }
+
+  .weather-menu-day-block {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 7px;
+  }
+
+  .weather-menu-temp-chart {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 .unsplash-mode .weather-menu,
