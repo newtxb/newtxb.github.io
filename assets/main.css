@@ -188,11 +188,26 @@ html {
   outline: none;
 }
 
-.calendar-menu {
+.calendar-menu-wrapper {
   position: absolute;
   left: 0;
-  bottom: calc(100% + 8px);
+  bottom: 100%;
   width: min(300px, calc(100vw - 32px));
+  padding-bottom: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.calendar:hover .calendar-menu-wrapper,
+.calendar:focus-within .calendar-menu-wrapper {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.calendar-menu {
   padding: 11px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -201,18 +216,7 @@ html {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(4px);
-  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
   text-shadow: none;
-}
-
-.calendar:hover .calendar-menu,
-.calendar:focus-within .calendar-menu {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 
 .calendar-menu-title {
@@ -279,12 +283,27 @@ html {
   outline: none;
 }
 
-.weather-menu {
+.weather-menu-wrapper {
   position: absolute;
   right: 0;
-  bottom: calc(100% + 8px);
+  bottom: 100%;
   width: min(720px, calc(100vw - 20px));
   max-height: min(680px, calc(100vh - 24px));
+  padding-bottom: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.weather:hover .weather-menu-wrapper,
+.weather:focus-within .weather-menu-wrapper {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.weather-menu {
   padding: 11px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -293,20 +312,9 @@ html {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(4px);
-  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
   text-shadow: none;
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-.weather:hover .weather-menu,
-.weather:focus-within .weather-menu {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 
 .weather-menu-title {
