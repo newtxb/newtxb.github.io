@@ -579,6 +579,16 @@ html {
   height: 40px;
 }
 
+.weather-menu-temp-now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dotted rgba(214, 112, 112, 0.65);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .weather-menu-temp-line {
   fill: none;
   stroke: #4a84d8;
@@ -601,6 +611,7 @@ html {
   box-sizing: border-box;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  z-index: 2;
 }
 
 .weather-menu-temp-labels {
