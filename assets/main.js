@@ -1957,7 +1957,11 @@ const UnsplashBg = {
     const current = payload?.current_condition?.[0] || {};
     const currentTemp = Number.parseInt(current?.temp_C, 10);
     const currentLabel = (current?.weatherDesc?.[0]?.value || '').toString().trim() || 'Unknown';
-    const currentLocation = (payload?.nearest_area?.[0]?.areaName?.[0]?.value || '').toString().trim();
+    const nearestArea = payload?.nearest_area?.[0] || {};
+    const currentLocation = (nearestArea?.areaName?.[0]?.value || '').toString().trim();
+    const latitude = (nearestArea?.latitude || '').toString().trim();
+    const longitude = (nearestArea?.longitude || '').toString().trim();
+    const coordinates = latitude && longitude ? `${latitude}, ${longitude}` : null;
     const days = Array.isArray(payload?.weather) ? payload.weather : [];
     const todayMetrics = days[0] ? dayMetrics(days[0]) : {};
     const todayAstronomy = days[0]?.astronomy?.[0] || {};
@@ -1975,6 +1979,7 @@ const UnsplashBg = {
           humidityPct: parseTemp(current?.humidity),
           windKmph: parseTemp(current?.windspeedKmph),
           uvIndex: parseNumber(current?.uvIndex ?? current?.UVIndex),
+          coordinates,
           sunrise: (todayAstronomy?.sunrise || '').toString().trim() || null,
           sunset: (todayAstronomy?.sunset || '').toString().trim() || null,
           moonPhase: (todayAstronomy?.moon_phase || '').toString().trim() || null,
@@ -2064,7 +2069,7 @@ const UnsplashBg = {
 
     const toMetricList = (
       metrics = {},
-      options = { includeFeels: true, includeAstronomy: false, includeUv: true },
+      options = { includeFeels: true, includeAstronomy: false, includeUv: true, includeGps: false },
     ) => {
       const list = [
         {
@@ -2083,7 +2088,6 @@ const UnsplashBg = {
 
       list.push(
         { key: 'humidity', label: 'Humidity', value: metrics.humidityPct ?? null },
-        { key: 'wind', label: 'Wind', value: metrics.windKmph ?? null },
       );
 
       if (options.includeAstronomy) {
@@ -2092,6 +2096,10 @@ const UnsplashBg = {
           { key: 'sunset', label: 'Sunset', value: metrics.sunset ?? null },
         );
       }
+
+      list.push(
+        { key: 'wind', label: 'Wind', value: metrics.windKmph ?? null },
+      );
 
       if (options.includeUv !== false) {
         list.push({ key: 'uv', label: 'UV', value: metrics.uvIndex ?? null });
@@ -2103,13 +2111,17 @@ const UnsplashBg = {
         );
       }
 
+      if (options.includeGps) {
+        list.push({ key: 'gps', label: 'GPS', value: metrics.coordinates ?? null });
+      }
+
       return list;
     };
 
     const createMetricRow = (
       metrics = {},
       className = 'weather-menu-metrics',
-      options = { includeFeels: true, includeUv: true },
+      options = { includeFeels: true, includeUv: true, includeGps: false },
     ) => {
       const node = document.createElement('div');
       node.className = className;
@@ -2138,7 +2150,7 @@ const UnsplashBg = {
     menu.appendChild(createMetricRow(
       forecast.current?.metrics,
       'weather-menu-current-metrics',
-      { includeFeels: false, includeAstronomy: true, includeUv: false },
+      { includeFeels: false, includeAstronomy: true, includeUv: true, includeGps: true },
     ));
 
     const forecastHeader = document.createElement('div');
