@@ -1087,7 +1087,11 @@ const UnsplashBg = {
     calendarMenu.setAttribute('role', 'group');
     calendarMenu.setAttribute('aria-label', 'Current month calendar');
 
-    calendar.append(calendarSummary, calendarMenu);
+    const calendarMenuWrapper = document.createElement('div');
+    calendarMenuWrapper.className = 'calendar-menu-wrapper';
+    calendarMenuWrapper.appendChild(calendarMenu);
+
+    calendar.append(calendarSummary, calendarMenuWrapper);
   };
 
   const toDateKey = (date) => {
@@ -1912,6 +1916,9 @@ const UnsplashBg = {
     menu.setAttribute('role', 'group');
     menu.setAttribute('aria-label', 'Next days weather');
 
+    const menuWrapper = document.createElement('div');
+    menuWrapper.className = 'weather-menu-wrapper';
+
     const header = document.createElement('div');
     header.className = 'weather-menu-title';
     const feelsLike = forecast.current?.metrics?.feelsLikeC;
@@ -2202,7 +2209,8 @@ const UnsplashBg = {
     }
 
     menu.appendChild(rows);
-    weather.append(current, menu);
+    menuWrapper.appendChild(menu);
+    weather.append(current, menuWrapper);
   };
 
   const fetchForecast = async (location) => {
