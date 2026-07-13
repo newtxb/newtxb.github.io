@@ -1768,6 +1768,11 @@ const UnsplashBg = {
     return Number.isNaN(parsed) ? null : parsed;
   };
 
+  const parseNumber = (value) => {
+    const parsed = Number.parseFloat(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+
   const weatherEmoji = (label = '') => {
     const text = label.toLowerCase();
     if (!text) return '🌤️';
@@ -1812,12 +1817,28 @@ const UnsplashBg = {
       .filter(Boolean);
   };
 
+  const dayMetrics = (entry) => {
+    const hourly = Array.isArray(entry?.hourly) ? entry.hourly : [];
+    const sample = hourly[Math.floor(hourly.length / 2)] || hourly[0] || {};
+
+    return {
+      rainMm: parseNumber(sample?.precipMM),
+      rainChancePct: parseTemp(sample?.chanceofrain),
+      feelsLikeC: parseTemp(sample?.FeelsLikeC),
+      humidityPct: parseTemp(sample?.humidity),
+      windKmph: parseTemp(sample?.windspeedKmph),
+      uvIndex: parseNumber(sample?.uvIndex ?? sample?.UVIndex),
+    };
+  };
+
   const normalizeWeather = (payload) => {
     const current = payload?.current_condition?.[0] || {};
     const currentTemp = Number.parseInt(current?.temp_C, 10);
     const currentLabel = (current?.weatherDesc?.[0]?.value || '').toString().trim() || 'Unknown';
     const currentLocation = (payload?.nearest_area?.[0]?.areaName?.[0]?.value || '').toString().trim();
     const days = Array.isArray(payload?.weather) ? payload.weather : [];
+    const todayMetrics = days[0] ? dayMetrics(days[0]) : {};
+    const todayAstronomy = days[0]?.astronomy?.[0] || {};
 
     return {
       current: {
@@ -1825,6 +1846,17 @@ const UnsplashBg = {
         label: currentLabel,
         emoji: weatherEmoji(currentLabel),
         location: currentLocation,
+        metrics: {
+          rainMm: parseNumber(current?.precipMM),
+          rainChancePct: todayMetrics.rainChancePct ?? null,
+          feelsLikeC: parseTemp(current?.FeelsLikeC),
+          humidityPct: parseTemp(current?.humidity),
+          windKmph: parseTemp(current?.windspeedKmph),
+          uvIndex: parseNumber(current?.uvIndex ?? current?.UVIndex),
+          sunrise: (todayAstronomy?.sunrise || '').toString().trim() || null,
+          sunset: (todayAstronomy?.sunset || '').toString().trim() || null,
+          moonPhase: (todayAstronomy?.moon_phase || '').toString().trim() || null,
+        },
       },
       today: days[0]
         ? {
@@ -1834,6 +1866,7 @@ const UnsplashBg = {
             min: parseTemp(days[0]?.mintempC),
             max: parseTemp(days[0]?.maxtempC),
             parts: dayParts(days[0]),
+            metrics: dayMetrics(days[0]),
           }
         : null,
       nextDays: days.slice(1, 4).map((day) => {
@@ -1853,6 +1886,7 @@ const UnsplashBg = {
           min,
           max,
           parts: dayParts(day),
+          metrics: dayMetrics(day),
         };
       }),
     };
@@ -1880,8 +1914,101 @@ const UnsplashBg = {
 
     const header = document.createElement('div');
     header.className = 'weather-menu-title';
-    header.textContent = '3 days forecast';
+    header.textContent = 'Currently';
     menu.appendChild(header);
+
+    const formatMetricValue = (metric) => {
+      if (metric.value == null) return '--';
+      if (metric.key === 'rain') {
+        const amount = `${metric.value.rainMm == null ? '--' : metric.value.rainMm.toFixed(1)} mm`;
+        const chance = metric.value.rainChancePct == null ? '--%' : `${metric.value.rainChancePct}%`;
+        return `${amount} (${chance})`;
+      }
+      if (metric.key === 'feels') return `${metric.value}°`;
+      if (metric.key === 'humidity') return `${metric.value}%`;
+      if (metric.key === 'wind') return `${metric.value} km/h`;
+      if (metric.key === 'uv') return `${metric.value}`;
+      return String(metric.value);
+    };
+
+    const toMetricList = (metrics = {}, options = { includeFeels: true, includeAstronomy: false }) => {
+      const list = [
+        {
+          key: 'rain',
+          label: 'Rain',
+          value: {
+            rainMm: metrics.rainMm ?? null,
+            rainChancePct: metrics.rainChancePct ?? null,
+          },
+        },
+      ];
+
+      if (options.includeFeels !== false) {
+        list.push({ key: 'feels', label: 'Feels', value: metrics.feelsLikeC ?? null });
+      }
+
+      list.push(
+        { key: 'humidity', label: 'Humidity', value: metrics.humidityPct ?? null },
+        { key: 'wind', label: 'Wind', value: metrics.windKmph ?? null },
+      );
+
+      if (options.includeAstronomy) {
+        list.push(
+          { key: 'sunrise', label: 'Sunrise', value: metrics.sunrise ?? null },
+          { key: 'sunset', label: 'Sunset', value: metrics.sunset ?? null },
+        );
+      }
+
+      list.push({ key: 'uv', label: 'UV', value: metrics.uvIndex ?? null });
+
+      if (options.includeAstronomy) {
+        list.push(
+          { key: 'moon', label: 'Moon', value: metrics.moonPhase ?? null, wide: true },
+        );
+      }
+
+      return list;
+    };
+
+    const createMetricRow = (
+      metrics = {},
+      className = 'weather-menu-metrics',
+      options = { includeFeels: true },
+    ) => {
+      const node = document.createElement('div');
+      node.className = className;
+
+      toMetricList(metrics, options).forEach((metric) => {
+        const item = document.createElement('div');
+        item.className = 'weather-menu-metric';
+        if (metric.wide) item.classList.add('is-wide');
+        if (metric.key === 'moon') item.classList.add('is-moon');
+
+        const key = document.createElement('span');
+        key.className = 'weather-menu-metric-key';
+        key.textContent = metric.label;
+
+        const value = document.createElement('span');
+        value.className = 'weather-menu-metric-value';
+        value.textContent = formatMetricValue(metric);
+
+        item.append(key, value);
+        node.appendChild(item);
+      });
+
+      return node;
+    };
+
+    menu.appendChild(createMetricRow(
+      forecast.current?.metrics,
+      'weather-menu-current-metrics',
+      { includeFeels: true, includeAstronomy: true },
+    ));
+
+    const forecastHeader = document.createElement('div');
+    forecastHeader.className = 'weather-menu-title';
+    forecastHeader.textContent = '3 days forecast';
+    menu.appendChild(forecastHeader);
 
     const rows = document.createElement('div');
     rows.className = 'weather-menu-rows';
@@ -1934,7 +2061,7 @@ const UnsplashBg = {
       tempNode.textContent = `${min} / ${max}`;
 
       row.append(dayNode, labelNode, tempNode);
-      block.append(row, makePartRow(day.parts));
+      block.append(row, createMetricRow(day.metrics, 'weather-menu-metrics', { includeFeels: false, includeAstronomy: false }), makePartRow(day.parts));
       rows.appendChild(block);
     };
 
