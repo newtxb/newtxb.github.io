@@ -2441,7 +2441,11 @@ const UnsplashBg = {
     return normalizeWeather(data);
   };
 
+  let renderedForecastJson = '';
+  let loading = false;
+
   const loadWeather = async () => {
+    if (loading) return;
     const location = getWeatherLocation().trim();
     const key = cacheKey(location);
 
@@ -2460,6 +2464,7 @@ const UnsplashBg = {
     }
 
     if (!forecast) {
+      loading = true;
       try {
         forecast = await fetchForecast(location);
         window.localStorage.setItem(key, JSON.stringify({
@@ -2469,16 +2474,31 @@ const UnsplashBg = {
       } catch (e) {
         console.warn('Failed to fetch weather', e);
         window.localStorage.removeItem(key);
-        weather.textContent = '';
+        // Keep showing the previous forecast until a refresh succeeds
         return;
+      } finally {
+        loading = false;
       }
     }
 
+    // Only rebuild the DOM when the forecast actually changed
+    const serialized = JSON.stringify(forecast);
+    if (serialized === renderedForecastJson) return;
+    renderedForecastJson = serialized;
     renderForecast(forecast);
   };
 
   document.addEventListener('settings:weatherLocationChanged', () => {
     loadWeather();
+  });
+
+  // Refresh at interval while the tab is open (fetches only once the cache expires)
+  setInterval(() => {
+    if (!document.hidden) loadWeather();
+  }, 60 * 1000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) loadWeather();
   });
 
   loadWeather();
@@ -2494,26 +2514,61 @@ const UnsplashBg = {
   const quoteAuthor = quote.querySelector('.author');
   const storageKey = 'quote-of-the-day';
 
-  let qotd = window.localStorage.getItem(storageKey);
-  if (qotd) {
-    qotd = JSON.parse(qotd);
-    if (qotd.expire < Date.now()) qotd = null;
-    else ({ qotd } = qotd);
-  }
+  const readCache = () => {
+    try {
+      const cached = JSON.parse(window.localStorage.getItem(storageKey));
+      if (cached && cached.expire > Date.now()) return cached.qotd;
+    } catch (e) {
+      // Corrupted cache, fetch a fresh one
+    }
+    return null;
+  };
 
-  if (!qotd) {
-    // TODO: handle errors
-    qotd = (await (
-      await window.fetch('https://raw.githubusercontent.com/dwyl/quotes/master/quotes.json')
-    ).json());
-    qotd = qotd.filter(({ text, author }) => author && text.length < 90);
-    qotd = qotd[Math.floor(qotd.length * Math.random())];
-    window.localStorage.setItem(storageKey, JSON.stringify({
-      qotd,
-      expire: Date.now() + 12 * 3600 * 1000,
-    }));
-  }
+  const fetchQuote = async () => {
+    const res = await window.fetch('https://raw.githubusercontent.com/dwyl/quotes/master/quotes.json');
+    if (!res.ok) throw new Error('Quotes fetch error');
+    const quotes = (await res.json()).filter(({ text, author }) => author && text.length < 90);
+    return quotes[Math.floor(quotes.length * Math.random())];
+  };
 
-  quoteText.textContent = /\w$/.test(qotd.text) ? `${qotd.text}.` : qotd.text;
-  quoteAuthor.textContent = qotd.author;
+  let renderedText = null;
+  let loading = false;
+
+  const loadQuote = async () => {
+    if (loading) return;
+
+    let qotd = readCache();
+    if (!qotd) {
+      loading = true;
+      try {
+        qotd = await fetchQuote();
+        window.localStorage.setItem(storageKey, JSON.stringify({
+          qotd,
+          expire: Date.now() + 12 * 3600 * 1000,
+        }));
+      } catch (e) {
+        console.warn('Failed to fetch quote', e);
+        // Keep showing the previous quote until a refresh succeeds
+        return;
+      } finally {
+        loading = false;
+      }
+    }
+
+    if (!qotd || qotd.text === renderedText) return;
+    renderedText = qotd.text;
+    quoteText.textContent = /\w$/.test(qotd.text) ? `${qotd.text}.` : qotd.text;
+    quoteAuthor.textContent = qotd.author;
+  };
+
+  // Refresh at interval while the tab is open (fetches only once the cache expires)
+  setInterval(() => {
+    if (!document.hidden) loadQuote();
+  }, 60 * 1000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) loadQuote();
+  });
+
+  loadQuote();
 })();
