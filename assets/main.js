@@ -608,11 +608,11 @@ const UnsplashBg = {
     }
     if (buttons.resetUnsplashPhoto) {
       if (settings.useUnsplash) {
+        buttons.resetUnsplashPhoto.style.display = '';
         buttons.resetUnsplashPhoto.textContent = 'Reset history';
         buttons.resetUnsplashPhoto.disabled = !isUnsplashReady();
       } else {
-        buttons.resetUnsplashPhoto.textContent = 'Reload';
-        buttons.resetUnsplashPhoto.disabled = false;
+        buttons.resetUnsplashPhoto.style.display = 'none';
       }
     }
   };
@@ -687,9 +687,18 @@ const UnsplashBg = {
   inputs.weatherLocation?.addEventListener('blur', updateWeatherLocation);
 
   inputs.useUnsplash?.addEventListener('change', () => {
+    const wasUnsplashEnabled = !!settings.useUnsplash;
     settings.useUnsplash = inputs.useUnsplash.checked;
     syncInputs();
     save();
+
+    if (wasUnsplashEnabled && !settings.useUnsplash) {
+      document.dispatchEvent(new CustomEvent('settings:unsplashToggled', {
+        detail: { enabled: false },
+      }));
+      window.location.reload();
+      return;
+    }
 
     if (settings.useUnsplash && settings.unsplashAuthenticated) {
       // Trigger immediate background update
