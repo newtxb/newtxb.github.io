@@ -1013,9 +1013,17 @@ html {
   padding: 10px;
 }
 
-.rows > div:first-child > div { margin-right: auto; }
+.rows > div:nth-child(1 of *:not(.is-hidden)) > div {
+  margin-right: auto;
+}
 
-.rows > div:last-child  > div { margin-left: auto; }
+.rows > div:nth-last-child(1 of *:not(.is-hidden)) > div {
+  margin-left: auto;
+}
+
+.rows > div:nth-child(1 of *:not(.is-hidden)):nth-last-child(1 of *:not(.is-hidden)) > div {
+  margin: auto;
+}
 
 .section-bottom .rows > div {
   align-self: flex-end;

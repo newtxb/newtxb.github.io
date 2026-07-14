@@ -526,7 +526,7 @@ const UnsplashBg = {
   const closeButtons = modal ? modal.querySelectorAll('[data-close-settings]') : [];
 
   const dateNode = document.querySelector('.calendar')?.parentNode;
-  const quoteNode = document.querySelector('.quote')?.parentNode;
+  const quoteNode = document.querySelector('.row-quote')?.parentNode;
   const weatherNode = document.querySelector('.weather')?.parentNode;
 
   const inputs = {
