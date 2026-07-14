@@ -79,6 +79,10 @@ html {
   font-weight: 300;
 }
 
+.unsplash-mode .bg {
+  display: none;
+}
+
 .unsplash-mode .app {
   text-shadow: 0px 1px 15px rgba(0, 0, 0, .15), 0px 1px 5px rgba(0, 0, 0, .15);
   color: white;
