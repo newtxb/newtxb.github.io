@@ -428,7 +428,6 @@ const UnsplashBg = {
           void bgEl.offsetHeight;
 
           setTimeout(() => {
-            // bgEl.style.transition = 'opacity 0.3s ease-in-out';
             bgEl.style.opacity = '0.1';
             requestAnimationFrame(() => {
               bgEl.style.transition = 'opacity 0.67s ease-in-out';
@@ -447,6 +446,14 @@ const UnsplashBg = {
   async loadDailyImage(accessKey, keywords) {
     const today = new Date().toDateString();
     const cacheKey = `unsplash-bg-${today}`;
+
+    // Drop previous days' entries so localStorage doesn't grow forever
+    for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+      const key = localStorage.key(index);
+      if (key && key.startsWith('unsplash-bg-') && key !== cacheKey) {
+        localStorage.removeItem(key);
+      }
+    }
 
     // Check if we already have today's image
     const cached = localStorage.getItem(cacheKey);
@@ -833,34 +840,21 @@ const UnsplashBg = {
     await resetBlacklistHistory();
   });
 
-  inputs.unsplashKeywords?.addEventListener('change', () => {
+  const commitUnsplashKeywords = () => {
     const nextValue = formatKeywordString(inputs.unsplashKeywords.value);
     const nextOverridden = nextValue.length > 0;
+    inputs.unsplashKeywords.value = nextValue;
     if (
       nextValue === settings.unsplashKeywords
       && nextOverridden === settings.unsplashKeywordsOverridden
     ) return;
-    inputs.unsplashKeywords.value = nextValue;
     settings.unsplashKeywords = nextValue;
     settings.unsplashKeywordsOverridden = nextOverridden;
     save();
-  });
+  };
 
-  inputs.unsplashKeywords?.addEventListener('blur', () => {
-    const nextValue = formatKeywordString(inputs.unsplashKeywords.value);
-    const nextOverridden = nextValue.length > 0;
-    if (
-      nextValue === settings.unsplashKeywords
-      && nextOverridden === settings.unsplashKeywordsOverridden
-    ) {
-      inputs.unsplashKeywords.value = nextValue;
-      return;
-    }
-    inputs.unsplashKeywords.value = nextValue;
-    settings.unsplashKeywords = nextValue;
-    settings.unsplashKeywordsOverridden = nextOverridden;
-    save();
-  });
+  inputs.unsplashKeywords?.addEventListener('change', commitUnsplashKeywords);
+  inputs.unsplashKeywords?.addEventListener('blur', commitUnsplashKeywords);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal?.classList.contains('open')) {
@@ -1115,7 +1109,7 @@ const UnsplashBg = {
 
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    const position = Math.random > 0.75 ? Math.random() : Math.random() * 0.8 + 0.1;
+    const position = Math.random() > 0.75 ? Math.random() : Math.random() * 0.8 + 0.1;
     particle.style.left = `${(position * 100).toFixed(2)}%`;
 
     const size = `${Math.round(weight)}px`;
@@ -1812,6 +1806,7 @@ const UnsplashBg = {
     // And handle response
     window[callback] = (args) => {
       script.remove();
+      delete window[callback];
       cacheSuggestions[text] = args;
       if (now < latest) return; // Already outdated
       latest = now;
