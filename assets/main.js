@@ -604,7 +604,7 @@ const UnsplashBg = {
       sections.authSection.style.display = settings.useUnsplash && !settings.unsplashAuthenticated ? 'block' : 'none';
     }
     if (sections.keywordsSection) {
-      sections.keywordsSection.style.display = settings.useUnsplash ? 'block' : 'none';
+      sections.keywordsSection.style.display = settings.useUnsplash && settings.unsplashAuthenticated ? 'block' : 'none';
     }
     if (buttons.resetUnsplashPhoto) {
       if (settings.useUnsplash) {
@@ -742,6 +742,12 @@ const UnsplashBg = {
       buttons.unlockUnsplash.disabled = false;
       buttons.unlockUnsplash.textContent = 'Unlock';
     }
+  });
+
+  inputs.unsplashPassword?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    buttons.unlockUnsplash?.click();
   });
 
   const resetBlacklistHistory = async () => {
