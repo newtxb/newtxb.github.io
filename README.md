@@ -21,10 +21,10 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 ### 🌤 Weather
 - Current conditions, detailed metrics (rain, humidity, wind, UV, sunrise/sunset, moon phase), and a 3-day forecast with temperature curves — hover the weather (bottom right).
 - Powered by [wttr.in](https://wttr.in), auto-located by IP or pinned to a custom location in settings.
-- Forecasts are cached for 15 minutes in `localStorage`.
+- Forecasts are cached for 15 minutes in `localStorage` and refreshed automatically while the tab stays open (the previous forecast is kept on screen until a refresh succeeds).
 
 ### 💬 Quote of the day
-- A short quote from the [dwyl/quotes](https://github.com/dwyl/quotes) collection, refreshed every 12 hours. Hover to reveal the author.
+- A short quote from the [dwyl/quotes](https://github.com/dwyl/quotes) collection, refreshed every 12 hours (even while the tab stays open). Hover to reveal the author.
 
 ### 🖼 Backgrounds
 - **Default**: an animated radial gradient that slowly cycles through hues, with floating particles.
@@ -47,8 +47,7 @@ Click the gear (top right) to toggle the date / quote / weather rows, set your u
 │   ├── main.css        # All styles
 │   └── favicon.png
 ├── service-worker.js   # Precache app shell + daily Unsplash image cache
-├── github.json         # Jekyll template → exposes the Pages build revision as version
-└── TODO.md             # Ideas & known rough edges
+└── github.json         # Jekyll template → exposes the Pages build revision as version
 ```
 
 `main.js` is intentionally a single file split into self-contained sections, each an async IIFE:
