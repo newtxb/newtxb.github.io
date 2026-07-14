@@ -11,6 +11,35 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function keywordStringToArray(keywords) {
+  return (keywords || '')
+    .toString()
+    .split(/[;,]/)
+    .map(keyword => keyword.trim())
+    .filter(Boolean);
+}
+
+function formatKeywordString(keywords) {
+  return keywordStringToArray(keywords).join(', ');
+}
+
+const DEFAULT_UNSPLASH_KEYWORDS = [
+  'china',
+  'korea',
+  'taiwan',
+  'taipei',
+  'hong kong',
+  'seoul',
+  'busan',
+  'shanghai',
+  'guangzhou',
+  'chongqing',
+  'chengdu',
+  'tainan',
+];
+
+const DEFAULT_UNSPLASH_KEYWORDS_TEXT = DEFAULT_UNSPLASH_KEYWORDS.join(', ');
+
 function clampByte(value) {
   return Math.max(0, Math.min(255, Math.round(value)));
 }
@@ -325,11 +354,15 @@ const UnsplashBg = {
   },
 
   async getUnsplashImage(keywords, accessKey) {
-    if (!keywords || keywords.length === 0) {
-      keywords = ['china', 'japan', 'korea', 'taiwan'];
+    const cleanedKeywords = Array.isArray(keywords)
+      ? keywords.map(keyword => (keyword || '').toString().trim()).filter(Boolean)
+      : [];
+
+    if (cleanedKeywords.length === 0) {
+      cleanedKeywords.push(...DEFAULT_UNSPLASH_KEYWORDS);
     }
 
-    const keyword = keywords[Math.floor(Math.random() * keywords.length)];
+    const keyword = cleanedKeywords[Math.floor(Math.random() * cleanedKeywords.length)];
     const params = new URLSearchParams({
       query: keyword,
       client_id: accessKey,
@@ -518,7 +551,7 @@ const UnsplashBg = {
     weatherLocation: '',
     useUnsplash: false,
     unsplashAuthenticated: false,
-    unsplashKeywords: 'china;korea;taiwan;taipei;hong kong;seoul;busan;shanghai;guangzhou;chongqing;chengdu;tainan',
+    unsplashKeywords: DEFAULT_UNSPLASH_KEYWORDS_TEXT,
     unsplashKeywordsOverridden: false,
   };
 
@@ -556,7 +589,7 @@ const UnsplashBg = {
   try {
     const saved = JSON.parse(window.localStorage.getItem(storageKey));
     if (saved && typeof saved === 'object') {
-      const savedKeywords = (saved.unsplashKeywords || '').toString().trim();
+      const savedKeywords = formatKeywordString(saved.unsplashKeywords || '');
       const inferredOverridden = (
         savedKeywords.length > 0
         && savedKeywords !== defaults.unsplashKeywords
@@ -771,10 +804,7 @@ const UnsplashBg = {
       PhotoBlacklist.clear();
 
       // Reload today's image with the cleared history
-      const keywords = (settings.unsplashKeywords || defaults.unsplashKeywords)
-        .split(';')
-        .map(k => k.trim())
-        .filter(k => k);
+      const keywords = keywordStringToArray(settings.unsplashKeywords || defaults.unsplashKeywords);
 
       const today = new Date().toDateString();
       const cacheKey = `unsplash-bg-${today}`;
@@ -804,24 +834,29 @@ const UnsplashBg = {
   });
 
   inputs.unsplashKeywords?.addEventListener('change', () => {
-    const nextValue = inputs.unsplashKeywords.value.trim();
+    const nextValue = formatKeywordString(inputs.unsplashKeywords.value);
     const nextOverridden = nextValue.length > 0;
     if (
       nextValue === settings.unsplashKeywords
       && nextOverridden === settings.unsplashKeywordsOverridden
     ) return;
+    inputs.unsplashKeywords.value = nextValue;
     settings.unsplashKeywords = nextValue;
     settings.unsplashKeywordsOverridden = nextOverridden;
     save();
   });
 
   inputs.unsplashKeywords?.addEventListener('blur', () => {
-    const nextValue = inputs.unsplashKeywords.value.trim();
+    const nextValue = formatKeywordString(inputs.unsplashKeywords.value);
     const nextOverridden = nextValue.length > 0;
     if (
       nextValue === settings.unsplashKeywords
       && nextOverridden === settings.unsplashKeywordsOverridden
-    ) return;
+    ) {
+      inputs.unsplashKeywords.value = nextValue;
+      return;
+    }
+    inputs.unsplashKeywords.value = nextValue;
     settings.unsplashKeywords = nextValue;
     settings.unsplashKeywordsOverridden = nextOverridden;
     save();
@@ -904,10 +939,7 @@ const UnsplashBg = {
       if (opaqueLayer) opaqueLayer.remove();
 
       // Load Unsplash image
-      const keywords = (settings.unsplashKeywords || 'china;japan;korea;taiwan')
-        .split(';')
-        .map(k => k.trim())
-        .filter(k => k);
+      const keywords = keywordStringToArray(settings.unsplashKeywords || DEFAULT_UNSPLASH_KEYWORDS_TEXT);
 
       try {
         await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
@@ -926,10 +958,7 @@ const UnsplashBg = {
   (async () => {
     const settings = window.homeSettings?.get?.() || {};
     if (settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey) {
-      const keywords = (settings.unsplashKeywords || 'china;japan;korea;taiwan')
-        .split(';')
-        .map(k => k.trim())
-        .filter(k => k);
+      const keywords = keywordStringToArray(settings.unsplashKeywords || DEFAULT_UNSPLASH_KEYWORDS_TEXT);
 
       try {
         setUnsplashModeState(true);
