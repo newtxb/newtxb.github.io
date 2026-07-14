@@ -519,6 +519,7 @@ const UnsplashBg = {
     useUnsplash: false,
     unsplashAuthenticated: false,
     unsplashKeywords: 'china;korea;taiwan;taipei;hong kong;seoul;busan;shanghai;guangzhou;chongqing;chengdu;tainan',
+    unsplashKeywordsOverridden: false,
   };
 
   const modal = document.querySelector('.settings-modal');
@@ -555,12 +556,20 @@ const UnsplashBg = {
   try {
     const saved = JSON.parse(window.localStorage.getItem(storageKey));
     if (saved && typeof saved === 'object') {
+      const savedKeywords = (saved.unsplashKeywords || '').toString().trim();
+      const inferredOverridden = (
+        savedKeywords.length > 0
+        && savedKeywords !== defaults.unsplashKeywords
+      );
       settings = {
         ...defaults,
         ...saved,
         username: (saved.username || '').toString().trim(),
         weatherLocation: (saved.weatherLocation || '').toString().trim(),
-        unsplashKeywords: (saved.unsplashKeywords || defaults.unsplashKeywords).toString().trim(),
+        unsplashKeywords: savedKeywords,
+        unsplashKeywordsOverridden: typeof saved.unsplashKeywordsOverridden === 'boolean'
+          ? saved.unsplashKeywordsOverridden
+          : inferredOverridden,
       };
     }
   } catch (e) {
@@ -583,7 +592,12 @@ const UnsplashBg = {
     inputs.username.value = settings.username || '';
     inputs.weatherLocation.value = settings.weatherLocation || '';
     inputs.useUnsplash.checked = !!settings.useUnsplash;
-    inputs.unsplashKeywords.value = settings.unsplashKeywords || defaults.unsplashKeywords;
+    if (inputs.unsplashKeywords) {
+      inputs.unsplashKeywords.placeholder = defaults.unsplashKeywords;
+      inputs.unsplashKeywords.value = settings.unsplashKeywordsOverridden
+        ? settings.unsplashKeywords
+        : '';
+    }
 
     // Update UI visibility
     if (sections.authSection) {
@@ -776,15 +790,25 @@ const UnsplashBg = {
 
   inputs.unsplashKeywords?.addEventListener('change', () => {
     const nextValue = inputs.unsplashKeywords.value.trim();
-    if (nextValue === settings.unsplashKeywords) return;
+    const nextOverridden = nextValue.length > 0;
+    if (
+      nextValue === settings.unsplashKeywords
+      && nextOverridden === settings.unsplashKeywordsOverridden
+    ) return;
     settings.unsplashKeywords = nextValue;
+    settings.unsplashKeywordsOverridden = nextOverridden;
     save();
   });
 
   inputs.unsplashKeywords?.addEventListener('blur', () => {
     const nextValue = inputs.unsplashKeywords.value.trim();
-    if (nextValue === settings.unsplashKeywords) return;
+    const nextOverridden = nextValue.length > 0;
+    if (
+      nextValue === settings.unsplashKeywords
+      && nextOverridden === settings.unsplashKeywordsOverridden
+    ) return;
     settings.unsplashKeywords = nextValue;
+    settings.unsplashKeywordsOverridden = nextOverridden;
     save();
   });
 
@@ -1123,7 +1147,7 @@ const UnsplashBg = {
     calendarSummary.setAttribute('tabindex', '0');
 
     calendarMenu = document.createElement('div');
-    calendarMenu.className = 'calendar-menu';
+    calendarMenu.className = 'panel-menu calendar-menu';
     calendarMenu.setAttribute('role', 'group');
     calendarMenu.setAttribute('aria-label', 'Current month calendar');
 
@@ -2049,7 +2073,7 @@ const UnsplashBg = {
     current.title = label;
 
     const menu = document.createElement('div');
-    menu.className = 'weather-menu';
+    menu.className = 'panel-menu weather-menu';
     menu.setAttribute('role', 'group');
     menu.setAttribute('aria-label', 'Next days weather');
 
