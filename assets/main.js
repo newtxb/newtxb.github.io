@@ -1955,7 +1955,15 @@ const UnsplashBg = {
   const weather = document.querySelector('.weather');
   if (!weather) return;
 
-  const storageKey = 'weather-forecast-v2';
+  const storageKey = 'weather-forecast-v3';
+
+  // Drop entries from previous storage versions
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+    if (key && key.startsWith('weather-forecast-') && !key.startsWith(storageKey)) {
+      localStorage.removeItem(key);
+    }
+  }
 
   const getWeatherLocation = () => window.homeSettings?.get?.().weatherLocation || '';
 
@@ -1989,6 +1997,13 @@ const UnsplashBg = {
     if (/cloud|overcast/.test(text)) return '☁️';
     if (/sun|clear/.test(text)) return '☀️';
     return '🌤️';
+  };
+
+  const windArrow = (degrees) => {
+    if (!Number.isFinite(degrees)) return '';
+    // wttr.in reports where the wind comes from; point the arrow where it blows to
+    const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    return arrows[Math.round((((degrees % 360) + 360) % 360) / 45) % 8];
   };
 
   const toPartName = (timeValue) => {
@@ -2059,6 +2074,7 @@ const UnsplashBg = {
       feelsLikeC: parseTemp(sample?.FeelsLikeC),
       humidityPct: parseTemp(sample?.humidity),
       windKmph: parseTemp(sample?.windspeedKmph),
+      windDirDeg: parseTemp(sample?.winddirDegree),
       uvIndex: parseNumber(sample?.uvIndex ?? sample?.UVIndex),
     };
   };
@@ -2088,6 +2104,7 @@ const UnsplashBg = {
           feelsLikeC: parseTemp(current?.FeelsLikeC),
           humidityPct: parseTemp(current?.humidity),
           windKmph: parseTemp(current?.windspeedKmph),
+          windDirDeg: parseTemp(current?.winddirDegree),
           uvIndex: parseNumber(current?.uvIndex ?? current?.UVIndex),
           coordinates,
           sunrise: (todayAstronomy?.sunrise || '').toString().trim() || null,
@@ -2172,7 +2189,10 @@ const UnsplashBg = {
       }
       if (metric.key === 'feels') return `${metric.value}°`;
       if (metric.key === 'humidity') return `${metric.value}%`;
-      if (metric.key === 'wind') return `${metric.value} km/h`;
+      if (metric.key === 'wind') {
+        const arrow = windArrow(metric.value.windDirDeg);
+        return `${arrow ? `${arrow} ` : ''}${metric.value.windKmph} km/h`;
+      }
       if (metric.key === 'uv') return `${metric.value}`;
       return String(metric.value);
     };
@@ -2207,9 +2227,13 @@ const UnsplashBg = {
         );
       }
 
-      list.push(
-        { key: 'wind', label: 'Wind', value: metrics.windKmph ?? null },
-      );
+      list.push({
+        key: 'wind',
+        label: 'Wind',
+        value: metrics.windKmph == null
+          ? null
+          : { windKmph: metrics.windKmph, windDirDeg: metrics.windDirDeg ?? null },
+      });
 
       if (options.includeUv !== false) {
         list.push({ key: 'uv', label: 'UV', value: metrics.uvIndex ?? null });
