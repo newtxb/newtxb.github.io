@@ -524,35 +524,56 @@ const UnsplashBg = {
 (async () => {
   const VERSION_KEY = 'current-version';
   const PRECACHE = 'precache-v1';
-
-  let github;
-  try {
-    // TODO: cache and check every 30m
-    const req = await window.fetch('github.json', { cache: 'no-cache' });
-    github = await req.json();
-  } catch (e) {
-    console.warn('Failed to check for update', e);
-    return;
-  }
-
-  // We are up to date!
-  if (github.version === window.localStorage.getItem(VERSION_KEY)) return;
-
-  // We're not... delete the old
-  await window.caches.delete(PRECACHE);
-  window.localStorage.setItem(VERSION_KEY, github.version);
+  const CHECK_INTERVAL = 30 * 60 * 1000;
 
   const sw = window.navigator.serviceWorker;
-  if (!sw || !sw.controller) return;
-
-  sw.addEventListener('message', (event) => {
+  sw?.addEventListener('message', (event) => {
     if (event.data && event.data.action === 'CACHE_CLEARED') {
       document.querySelector('.update').classList.add('active');
     }
   });
 
-  // And update!
-  sw.controller.postMessage({ action: 'CLEAR_CACHE' });
+  let checking = false;
+  let updateApplied = false;
+  let lastCheck = 0;
+
+  const checkForUpdate = async () => {
+    if (checking || updateApplied) return;
+    checking = true;
+    lastCheck = Date.now();
+
+    try {
+      const req = await window.fetch('github.json', { cache: 'no-cache' });
+      const github = await req.json();
+
+      // We are up to date!
+      if (github.version === window.localStorage.getItem(VERSION_KEY)) return;
+
+      // We're not... delete the old
+      updateApplied = true;
+      await window.caches.delete(PRECACHE);
+      window.localStorage.setItem(VERSION_KEY, github.version);
+
+      if (!sw || !sw.controller) return;
+
+      // And update! (the toast shows once the SW confirms the fresh cache)
+      sw.controller.postMessage({ action: 'CLEAR_CACHE' });
+    } catch (e) {
+      console.warn('Failed to check for update', e);
+    } finally {
+      checking = false;
+    }
+  };
+
+  checkForUpdate();
+
+  setInterval(() => {
+    if (!document.hidden) checkForUpdate();
+  }, CHECK_INTERVAL);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && Date.now() - lastCheck > CHECK_INTERVAL) checkForUpdate();
+  });
 })();
 
 // ---------------------------------------------------------------------------------------------- //

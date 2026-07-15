@@ -36,7 +36,7 @@ Click the gear (top right) to toggle the date / quote / weather rows, set your u
 ### 📦 Offline & updates
 - A service worker precaches the app shell (cache-first), so new tabs open instantly with no network.
 - The current Unsplash photo is also cached for offline use (only one image kept at a time).
-- On load, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears.
+- On load and every 30 minutes while the tab is open, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears.
 
 ## Project layout
 
