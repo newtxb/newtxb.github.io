@@ -63,6 +63,7 @@ function rgbToHex(r, g, b) {
 }
 
 function hexToRgb(hex) {
+  if (typeof hex !== 'string') return null;
   const normalized = hex.replace(/^#/, '').trim();
   if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
 
