@@ -1116,7 +1116,6 @@ html {
 
 .search .search-input {
   position: relative;
-  z-index: 1;
   width: 100%;
   background: transparent;
   outline: none;
@@ -1124,7 +1123,18 @@ html {
   margin: 0;
   font: inherit;
   border: 0;
-  padding: 8px 296px 8px 32px;
+  /* make text above helper (esc to cancel, enter to search */
+  text-shadow: 0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white,
+               0px 0px 15px white, 0px 0px 15px white, 0px 0px 15px white;
+  z-index: 4;
+  padding: 8px 40px 8px 32px;
 }
 
 .search .search-input::placeholder {
