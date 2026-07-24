@@ -2395,3 +2395,518 @@ code {
     width: min(320px, calc(100vw - 20px));
   }
 }
+
+/* Hue */
+
+.hue-info {
+  position: fixed;
+  top: 16px;
+  left: 98px; /* .sonos-info left (58px) + trigger width (36px) + 4px gap */
+  z-index: 21;
+}
+
+.hue-info-trigger {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: transform .12s ease-in-out, opacity .12s ease-in-out;
+}
+
+.hue-info-trigger::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20px 20px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 489.242 489.242' xmlns='http://www.w3.org/2000/svg' fill='%23ffffff'%3E%3Cpath d='M416.321,171.943c0-97.8-82.2-176.9-181-171.7c-89.5,5.2-160.3,79.1-162.4,168.6c0,44.7,16.6,86.3,45.8,118.6c47.7,51.1,41.6,110.3,41.6,110.3c0,11.4,9.4,20.8,20.8,20.8h126.9c11.4,0,20.8-9.4,21.8-20.8c0,0-7-57.7,40.6-109.2C399.621,257.243,416.321,215.643,416.321,171.943z M288.321,377.943h-87.4c-2.1-42.7-20.8-84.3-51-116.5c-22.9-25-34.3-57.2-34.3-90.5c1-68.7,54.1-124.8,122.8-129c74.9-4.2,137.3,56.2,137.3,130c0,32.3-12.5,64.5-35.4,88.4C309.121,293.643,290.421,335.243,288.321,377.943z'/%3E%3Cpath d='M281.021,447.643h-73.9c-11.4,0-20.8,9.4-20.8,20.8s9.4,20.8,20.8,20.8h73.9c11.4,0,20.8-9.4,20.8-20.8C301.821,457.043,292.521,447.643,281.021,447.643z'/%3E%3C/svg%3E");
+  opacity: 0.9;
+}
+
+.hue-info-trigger:hover,
+.hue-info-trigger:focus-visible {
+  outline: none;
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.hue-info-trigger:hover::before,
+.hue-info-trigger:focus-visible::before {
+  opacity: 1;
+}
+
+.hue-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0;
+  width: min(380px, calc(100vw - 36px));
+  max-height: min(620px, calc(100vh - 32px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(103, 122, 145, 0.4) transparent;
+}
+
+.hue-menu::-webkit-scrollbar {
+  width: 7px;
+}
+
+.hue-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hue-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(103, 122, 145, 0.35);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.hue-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(103, 122, 145, 0.55);
+}
+
+.hue-info:hover .hue-menu,
+.hue-info:focus-within .hue-menu,
+.hue-info.is-open .hue-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.hue-menu-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #5a6a81;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hue-loader {
+  display: none;
+  width: 11px;
+  height: 11px;
+  border: 2px solid rgba(90, 106, 129, 0.28);
+  border-top-color: #5a6a81;
+  border-radius: 50%;
+  animation: sonos-spin 0.7s linear infinite;
+}
+
+.hue-loader.is-active {
+  display: inline-block;
+}
+
+.hue-empty {
+  font-size: 0.83rem;
+  color: #526178;
+  padding: 4px 2px;
+}
+
+.hue-error {
+  color: #a34040;
+}
+
+.hue-rooms {
+  display: grid;
+  gap: 8px;
+}
+
+.hue-room {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(103, 122, 145, 0.18);
+  transition: border-color .15s ease-in-out, background-color .15s ease-in-out;
+}
+
+.hue-room.is-on {
+  border-color: rgba(214, 158, 46, 0.5);
+  background: rgba(253, 244, 224, 0.75);
+  animation: hue-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes hue-glow {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(214, 158, 46, 0.08); }
+  50% { box-shadow: 0 0 0 5px rgba(214, 158, 46, 0.14); }
+}
+
+.hue-room-summary {
+  cursor: pointer;
+}
+
+.hue-room-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.94rem;
+  color: #2c3b52;
+}
+
+.hue-room-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.hue-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 0;
+  /* Ignored when used as a flex child (room icon, buttons); only affects
+     icons sitting inline with text, like the Scenes header's star. */
+  vertical-align: -1px;
+}
+
+.hue-room-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex: 0 0 auto;
+  background: rgba(103, 122, 145, 0.18);
+  color: rgba(103, 122, 145, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hue-room.is-on .hue-room-icon {
+  background: rgba(214, 158, 46, 0.18);
+  color: #a5750f;
+}
+
+.hue-room-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hue-room-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #232f42;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hue-room-subtitle {
+  font-size: 0.75rem;
+  color: #6d7c92;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hue-toggle-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  flex: 0 0 auto;
+  background: rgba(103, 122, 145, 0.16);
+  color: #445164;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .12s ease-in-out;
+}
+
+.hue-toggle-btn:hover {
+  background: rgba(103, 122, 145, 0.28);
+}
+
+.hue-toggle-btn.is-on {
+  background: rgba(214, 158, 46, 0.22);
+  color: #8a5d1a;
+}
+
+.hue-toggle-btn.is-on:hover {
+  background: rgba(214, 158, 46, 0.34);
+}
+
+.hue-brightness-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.hue-brightness-icon {
+  flex: 0 0 auto;
+  opacity: 0.7;
+  color: #445164;
+}
+
+.hue-brightness-slider {
+  flex: 1 1 auto;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(103, 122, 145, 0.28);
+  cursor: pointer;
+  outline: none;
+}
+
+.hue-brightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #d69e2e;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.hue-brightness-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(103, 122, 145, 0.28);
+}
+
+.hue-brightness-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #d69e2e;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.hue-brightness-value {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #445164;
+  width: 32px;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.hue-expanded {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(103, 122, 145, 0.18);
+  display: grid;
+  gap: 10px;
+  cursor: default;
+}
+
+.hue-expanded-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #65748a;
+  margin-bottom: 5px;
+}
+
+.hue-section-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hue-section-toggle:hover {
+  color: #3a4a60;
+}
+
+.hue-light-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #2c3b52;
+}
+
+.hue-light-toggle {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #6d7c92;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 2px;
+  transition: opacity .12s ease-in-out, color .12s ease-in-out;
+}
+
+.hue-light-toggle:hover {
+  opacity: 1;
+}
+
+.hue-light-toggle.is-on {
+  color: #a5750f;
+  opacity: 1;
+}
+
+.hue-light-label {
+  flex: 0 0 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hue-light-name-color {
+  cursor: pointer;
+  text-decoration: underline dashed rgba(103, 122, 145, 0.3);
+  text-underline-offset: 1px;
+  text-decoration-thickness: 2px;
+}
+
+.hue-light-name-color:hover {
+  text-decoration-color: rgba(83, 120, 166, 0.8);
+}
+
+.hue-light-item {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.hue-color-picker {
+  display: grid;
+  gap: 7px;
+  margin: 2px 0 4px 21px; /* aligns under the name, past the toggle icon */
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(103, 122, 145, 0.18);
+  cursor: default;
+}
+
+.hue-color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hue-color-picker-label {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  color: #65748a;
+  width: 32px;
+}
+
+.hue-color-preview {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(103, 122, 145, 0.3);
+}
+
+.hue-color-hue-slider,
+.hue-color-sat-slider {
+  flex: 1 1 auto;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.hue-color-hue-slider {
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+.hue-color-hue-slider::-webkit-slider-thumb,
+.hue-color-sat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.hue-color-hue-slider::-moz-range-track {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+.hue-color-sat-slider::-moz-range-track {
+  height: 10px;
+  border-radius: 5px;
+}
+
+.hue-color-hue-slider::-moz-range-thumb,
+.hue-color-sat-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.hue-light-value {
+  flex: 0 0 auto;
+  width: 32px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.hue-scenes-list {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #526178;
+}
+
+.hue-scene-btn {
+  border: 1px solid rgba(103, 122, 145, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #384a63;
+  font-size: 0.76rem;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: background-color .12s ease-in-out, border-color .12s ease-in-out;
+}
+
+.hue-scene-btn:hover {
+  background: rgba(236, 244, 253, 0.95);
+  border-color: rgba(214, 158, 46, 0.4);
+}
+
+@media (max-width: 640px) {
+  .hue-menu {
+    width: min(320px, calc(100vw - 20px));
+  }
+}
