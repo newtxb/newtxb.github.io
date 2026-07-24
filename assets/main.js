@@ -2700,6 +2700,7 @@ const UnsplashBg = {
     star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
     moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
     music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    tv: '<rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/>',
     queue: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
   };
 
@@ -2729,20 +2730,26 @@ const UnsplashBg = {
 
   // currentTrack.absoluteAlbumArtUri and favorites' albumArtUri are already
   // full, directly-loadable URLs — no proxying/auth needed, just an <img>.
-  const setArtImage = (container, url) => {
+  const setArtImage = (container, url, placeholderIcon = 'music') => {
     if (!url) {
-      container.replaceChildren(icon('music'));
+      container.replaceChildren(icon(placeholderIcon));
       return;
     }
     container.replaceChildren(); // clear any prior placeholder before adding the image
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
-    img.onerror = () => { container.replaceChildren(icon('music')); };
+    img.onerror = () => { container.replaceChildren(icon(placeholderIcon)); };
     container.appendChild(img);
   };
 
   const normalizeTrack = (track) => {
+    // Line-in (e.g. TV over HDMI-ARC/optical) has no title/artist/album —
+    // flag it explicitly so the UI can show "TV"/"HDMI" instead of treating
+    // it as an empty queue.
+    if ((track?.type || '') === 'line_in') {
+      return { title: '', artist: '', album: '', art: null, isLineIn: true };
+    }
     const title = (track?.title || '').trim();
     if (!title) return null;
     return {
@@ -2750,6 +2757,7 @@ const UnsplashBg = {
       artist: (track.artist || '').trim(),
       album: (track.album || '').trim(),
       art: track.absoluteAlbumArtUri || null,
+      isLineIn: false,
     };
   };
 
@@ -3551,20 +3559,22 @@ const UnsplashBg = {
     const trackRow = document.createElement('div');
     trackRow.className = 'sonos-track-row';
 
+    const isLineIn = !!group.track?.isLineIn;
+
     const art = document.createElement('div');
     art.className = 'sonos-art';
-    setArtImage(art, group.track?.art);
+    setArtImage(art, group.track?.art, isLineIn ? 'tv' : 'music');
     trackRow.appendChild(art);
 
     const info = document.createElement('div');
     info.className = 'sonos-track-info';
     const titleEl = document.createElement('div');
     titleEl.className = 'sonos-track-title';
-    titleEl.textContent = group.track?.title || 'No music selected';
+    titleEl.textContent = isLineIn ? 'TV' : (group.track?.title || 'No music selected');
     if (group.track?.title) titleEl.title = group.track.title;
     const subtitleEl = document.createElement('div');
     subtitleEl.className = 'sonos-track-subtitle';
-    subtitleEl.textContent = group.track ? (group.track.artist || group.track.album || '') : 'Queue is empty';
+    subtitleEl.textContent = isLineIn ? 'HDMI' : (group.track ? (group.track.artist || group.track.album || '') : 'Queue is empty');
     info.append(titleEl, subtitleEl);
     trackRow.appendChild(info);
 
