@@ -13,31 +13,33 @@
     <!-- JS will make stuff like <div class="bg"></div> -->
   </div>
   <div class="particles"></div>
-  <div class="unsplash-info" aria-live="polite">
-    <button class="unsplash-info-trigger button-trigger" type="button" title="Unsplash image details">✨</button>
-    <div class="panel-menu unsplash-info-menu" role="group" aria-label="Unsplash image actions">
-      <div class="unsplash-info-text">Image details unavailable</div>
-      <div class="unsplash-info-actions">
-        <a class="unsplash-info-link" href="#" target="_blank" rel="noopener noreferrer">See on Unsplash</a>
-        <button type="button" class="unsplash-info-reload">Reload today's photo</button>
+  <div class="top-left-triggers">
+    <div class="unsplash-info" aria-live="polite">
+      <button class="unsplash-info-trigger button-trigger" type="button" title="Unsplash image details">✨</button>
+      <div class="panel-menu unsplash-info-menu" role="group" aria-label="Unsplash image actions">
+        <div class="unsplash-info-text">Image details unavailable</div>
+        <div class="unsplash-info-actions">
+          <a class="unsplash-info-link" href="#" target="_blank" rel="noopener noreferrer">See on Unsplash</a>
+          <button type="button" class="unsplash-info-reload">Reload today's photo</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="sonos-info" aria-live="polite">
-    <button class="sonos-info-trigger button-trigger" type="button" title="Sonos controls">🔊</button>
-    <div class="panel-menu sonos-menu" role="group" aria-label="Sonos rooms">
-      <div class="sonos-menu-title">Sonos Controller <span class="sonos-loader" aria-hidden="true"></span></div>
-      <div class="sonos-rooms">
-        <div class="sonos-empty">Unlock in Settings to enable Sonos control.</div>
+    <div class="sonos-info" aria-live="polite">
+      <button class="sonos-info-trigger button-trigger" type="button" title="Sonos controls">🔊</button>
+      <div class="panel-menu sonos-menu" role="group" aria-label="Sonos rooms">
+        <div class="sonos-menu-title">Sonos Controller <span class="sonos-loader" aria-hidden="true"></span></div>
+        <div class="sonos-rooms">
+          <div class="sonos-empty">Unlock in Settings to enable Sonos control.</div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="hue-info" aria-live="polite">
-    <button class="hue-info-trigger button-trigger" type="button" title="Hue lights">💡</button>
-    <div class="panel-menu hue-menu" role="group" aria-label="Hue rooms">
-      <div class="hue-menu-title">Hue Lights <span class="hue-loader" aria-hidden="true"></span></div>
-      <div class="hue-rooms">
-        <div class="hue-empty">Unlock in Settings to enable Hue control.</div>
+    <div class="hue-info" aria-live="polite">
+      <button class="hue-info-trigger button-trigger" type="button" title="Hue lights">💡</button>
+      <div class="panel-menu hue-menu" role="group" aria-label="Hue rooms">
+        <div class="hue-menu-title">Hue Lights <span class="hue-loader" aria-hidden="true"></span></div>
+        <div class="hue-rooms">
+          <div class="hue-empty">Unlock in Settings to enable Hue control.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -77,7 +79,7 @@
         <div class="settings-toggle-row">
           <label class="settings-toggle">
             <input type="checkbox" name="useUnsplash">
-            <span>Use Unsplash backgrounds</span>
+            <span data-use-unsplash-label>Use Unsplash backgrounds</span>
           </label>
           <button type="button" class="settings-secondary-btn" data-reset-unsplash-photo>Reset history</button>
         </div>
