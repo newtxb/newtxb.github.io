@@ -31,6 +31,10 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 - **Drag** a room name onto another room's card to group them; drag a grouped room onto empty space in the list to ungroup it.
 - **Click** a card for more controls: per-room volume balance within a group, shuffle/repeat/crossfade, sleep timer, favorites, and the current queue.
 
+### 💡 Hue control
+- Hover the bulb icon (next to the Sonos 🔊 button) for a live control panel of every Hue room: on/off, brightness.
+- **Click** a card for more controls: individual lights within the room (on/off + brightness each), and scenes to recall.
+
 ### 🖼 Backgrounds
 - **Default**: an animated radial gradient that slowly cycles through hues, with floating particles.
 - **Unsplash mode** (optional): a new photo every day, picked from your own comma-separated search keywords. The photo's average color becomes the page theme color, image details are shown behind the ✨ button (with a link back to Unsplash and a "reload today's photo" action), and recently shown photos are blacklisted (last 30) to avoid repeats.
@@ -71,6 +75,8 @@ Click the gear (top right) to toggle the date / quote / weather rows, set your u
 | Search | Focus handling, Google JSONP suggestions, URL detection, ChatGPT hand-off |
 | Weather | wttr.in fetch, normalization, forecast panel rendering |
 | Quote | Quote of the day fetch & cache |
+| Sonos | Room/group control panel — see [🔊 Sonos control](#-sonos-control) |
+| Hue | Room/light control panel — see [💡 Hue control](#-hue-control) |
 
 Modules communicate via `document` custom events (`settings:usernameChanged`, `unsplash:modeChanged`, …) and a single read-only accessor `window.homeSettings.get()` — there is no shared mutable state.
 
@@ -97,7 +103,6 @@ The page itself is fully static; at runtime it may talk to:
 - `wttr.in` — weather (geolocated by IP unless a location is set)
 - `raw.githubusercontent.com` — quote list
 - `api.unsplash.com` / `images.unsplash.com` — only when Unsplash mode is unlocked and enabled
-- `sonos-api.proxy.cloud.jclerc.com` — self-hosted [node-sonos-http-api](https://github.com/jishi/node-sonos-http-api) bridge, only when Sonos control is unlocked
 
 No analytics, no cookies, `referrer: no-referrer`.
 
@@ -114,7 +119,6 @@ The service worker deliberately does **not** register on `localhost`, `127.0.0.1
 
 Notes:
 - `github.json` contains Jekyll front matter and is only rendered on GitHub Pages; locally the update check just fails silently.
-- Unsplash mode requires unlocking the encrypted credentials with the password (settings → "Use Unsplash backgrounds").
 
 ## Deployment
 

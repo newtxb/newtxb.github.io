@@ -599,7 +599,10 @@ const UnsplashBg = {
     unsplashAuthenticated: false,
     unsplashKeywords: DEFAULT_UNSPLASH_KEYWORDS_TEXT,
     unsplashKeywordsOverridden: false,
-    sonosBearerToken: '',
+    // Shared bearer for both the Sonos and Hue reverse proxies (sha1 of the
+    // same unlock password); each proxy translates it to its own real
+    // backend auth server-side, never forwarding this value onward.
+    apiBearerToken: '',
   };
 
   const modal = document.querySelector('.settings-modal');
@@ -815,7 +818,9 @@ const UnsplashBg = {
       // Success! Store encrypted credentials in localStorage
       settings.unsplashAuthenticated = true;
       settings.unsplashAccessKey = creds.access_key;
-      settings.sonosBearerToken = await sha1Hex(password);
+      // Also unlocks Sonos and Hue control — both proxies accept this same
+      // bearer and hold their own real backend auth server-side.
+      settings.apiBearerToken = await sha1Hex(password);
       save();
 
       inputs.unsplashPassword.value = '';
@@ -2659,7 +2664,7 @@ const UnsplashBg = {
     'ccd02caf5ce6d1286b7f92c24c2d7827ee698ab6',
   ];
 
-  const getToken = () => window.homeSettings?.get?.().sonosBearerToken || '';
+  const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
 
   const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
 
@@ -3823,6 +3828,824 @@ const UnsplashBg = {
   // relatedTarget is unreliable when the previously-focused element is
   // removed from the DOM by a re-render — defer to a fresh tick and check
   // document.activeElement directly instead of trusting this event alone.
+  container.addEventListener('focusout', () => {
+    setTimeout(scheduleClose, 0);
+  });
+
+  menu.addEventListener('mousedown', () => { interacting = true; });
+  document.addEventListener('mouseup', () => {
+    if (!interacting) return;
+    interacting = false;
+    scheduleRefresh(200);
+  });
+
+  renderRooms();
+})();
+
+// ---------------------------------------------------------------------------------------------- //
+// HUE
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const container = document.querySelector('.hue-info');
+  const roomsEl = document.querySelector('.hue-rooms');
+  const menu = document.querySelector('.hue-menu');
+  if (!container || !roomsEl || !menu) return;
+
+  const API_BASE = 'https://hue-api.proxy.cloud.jclerc.com/';
+  const POLL_MS = 4000;
+  const BRIGHTNESS_SEND_DEBOUNCE_MS = 150;
+
+  // Room names to hide entirely, as SHA-1 hashes rather than plaintext (same
+  // approach as the Sonos blacklist).
+  const BLACKLISTED_ROOM_NAME_HASHES = [
+    '352ed2b2dd77a1770ddbde839c9fd18cc3eb8f3f',
+  ];
+
+  // Technical/internal scene names (not personal info, so plaintext is fine
+  // here unlike the room blacklist above).
+  const HIDDEN_SCENE_NAMES = ['Scene myScene', 'Scene storageScene'];
+
+  // Same shared bearer as Sonos (sha1 of the same unlock password) — the
+  // proxy already holds real Hue Bridge auth server-side and translates this
+  // into it, so requests here go straight to e.g. /lights, no /api/<user>
+  // prefix and no bridge application key ever touches the browser.
+  const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
+
+  const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
+
+  const api = async (path, { method = 'GET', body } = {}) => {
+    const token = getToken();
+    let res;
+    try {
+      res = await fetch(apiUrl(path), {
+        method,
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (e) {
+      throw new Error('Network error — the Hue API may be unreachable, or blocking this origin (CORS)');
+    }
+    if (!res.ok) {
+      const err = new Error(`Hue API error ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    const contentType = res.headers.get('content-type') || '';
+    return contentType.includes('json') ? res.json() : null;
+  };
+
+  const applySliderFill = (slider, color = '#d69e2e') => {
+    const min = Number(slider.min) || 0;
+    const max = Number(slider.max) || 100;
+    const value = Number(slider.value) || 0;
+    const pct = max > min ? Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100)) : 0;
+    slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, rgba(103, 122, 145, 0.28) ${pct}%, rgba(103, 122, 145, 0.28) 100%)`;
+  };
+
+  // Small inline stroke-icon set, matching the trigger buttons' visual style
+  // (currentColor so they pick up hover/on-state colors via CSS).
+  const ICON_DEFS = {
+    power: { viewBox: '0 0 24 24', markup: '<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>' },
+    sun: { viewBox: '0 0 24 24', markup: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' },
+    star: { viewBox: '0 0 24 24', markup: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+    // Filled bulb glyph (not stroke-based like the others), from tmp-bulb.svg.
+    bulb: {
+      viewBox: '0 0 489.242 489.242',
+      markup: '<path fill="currentColor" stroke="none" d="M416.321,171.943c0-97.8-82.2-176.9-181-171.7c-89.5,5.2-160.3,79.1-162.4,168.6c0,44.7,16.6,86.3,45.8,118.6c47.7,51.1,41.6,110.3,41.6,110.3c0,11.4,9.4,20.8,20.8,20.8h126.9c11.4,0,20.8-9.4,21.8-20.8c0,0-7-57.7,40.6-109.2C399.621,257.243,416.321,215.643,416.321,171.943z M288.321,377.943h-87.4c-2.1-42.7-20.8-84.3-51-116.5c-22.9-25-34.3-57.2-34.3-90.5c1-68.7,54.1-124.8,122.8-129c74.9-4.2,137.3,56.2,137.3,130c0,32.3-12.5,64.5-35.4,88.4C309.121,293.643,290.421,335.243,288.321,377.943z"/><path fill="currentColor" stroke="none" d="M281.021,447.643h-73.9c-11.4,0-20.8,9.4-20.8,20.8s9.4,20.8,20.8,20.8h73.9c11.4,0,20.8-9.4,20.8-20.8C301.821,457.043,292.521,447.643,281.021,447.643z"/>',
+    },
+    plug: { viewBox: '0 0 24 24', markup: '<path d="M9 2v4"/><path d="M15 2v4"/><path d="M6 8h12v4a6 6 0 0 1-12 0V8z"/><path d="M12 18v4"/>' },
+  };
+
+  const createIcon = (name, sizePx = 16) => {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'hue-icon';
+    const def = ICON_DEFS[name];
+    if (!def) return wrapper;
+    wrapper.innerHTML = `<svg viewBox="${def.viewBox}" width="${sizePx}" height="${sizePx}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${def.markup}</svg>`;
+    return wrapper;
+  };
+
+  const loaderEl = document.querySelector('.hue-loader');
+
+  const MIN_LOADER_MS = 500;
+  let refreshInFlightCount = 0;
+  let loaderShownAt = 0;
+  let loaderHideTimer = null;
+  const beginRefreshIndicator = () => {
+    refreshInFlightCount += 1;
+    if (refreshInFlightCount === 1) {
+      clearTimeout(loaderHideTimer);
+      loaderHideTimer = null;
+      loaderShownAt = Date.now();
+      loaderEl?.classList.add('is-active');
+    }
+  };
+  const endRefreshIndicator = () => {
+    refreshInFlightCount = Math.max(0, refreshInFlightCount - 1);
+    if (refreshInFlightCount > 0) return;
+    const remaining = Math.max(0, MIN_LOADER_MS - (Date.now() - loaderShownAt));
+    clearTimeout(loaderHideTimer);
+    loaderHideTimer = setTimeout(() => {
+      if (refreshInFlightCount === 0) loaderEl?.classList.remove('is-active');
+    }, remaining);
+  };
+
+  let burstRefreshInterval = null;
+  let burstRefreshTimeout = null;
+  const stopBurstRefresh = () => {
+    clearInterval(burstRefreshInterval);
+    clearTimeout(burstRefreshTimeout);
+    burstRefreshInterval = null;
+    burstRefreshTimeout = null;
+  };
+  const startBurstRefresh = () => {
+    clearInterval(burstRefreshInterval);
+    clearTimeout(burstRefreshTimeout);
+    refresh();
+    burstRefreshInterval = setInterval(refresh, 1000);
+    burstRefreshTimeout = setTimeout(stopBurstRefresh, 5000);
+  };
+
+  // --- Normalization ---
+  // This is the older v1-style API (the proxy strips /api/<user> and
+  // forwards path-for-path): /lights, /groups, /scenes each return an object
+  // keyed by numeric-ish string ID, not an array — and brightness ("bri") is
+  // 0-254, not a 0-100 percentage, so it's converted here for the UI and
+  // converted back on the way out.
+  const briToPct = (bri) => (bri == null ? null : Math.round((bri / 254) * 100));
+  const pctToBri = (pct) => Math.max(1, Math.min(254, Math.round((pct / 100) * 254)));
+
+  // Standard Philips-documented Wide RGB D65 <-> xy conversion, used by every
+  // third-party Hue integration. Pure math, no network round-trip to verify.
+  const rgbToXy = (r, g, b) => {
+    const gammaCorrect = (c) => (c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92);
+    const rr = gammaCorrect(r / 255);
+    const gg = gammaCorrect(g / 255);
+    const bb = gammaCorrect(b / 255);
+
+    const X = rr * 0.664511 + gg * 0.154324 + bb * 0.162028;
+    const Y = rr * 0.283881 + gg * 0.668433 + bb * 0.047685;
+    const Z = rr * 0.000088 + gg * 0.072310 + bb * 0.986039;
+
+    const sum = X + Y + Z;
+    if (sum === 0) return [0.3127, 0.3290]; // D65 white point fallback
+    return [X / sum, Y / sum];
+  };
+
+  const xyToRgbHex = (x, y) => {
+    const z = 1 - x - y;
+    const Y = 1;
+    const X = (Y / y) * x;
+    const Z = (Y / y) * z;
+
+    let r = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
+    let g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
+    let b = X * 0.051713 - Y * 0.121364 + Z * 1.011530;
+
+    // Forcing Y=1 (max luminance) pushes less-saturated chromaticities
+    // outside the valid [0,1] RGB range. Clamping each channel
+    // independently would distort the R:G:B ratio and make everything look
+    // more saturated than it really is — instead, clip negatives (out of
+    // the sRGB triangle) and rescale all three channels uniformly by
+    // whichever is largest, which preserves the true ratio (and therefore
+    // the true saturation) and just comes out dimmer overall.
+    r = Math.max(0, r);
+    g = Math.max(0, g);
+    b = Math.max(0, b);
+    const maxChannel = Math.max(r, g, b);
+    if (maxChannel > 1) {
+      r /= maxChannel;
+      g /= maxChannel;
+      b /= maxChannel;
+    }
+
+    const reverseGamma = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+    r = reverseGamma(r);
+    g = reverseGamma(g);
+    b = reverseGamma(b);
+
+    const toByte = (c) => Math.max(0, Math.min(255, Math.round(c * 255)));
+    return rgbToHex(toByte(r), toByte(g), toByte(b));
+  };
+
+  // HSV, not HSL, for the picker: HSL's "saturation" stays near 100% even
+  // for pale/washed-out colors once lightness is high, which is why the
+  // slider looked stuck at 100% — HSV's saturation (chroma relative to the
+  // max channel) actually tracks "how washed out does this look", matching
+  // what a Saturation slider should mean. Value is fixed at 100% when
+  // going back to RGB since overall brightness is controlled elsewhere.
+  const rgbToHsv = (r, g, b) => {
+    const rr = r / 255;
+    const gg = g / 255;
+    const bb = b / 255;
+    const max = Math.max(rr, gg, bb);
+    const min = Math.min(rr, gg, bb);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === rr) h = ((gg - bb) / d) % 6;
+      else if (max === gg) h = (bb - rr) / d + 2;
+      else h = (rr - gg) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    const s = max === 0 ? 0 : d / max;
+    return [h, s * 100, max * 100];
+  };
+
+  const hsvToRgbHex = (h, s, v) => {
+    const hh = ((h % 360) + 360) % 360;
+    const ss = Math.max(0, Math.min(100, s)) / 100;
+    const vv = Math.max(0, Math.min(100, v)) / 100;
+
+    const c = vv * ss;
+    const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+    const m = vv - c;
+
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    if (hh < 60) { r = c; g = x; }
+    else if (hh < 120) { r = x; g = c; }
+    else if (hh < 180) { g = c; b = x; }
+    else if (hh < 240) { g = x; b = c; }
+    else if (hh < 300) { r = x; b = c; }
+    else { r = c; b = x; }
+
+    return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
+  };
+
+  const normalizeLight = ([lightId, light]) => {
+    const reachable = light.state?.reachable !== false;
+    return {
+      id: lightId,
+      name: light.name || 'Light',
+      reachable,
+      // Unreachable means physically powered down — show it as off
+      // regardless of the bridge's last-remembered state.
+      on: reachable && !!light.state?.on,
+      brightness: briToPct(light.state?.bri),
+      isPlug: light.config?.archetype === 'plug',
+      hasColor: Array.isArray(light.state?.xy),
+      xy: Array.isArray(light.state?.xy) ? light.state.xy : null,
+    };
+  };
+
+  const normalizeRooms = ({ lights, groups, scenes }) => {
+    const lightEntries = Object.entries(lights || {});
+    const groupEntries = Object.entries(groups || {})
+      // Group "0" is Hue's synthetic "every light" group; Zones/Rooms are
+      // the meaningful logical groupings for a dashboard like this one.
+      .filter(([id, group]) => id !== '0' && ['Room', 'Zone'].includes(group.type));
+    const sceneEntries = Object.entries(scenes || {});
+
+    return groupEntries
+      .map(([groupId, group]) => {
+        const memberLightIds = new Set((group.lights || []).map(String));
+
+        const roomLights = lightEntries
+          .filter(([lightId]) => memberLightIds.has(lightId))
+          .map(normalizeLight);
+
+        const roomScenes = sceneEntries
+          .filter(([, scene]) => scene.group === groupId && !HIDDEN_SCENE_NAMES.includes((scene.name || '').trim()))
+          .map(([sceneId, scene]) => ({ id: sceneId, name: scene.name || 'Scene' }));
+
+        return {
+          id: groupId,
+          name: group.name || 'Room',
+          // Derived from the (reachability-corrected) individual lights
+          // rather than the bridge's own any_on, so the card highlight
+          // always matches the "X of Y lights on" count shown below it.
+          on: roomLights.some(l => l.on),
+          brightness: briToPct(group.action?.bri),
+          lights: roomLights,
+          scenes: roomScenes,
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const isBlacklistedRoomName = async (name) => BLACKLISTED_ROOM_NAME_HASHES.includes(await sha1Hex(name));
+
+  const filterBlacklistedRooms = async (roomsToFilter) => {
+    const keepFlags = await Promise.all(roomsToFilter.map(room => isBlacklistedRoomName(room.name).then(b => !b)));
+    return roomsToFilter.filter((_, index) => keepFlags[index]);
+  };
+
+  // --- State ---
+  let rooms = [];
+  let loaded = false;
+  let expandedId = null;
+  const expandedScenesIds = new Set();
+  let expandedColorId = null; // only one light's color picker open at a time
+  let pollTimer = null;
+  let refreshDebounceTimer = null;
+  let interacting = false;
+  let lastError = null;
+  const brightnessThrottleTimers = new Map();
+
+  // kind: 'light' -> PUT /lights/{id}/state, 'group' -> PUT /groups/{id}/action.
+  // pct is 0-100 (what the UI shows); converted to Hue's 0-254 "bri" here.
+  const sendBrightnessThrottled = (targetId, kind, id, pct) => {
+    clearTimeout(brightnessThrottleTimers.get(targetId));
+    brightnessThrottleTimers.set(targetId, setTimeout(async () => {
+      brightnessThrottleTimers.delete(targetId);
+      const path = kind === 'group'
+        ? `/groups/${encodeURIComponent(id)}/action`
+        : `/lights/${encodeURIComponent(id)}/state`;
+      try {
+        await api(path, { method: 'PUT', body: { bri: pctToBri(pct) } });
+      } catch (e) {
+        console.warn('Hue brightness change failed', e);
+      }
+    }, BRIGHTNESS_SEND_DEBOUNCE_MS));
+  };
+
+  const setExpanded = (id) => {
+    // Opening or closing a room's controls also collapses any open color
+    // picker for lights within it.
+    const room = rooms.find(r => r.id === id);
+    if (room && room.lights.some(l => l.id === expandedColorId)) expandedColorId = null;
+    expandedId = expandedId === id ? null : id;
+    renderRooms();
+  };
+
+  const renderScenesList = (el, room) => {
+    el.textContent = '';
+    if (!room.scenes.length) {
+      el.textContent = 'No scenes found.';
+      return;
+    }
+    room.scenes.forEach((scene) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hue-scene-btn';
+      btn.textContent = scene.name;
+      btn.addEventListener('click', async () => {
+        try {
+          // v1 has no per-scene recall endpoint — activate it via the
+          // room/group's action instead.
+          await api(`/groups/${encodeURIComponent(room.id)}/action`, {
+            method: 'PUT',
+            body: { scene: scene.id },
+          });
+          startBurstRefresh();
+        } catch (e) {
+          console.warn('Hue scene recall failed', e);
+        }
+      });
+      el.appendChild(btn);
+    });
+  };
+
+  const buildScenesSection = (room) => {
+    const section = document.createElement('div');
+    section.className = 'hue-expanded-section';
+
+    const isOpen = expandedScenesIds.has(room.id);
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'hue-expanded-title hue-section-toggle';
+    header.append(`${isOpen ? '▾' : '▸'} `, createIcon('star', 11), ' Scenes');
+    header.addEventListener('click', () => {
+      if (isOpen) expandedScenesIds.delete(room.id);
+      else expandedScenesIds.add(room.id);
+      renderRooms();
+    });
+    section.appendChild(header);
+
+    if (isOpen) {
+      const list = document.createElement('div');
+      list.className = 'hue-scenes-list';
+      renderScenesList(list, room);
+      section.appendChild(list);
+    }
+
+    return section;
+  };
+
+  // Custom hue + saturation picker (no native <input type="color">). Sends
+  // via xy like the rest of the color-writing code; lightness is fixed at
+  // 50% since overall brightness is already controlled by the light's own
+  // brightness slider elsewhere in its row.
+  const buildColorPicker = (light) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'hue-color-picker';
+    wrap.addEventListener('click', e => e.stopPropagation());
+
+    let initialHue = 0;
+    let initialSat = 100;
+    if (light.xy) {
+      const rgb = hexToRgb(xyToRgbHex(light.xy[0], light.xy[1]));
+      if (rgb) {
+        const [h, s] = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        initialHue = h;
+        initialSat = s;
+      }
+    }
+
+    const previewRow = document.createElement('div');
+    previewRow.className = 'hue-color-picker-row';
+    const preview = document.createElement('span');
+    preview.className = 'hue-color-preview';
+
+    const hueSlider = document.createElement('input');
+    hueSlider.type = 'range';
+    hueSlider.min = '0';
+    hueSlider.max = '360';
+    hueSlider.value = String(Math.round(initialHue));
+    hueSlider.className = 'hue-color-hue-slider';
+    previewRow.append(preview, hueSlider);
+
+    const satRow = document.createElement('div');
+    satRow.className = 'hue-color-picker-row';
+    const satLabel = document.createElement('span');
+    satLabel.className = 'hue-color-picker-label';
+    satLabel.textContent = 'Bright';
+    const satSlider = document.createElement('input');
+    satSlider.type = 'range';
+    satSlider.min = '0';
+    satSlider.max = '100';
+    satSlider.value = String(Math.round(initialSat));
+    satSlider.className = 'hue-color-sat-slider';
+    satRow.append(satLabel, satSlider);
+
+    const updateSatTrack = () => {
+      const h = Number(hueSlider.value);
+      satSlider.style.background = `linear-gradient(to right, ${hsvToRgbHex(h, 0, 100)}, ${hsvToRgbHex(h, 100, 100)})`;
+    };
+    const updatePreview = () => {
+      preview.style.background = hsvToRgbHex(Number(hueSlider.value), Number(satSlider.value), 100);
+    };
+
+    const sendColor = () => {
+      const rgb = hexToRgb(hsvToRgbHex(Number(hueSlider.value), Number(satSlider.value), 100));
+      if (!rgb) return;
+      const [x, y] = rgbToXy(rgb.r, rgb.g, rgb.b);
+      clearTimeout(brightnessThrottleTimers.get(`color:${light.id}`));
+      brightnessThrottleTimers.set(`color:${light.id}`, setTimeout(async () => {
+        brightnessThrottleTimers.delete(`color:${light.id}`);
+        try {
+          await api(`/lights/${encodeURIComponent(light.id)}/state`, { method: 'PUT', body: { xy: [x, y] } });
+          startBurstRefresh();
+        } catch (e) {
+          console.warn('Hue color change failed', e);
+        }
+      }, BRIGHTNESS_SEND_DEBOUNCE_MS));
+    };
+
+    hueSlider.addEventListener('input', () => {
+      updateSatTrack();
+      updatePreview();
+      sendColor();
+    });
+    satSlider.addEventListener('input', () => {
+      updatePreview();
+      sendColor();
+    });
+
+    updateSatTrack();
+    updatePreview();
+
+    wrap.append(previewRow, satRow);
+    return wrap;
+  };
+
+  const renderExpanded = (room) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'hue-expanded';
+    wrap.addEventListener('click', e => e.stopPropagation());
+
+    if (room.lights.length > 1) {
+      const section = document.createElement('div');
+      section.className = 'hue-expanded-section';
+      const title = document.createElement('div');
+      title.className = 'hue-expanded-title';
+      title.textContent = 'Individual lights';
+      section.appendChild(title);
+
+      room.lights.forEach((light) => {
+        const itemWrap = document.createElement('div');
+        itemWrap.className = 'hue-light-item';
+
+        const row = document.createElement('div');
+        row.className = 'hue-light-row';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'hue-light-toggle';
+        if (light.on) toggleBtn.classList.add('is-on');
+        toggleBtn.appendChild(createIcon(light.isPlug ? 'plug' : 'bulb', 15));
+        toggleBtn.setAttribute('aria-label', light.on ? 'Turn off' : 'Turn on');
+        toggleBtn.addEventListener('click', async () => {
+          try {
+            await api(`/lights/${encodeURIComponent(light.id)}/state`, {
+              method: 'PUT',
+              body: { on: !light.on },
+            });
+            startBurstRefresh();
+          } catch (e) {
+            console.warn('Hue light toggle failed', e);
+          }
+        });
+
+        const label = document.createElement('span');
+        label.className = 'hue-light-label';
+        label.textContent = light.name;
+
+        if (light.hasColor) {
+          label.classList.add('hue-light-name-color');
+          label.title = 'Click to change color';
+          label.addEventListener('click', (e) => {
+            e.stopPropagation();
+            expandedColorId = expandedColorId === light.id ? null : light.id;
+            renderRooms();
+          });
+        }
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.className = 'hue-brightness-slider';
+
+        const valueEl = document.createElement('span');
+        valueEl.className = 'hue-light-value';
+
+        if (light.isPlug) {
+          // Plugs are strictly on/off — step 100 with min/max 0/100 leaves
+          // only two valid positions, so dragging anywhere just snaps to
+          // whichever end is closer and toggles the plug accordingly.
+          slider.min = '0';
+          slider.max = '100';
+          slider.step = '100';
+          slider.value = light.on ? '100' : '0';
+          applySliderFill(slider);
+          valueEl.textContent = light.on ? 'ON' : 'OFF';
+
+          slider.addEventListener('input', async () => {
+            const isOn = Number(slider.value) >= 50;
+            valueEl.textContent = isOn ? 'ON' : 'OFF';
+            applySliderFill(slider);
+            try {
+              await api(`/lights/${encodeURIComponent(light.id)}/state`, { method: 'PUT', body: { on: isOn } });
+              startBurstRefresh();
+            } catch (e) {
+              console.warn('Hue plug toggle failed', e);
+            }
+          });
+        } else {
+          slider.min = '1';
+          slider.max = '100';
+          slider.value = String(light.brightness ?? 1);
+          const sliderColor = light.hasColor && light.xy ? xyToRgbHex(light.xy[0], light.xy[1]) : '#d69e2e';
+          applySliderFill(slider, sliderColor);
+          valueEl.textContent = light.brightness == null ? '--' : `${Math.round(light.brightness)}%`;
+
+          slider.addEventListener('input', () => {
+            const value = Number.parseInt(slider.value, 10);
+            valueEl.textContent = `${value}%`;
+            applySliderFill(slider, sliderColor);
+            sendBrightnessThrottled(`light:${light.id}`, 'light', light.id, value);
+          });
+        }
+
+        row.append(toggleBtn, label, slider, valueEl);
+        itemWrap.appendChild(row);
+
+        if (light.hasColor && expandedColorId === light.id) {
+          itemWrap.appendChild(buildColorPicker(light));
+        }
+
+        section.appendChild(itemWrap);
+      });
+      wrap.appendChild(section);
+    }
+
+    wrap.appendChild(buildScenesSection(room));
+
+    return wrap;
+  };
+
+  const renderRoomCard = (room) => {
+    const card = document.createElement('div');
+    card.className = 'hue-room';
+    card.dataset.roomId = room.id;
+    if (room.on) card.classList.add('is-on');
+
+    const summary = document.createElement('div');
+    summary.className = 'hue-room-summary';
+
+    const header = document.createElement('div');
+    header.className = 'hue-room-header';
+    header.textContent = room.name;
+    summary.appendChild(header);
+
+    const row = document.createElement('div');
+    row.className = 'hue-room-row';
+
+    const icon = document.createElement('div');
+    icon.className = 'hue-room-icon';
+    icon.appendChild(createIcon('bulb', 20));
+    row.appendChild(icon);
+
+    const info = document.createElement('div');
+    info.className = 'hue-room-info';
+    const title = document.createElement('div');
+    title.className = 'hue-room-title';
+    const onCount = room.lights.filter(l => l.on).length;
+    title.textContent = room.lights.length
+      ? `${onCount} of ${room.lights.length} light${room.lights.length === 1 ? '' : 's'} on`
+      : (room.on ? 'On' : 'Off');
+    const subtitle = document.createElement('div');
+    subtitle.className = 'hue-room-subtitle';
+    subtitle.textContent = room.scenes.length ? `${room.scenes.length} scene${room.scenes.length === 1 ? '' : 's'}` : '';
+    info.append(title, subtitle);
+    row.appendChild(info);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'hue-toggle-btn';
+    if (room.on) toggleBtn.classList.add('is-on');
+    toggleBtn.appendChild(createIcon('power', 16));
+    toggleBtn.setAttribute('aria-label', room.on ? 'Turn off room' : 'Turn on room');
+    toggleBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await api(`/groups/${encodeURIComponent(room.id)}/action`, {
+          method: 'PUT',
+          body: { on: !room.on },
+        });
+        startBurstRefresh();
+      } catch (err) {
+        console.warn('Hue room toggle failed', err);
+      }
+    });
+    row.appendChild(toggleBtn);
+
+    summary.appendChild(row);
+
+    const brightnessRow = document.createElement('div');
+    brightnessRow.className = 'hue-brightness-row';
+
+    const brightnessIcon = document.createElement('span');
+    brightnessIcon.className = 'hue-brightness-icon';
+    brightnessIcon.appendChild(createIcon('sun', 14));
+    brightnessRow.appendChild(brightnessIcon);
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '1';
+    slider.max = '100';
+    slider.className = 'hue-brightness-slider';
+    slider.value = String(room.brightness ?? 1);
+    slider.addEventListener('click', e => e.stopPropagation());
+    applySliderFill(slider);
+
+    const valueEl = document.createElement('span');
+    valueEl.className = 'hue-brightness-value';
+    valueEl.textContent = room.brightness == null ? '--' : `${Math.round(room.brightness)}%`;
+
+    slider.addEventListener('input', () => {
+      const value = Number.parseInt(slider.value, 10);
+      valueEl.textContent = `${value}%`;
+      applySliderFill(slider);
+      sendBrightnessThrottled(`room:${room.id}`, 'group', room.id, value);
+    });
+    brightnessRow.appendChild(slider);
+    brightnessRow.appendChild(valueEl);
+    summary.appendChild(brightnessRow);
+
+    summary.addEventListener('click', (e) => {
+      if (e.target.closest('button, input, select, a')) return;
+      setExpanded(room.id);
+    });
+    card.appendChild(summary);
+
+    if (expandedId === room.id) {
+      card.classList.add('is-expanded');
+      card.appendChild(renderExpanded(room));
+    }
+
+    return card;
+  };
+
+  function renderRooms() {
+    roomsEl.textContent = '';
+
+    if (!getToken()) {
+      const empty = document.createElement('div');
+      empty.className = 'hue-empty';
+      empty.textContent = 'Unlock in Settings to enable Hue control.';
+      roomsEl.appendChild(empty);
+      return;
+    }
+
+    if (!loaded) {
+      const message = document.createElement('div');
+      message.className = 'hue-empty';
+      if (lastError) {
+        message.classList.add('hue-error');
+        message.textContent = lastError.status === 401 || lastError.status === 403
+          ? 'Invalid Hue token — unlock again in Settings.'
+          : `Couldn't reach Hue (${lastError.message})`;
+      } else {
+        message.textContent = 'Loading rooms…';
+      }
+      roomsEl.appendChild(message);
+      return;
+    }
+
+    if (!rooms.length) {
+      const empty = document.createElement('div');
+      empty.className = 'hue-empty';
+      empty.textContent = 'No Hue rooms found.';
+      roomsEl.appendChild(empty);
+      return;
+    }
+
+    rooms.forEach(room => roomsEl.appendChild(renderRoomCard(room)));
+  }
+
+  async function refresh() {
+    if (interacting) return;
+    if (!getToken()) {
+      loaded = false;
+      lastError = null;
+      renderRooms();
+      return;
+    }
+    beginRefreshIndicator();
+    try {
+      const [lights, groups, scenes] = await Promise.all([
+        api('/lights'),
+        api('/groups'),
+        api('/scenes'),
+      ]);
+      rooms = await filterBlacklistedRooms(normalizeRooms({ lights, groups, scenes }));
+      loaded = true;
+      lastError = null;
+      renderRooms();
+    } catch (e) {
+      console.warn('Failed to refresh Hue resources', e);
+      lastError = e;
+      renderRooms();
+    } finally {
+      endRefreshIndicator();
+    }
+  }
+
+  function scheduleRefresh(delay = 0) {
+    clearTimeout(refreshDebounceTimer);
+    refreshDebounceTimer = setTimeout(refresh, delay);
+  }
+
+  const startPolling = () => {
+    if (pollTimer) return;
+    refresh();
+    pollTimer = setInterval(refresh, POLL_MS);
+  };
+
+  const stopPolling = () => {
+    clearInterval(pollTimer);
+    pollTimer = null;
+    stopBurstRefresh();
+    expandedId = null;
+  };
+
+  // Every render tears down and recreates the whole card subtree, which can
+  // cause spurious mouseleave/focusout signals on the container — don't
+  // trust any single event; re-check the real, live hover/focus state at the
+  // moment the close would actually happen (see the Sonos module for the
+  // full story on why this is necessary).
+  let closeTimer = null;
+  const cancelScheduledClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = null;
+  };
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      if (container.matches(':hover') || container.contains(document.activeElement)) return;
+      container.classList.remove('is-open');
+      stopPolling();
+    }, 150);
+  };
+
+  container.addEventListener('mouseenter', () => {
+    cancelScheduledClose();
+    container.classList.add('is-open');
+    startPolling();
+  });
+  container.addEventListener('focusin', () => {
+    cancelScheduledClose();
+    container.classList.add('is-open');
+    startPolling();
+  });
+  container.addEventListener('mouseleave', scheduleClose);
   container.addEventListener('focusout', () => {
     setTimeout(scheduleClose, 0);
   });
