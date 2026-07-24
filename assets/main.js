@@ -629,6 +629,10 @@ const UnsplashBg = {
     resetUnsplashPhoto: modal?.querySelector('[data-reset-unsplash-photo]'),
   };
 
+  const labels = {
+    useUnsplash: modal?.querySelector('[data-use-unsplash-label]'),
+  };
+
   const sections = {
     authSection: modal?.querySelector('[data-auth-section]'),
     keywordsSection: modal?.querySelector('[data-keywords-section]'),
@@ -689,8 +693,15 @@ const UnsplashBg = {
     if (sections.keywordsSection) {
       sections.keywordsSection.style.display = settings.useUnsplash && settings.unsplashAuthenticated ? 'block' : 'none';
     }
+    // Before the password has ever been entered, this checkbox is the
+    // general gate to reveal the password field (unlocking Sonos/Hue too,
+    // not just Unsplash), so it's labeled generically until then.
+    const advancedUnlocked = !!settings.apiBearerToken;
+    if (labels.useUnsplash) {
+      labels.useUnsplash.textContent = advancedUnlocked ? 'Use Unsplash backgrounds' : 'Use advanced features';
+    }
     if (buttons.resetUnsplashPhoto) {
-      if (settings.useUnsplash) {
+      if (settings.useUnsplash && advancedUnlocked) {
         buttons.resetUnsplashPhoto.style.display = '';
         buttons.resetUnsplashPhoto.textContent = 'Reset history';
         buttons.resetUnsplashPhoto.disabled = !isUnsplashReady();
@@ -822,6 +833,7 @@ const UnsplashBg = {
       // bearer and hold their own real backend auth server-side.
       settings.apiBearerToken = await sha1Hex(password);
       save();
+      document.dispatchEvent(new CustomEvent('settings:apiBearerTokenChanged'));
 
       inputs.unsplashPassword.value = '';
       syncInputs();
@@ -2666,6 +2678,14 @@ const UnsplashBg = {
 
   const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
 
+  // Hide the trigger entirely until unlocked, rather than showing it with
+  // an "unlock in Settings" message inside — nothing to interact with yet.
+  const updateTriggerVisibility = () => {
+    container.style.display = getToken() ? '' : 'none';
+  };
+  updateTriggerVisibility();
+  document.addEventListener('settings:apiBearerTokenChanged', updateTriggerVisibility);
+
   const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
 
   const api = async (path) => {
@@ -3871,6 +3891,14 @@ const UnsplashBg = {
   // into it, so requests here go straight to e.g. /lights, no /api/<user>
   // prefix and no bridge application key ever touches the browser.
   const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
+
+  // Hide the trigger entirely until unlocked, rather than showing it with
+  // an "unlock in Settings" message inside — nothing to interact with yet.
+  const updateTriggerVisibility = () => {
+    container.style.display = getToken() ? '' : 'none';
+  };
+  updateTriggerVisibility();
+  document.addEventListener('settings:apiBearerTokenChanged', updateTriggerVisibility);
 
   const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
 

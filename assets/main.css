@@ -97,21 +97,25 @@ html {
   text-shadow: none;
 }
 
-.unsplash-info {
+.top-left-triggers {
   position: fixed;
   top: 16px;
   left: 18px;
   z-index: 22;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-4px);
-  transition: opacity .18s ease-in-out, transform .18s ease-in-out;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.unsplash-info {
+  position: relative;
+  /* display:none (not opacity) so Sonos/Hue slide left into its spot
+     instead of leaving a gap where it would have been. */
+  display: none;
 }
 
 .unsplash-mode .unsplash-info {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+  display: block;
 }
 
 .unsplash-info-trigger {
@@ -1619,10 +1623,7 @@ code {
 /* Sonos */
 
 .sonos-info {
-  position: fixed;
-  top: 16px;
-  left: 58px; /* .unsplash-info left (18px) + trigger width (36px) + 4px gap */
-  z-index: 21;
+  position: relative;
 }
 
 .sonos-info-trigger {
@@ -2399,10 +2400,7 @@ code {
 /* Hue */
 
 .hue-info {
-  position: fixed;
-  top: 16px;
-  left: 98px; /* .sonos-info left (58px) + trigger width (36px) + 4px gap */
-  z-index: 21;
+  position: relative;
 }
 
 .hue-info-trigger {
