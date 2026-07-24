@@ -2014,6 +2014,37 @@ code {
   background: rgba(83, 120, 166, 0.28);
 }
 
+.sonos-play-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+
+.sonos-play-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42px;
+  height: 42px;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+}
+
+.sonos-play-ring-track {
+  fill: none;
+  stroke: rgba(83, 120, 166, 0.16);
+  stroke-width: 2;
+}
+
+.sonos-play-ring-fill {
+  fill: none;
+  stroke: rgba(0, 20, 50, 0.2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .2s linear;
+}
+
 .sonos-volume-row {
   display: flex;
   align-items: center;
