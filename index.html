@@ -100,7 +100,7 @@
   <div class="app columns">
     <!-- Notifications -->
     <div class="notifications">
-      <a class="notification update" href="javascript:window.location.reload()">
+      <a class="notification update" href="#">
         <div class="title">🆕 Update downloaded!</div>
         <div class="content">Reload the page or click here to update.</div>
       </a>
@@ -176,12 +176,7 @@
   </div>
 
   <!-- Useless garbage -->
+  <script src="assets/google-suggest.js"></script>
   <script src="assets/main.js"></script>
-  <script>
-    var LOCAL_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]', '::1'];
-    if ('serviceWorker' in navigator && LOCAL_HOSTNAMES.indexOf(window.location.hostname) === -1) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
 </body>
 </html>

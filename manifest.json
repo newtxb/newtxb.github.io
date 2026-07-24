@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "newtxb",
+  "description": "A minimal, self-contained new tab page — clock, search, weather, quote of the day, Sonos and Hue control.",
+  "version": "1.0.0",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
+}
