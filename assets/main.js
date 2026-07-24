@@ -2710,6 +2710,23 @@ const UnsplashBg = {
     return span;
   };
 
+  const PLAY_RING_RADIUS = 18;
+  const PLAY_RING_CIRCUMFERENCE = 2 * Math.PI * PLAY_RING_RADIUS;
+
+  // Circular progress ring drawn around a room's play/pause button while
+  // that track is playing — startProgressTicker keeps dashoffset in sync
+  // with elapsed/duration between polls.
+  const makePlayRing = (ratio) => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'sonos-play-ring');
+    svg.setAttribute('viewBox', '0 0 42 42');
+    svg.innerHTML = `
+      <circle class="sonos-play-ring-track" cx="21" cy="21" r="${PLAY_RING_RADIUS}"></circle>
+      <circle class="sonos-play-ring-fill" cx="21" cy="21" r="${PLAY_RING_RADIUS}" stroke-dasharray="${PLAY_RING_CIRCUMFERENCE}" stroke-dashoffset="${PLAY_RING_CIRCUMFERENCE * (1 - ratio)}"></circle>
+    `;
+    return svg;
+  };
+
   // currentTrack.absoluteAlbumArtUri and favorites' albumArtUri are already
   // full, directly-loadable URLs — no proxying/auth needed, just an <img>.
   const setArtImage = (container, url) => {
@@ -2918,23 +2935,35 @@ const UnsplashBg = {
   };
 
   // Locally extrapolates playback position between polls instead of only
-  // updating on each refresh, so the bar actually moves. Once the estimated
-  // position reaches the track's duration, forces a refresh to pick up
-  // whatever's playing next.
+  // updating on each refresh, so the bar/ring actually move. Runs across
+  // every playing room at once (not just the expanded one), since each
+  // room's card shows its own play-ring. Once a room's estimated position
+  // reaches its track's duration, forces a refresh to pick up whatever's
+  // playing next.
   const startProgressTicker = () => {
     if (progressTicker) return;
     progressTicker = setInterval(() => {
-      if (expandedMode !== 'controls' || expandedId == null) return;
-      const group = groups.find(g => g.id === expandedId);
-      if (!group || !group.isPlaying || !group.duration || group.fetchedAt == null) return;
+      let anyFinished = false;
 
-      const elapsed = Math.min(group.duration, (group.elapsedTime || 0) + (Date.now() - group.fetchedAt) / 1000);
-      const fill = document.querySelector('.sonos-progress-fill');
-      const currentEl = document.querySelector('.sonos-progress-current');
-      if (fill) fill.style.width = `${Math.min(100, (elapsed / group.duration) * 100)}%`;
-      if (currentEl) currentEl.textContent = formatClock(elapsed);
+      groups.forEach((group) => {
+        if (!group.isPlaying || !group.duration || group.fetchedAt == null) return;
+        const elapsed = Math.min(group.duration, (group.elapsedTime || 0) + (Date.now() - group.fetchedAt) / 1000);
+        const ratio = Math.min(1, elapsed / group.duration);
 
-      if (elapsed >= group.duration) startBurstRefresh();
+        const ringFill = roomsEl.querySelector(`[data-group-id="${group.id}"] .sonos-play-ring-fill`);
+        if (ringFill) ringFill.style.strokeDashoffset = String(PLAY_RING_CIRCUMFERENCE * (1 - ratio));
+
+        if (expandedMode === 'controls' && expandedId === group.id) {
+          const fill = document.querySelector('.sonos-progress-fill');
+          const currentEl = document.querySelector('.sonos-progress-current');
+          if (fill) fill.style.width = `${ratio * 100}%`;
+          if (currentEl) currentEl.textContent = formatClock(elapsed);
+        }
+
+        if (elapsed >= group.duration) anyFinished = true;
+      });
+
+      if (anyFinished) startBurstRefresh();
     }, 250);
   };
 
@@ -3551,6 +3580,14 @@ const UnsplashBg = {
     });
     trackRow.appendChild(groupBtn);
 
+    const playWrap = document.createElement('div');
+    playWrap.className = 'sonos-play-wrap';
+
+    if (group.isPlaying && group.duration) {
+      const ratio = Math.max(0, Math.min(1, (group.elapsedTime || 0) / group.duration));
+      playWrap.appendChild(makePlayRing(ratio));
+    }
+
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
     playBtn.className = 'sonos-play-btn';
@@ -3565,7 +3602,8 @@ const UnsplashBg = {
         console.warn('Sonos playpause failed', err);
       }
     });
-    trackRow.appendChild(playBtn);
+    playWrap.appendChild(playBtn);
+    trackRow.appendChild(playWrap);
 
     summary.appendChild(trackRow);
 
