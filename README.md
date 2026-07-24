@@ -47,15 +47,46 @@ Click the gear (top right) to toggle the date / quote / weather rows, set your u
 - The current Unsplash photo is also cached for offline use (only one image kept at a time).
 - On load and every 30 minutes while the tab is open, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears.
 
+## Chrome extension
+
+The same `index.html` doubles as a Chrome extension that replaces the new tab page:
+
+1. Open `chrome://extensions`, enable **Developer mode** (top right).
+2. Click **Load unpacked** and select this project's folder.
+3. Open a new tab — it now loads `index.html` straight from the extension instead of the network.
+
+To share a packaged build (e.g. for `chrome://extensions` → drag-and-drop install, or the Web Store), run `./build-extension.sh` — it zips only the files `manifest.json` references (`index.html`, `assets/main.css`, `assets/main.js`, the icons) into `extension.zip`, leaving out the website-only `service-worker.js`, `github.json`, and `README.md`.
+
+Everything works the same as the website, including the live Google autocomplete dropdown, with
+one adaptation made for the extension sandbox.
+
+That runtime detection is what makes loading the raw source folder unpacked work correctly, but
+`build-extension.sh` goes one step further for the packaged zip: it overrides the staged
+`assets/google-suggest.js` with `assets/google-suggest.ext.js`'s content, so the shipped bundle
+*is* the `fetch()`-only implementation — the JSONP `<script src>` doesn't ship at all, not even
+as an unreachable branch.
+
+The service worker (app-shell precaching + update toast) also doesn't register in the extension,
+since it already bundles every file locally — there's nothing to precache.
+
+Everything else (weather, quotes, Sonos, Hue, Unsplash backgrounds, settings) already used plain
+`fetch()`/`localStorage` and needed no changes.
+
 ## Project layout
 
 ```
 ├── index.html          # All markup: search, clock, settings modal, notification, panels
+├── manifest.json        # Chrome extension manifest (new-tab override)
+├── build-extension.sh   # Packages extension.zip for the Chrome extension build
 ├── assets/
 │   ├── main.js         # All logic, organized as independent IIFE modules
 │   ├── main.css        # All styles
-│   └── favicon.png
-├── service-worker.js   # Precache app shell + daily Unsplash image cache
+│   ├── google-suggest.js      # Google autocomplete call — JSONP, or loads google-suggest.ext.js
+│   │                          #   if run as the Chrome extension (self-detects at runtime)
+│   ├── google-suggest.ext.js  # Same, for the extension (fetch via proxy)
+│   ├── favicon.png
+│   └── icon-{16,48,128}.png  # Extension icons (generated from favicon.png)
+├── service-worker.js   # Precache app shell + daily Unsplash image cache (website only)
 └── github.json         # Jekyll template → exposes the Pages build revision as version
 ```
 

@@ -566,6 +566,21 @@ const UnsplashBg = {
 };
 
 // ---------------------------------------------------------------------------------------------- //
+// SERVICE WORKER
+// ---------------------------------------------------------------------------------------------- //
+
+(() => {
+  // Packaged as a Chrome extension: files are already bundled locally, no need to precache them,
+  // and page-scoped service workers aren't a good fit for extension pages.
+  const isExtension = window.location.protocol === 'chrome-extension:';
+  const isLocal = ['localhost', '127.0.0.1', '[::1]', '::1'].indexOf(window.location.hostname) !== -1;
+
+  if ('serviceWorker' in navigator && !isExtension && !isLocal) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+})();
+
+// ---------------------------------------------------------------------------------------------- //
 // UPDATER
 // ---------------------------------------------------------------------------------------------- //
 
@@ -573,6 +588,11 @@ const UnsplashBg = {
   const VERSION_KEY = 'current-version';
   const PRECACHE = 'precache-v1';
   const CHECK_INTERVAL = 30 * 60 * 1000;
+
+  document.querySelector('.notification.update').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.reload();
+  });
 
   const sw = window.navigator.serviceWorker;
   sw?.addEventListener('message', (event) => {
@@ -1896,23 +1916,16 @@ const UnsplashBg = {
       return;
     }
 
-    // Let's call Google
-    const script = document.createElement('script');
+    // Let's call Google (see assets/google-suggest.js)
     const q = encodeURIComponent(text);
     const now = Date.now();
-    const callback = `_${Math.random().toString(36).slice(2)}_${now}`;
-    script.src = `https://www.google.com/complete/search?client=chrome&callback=${callback}&q=${q}`;
-    document.body.appendChild(script);
-    // And handle response
-    window[callback] = (args) => {
-      script.remove();
-      delete window[callback];
+    window.googleSuggest?.(q, (args) => {
       cacheSuggestions[text] = args;
       if (now < latest) return; // Already outdated
       latest = now;
       suggestionsData = args;
       refreshSuggestions();
-    };
+    });
   };
 
   const updateSearchIcon = (value) => {
