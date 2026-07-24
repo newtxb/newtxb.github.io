@@ -22,8 +22,9 @@ time, mark, audio, video {
 }
 body {
 	line-height: 1;
+  height: 100%;
   background-color: #06273d;
-  transition: background-color 0.5s ease-in-out;
+  transition: background 0.5s ease-in-out;
 }
 ol, ul {
 	list-style: none;
@@ -48,6 +49,8 @@ table {
 }
 
 html {
+  height: 100%;
+  background-color: #06273d;
   font-size: 100%;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;

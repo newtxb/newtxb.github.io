@@ -124,6 +124,39 @@ function hslToHex(hue, saturation, lightness) {
   return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
 }
 
+function hexToHsl(hexColor) {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) return null;
+
+  const r = rgb.r / 255;
+  const g = rgb.g / 255;
+  const b = rgb.b / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+
+  let hue = 0;
+  if (delta !== 0) {
+    if (max === r) hue = ((g - b) / delta) % 6;
+    else if (max === g) hue = (b - r) / delta + 2;
+    else hue = (r - g) / delta + 4;
+    hue *= 60;
+    if (hue < 0) hue += 360;
+  }
+
+  const lightness = (max + min) / 2;
+  const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+
+  return { h: hue, s: saturation * 100, l: lightness * 100 };
+}
+
+function ensureMinSaturation(hexColor, minSaturation) {
+  const hsl = hexToHsl(hexColor);
+  if (!hsl || hsl.s >= minSaturation) return hexColor;
+  return hslToHex(hsl.h, minSaturation, hsl.l);
+}
+
 function mixHexColors(fromHex, toHex, amount) {
   const from = hexToRgb(fromHex);
   const to = hexToRgb(toHex);
@@ -138,9 +171,18 @@ function mixHexColors(fromHex, toHex, amount) {
 }
 
 const ThemeColor = {
+  MIN_SATURATION: 40,
+
   set(color) {
     if (!color) return;
-    document.body.style.backgroundColor = lowerColorToMaxLuma(color);
+    const saturated = ensureMinSaturation(lowerColorToMaxLuma(color), this.MIN_SATURATION);
+    const hsl = hexToHsl(saturated);
+    if (!hsl) return;
+
+    const lighter = hslToHex(hsl.h, hsl.s, Math.min(hsl.l + 15, 70));
+    const darker = hslToHex(hsl.h, Math.min(hsl.s + 10, 90), Math.max(hsl.l - 20, 10));
+    document.body.style.background = `radial-gradient(ellipse at center -60px, ${lighter}, ${darker})`;
+    document.documentElement.style.backgroundColor = saturated;
   }
 };
 
