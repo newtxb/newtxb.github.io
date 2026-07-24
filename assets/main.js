@@ -171,7 +171,7 @@ function mixHexColors(fromHex, toHex, amount) {
 }
 
 const ThemeColor = {
-  MIN_SATURATION: 40,
+  MIN_SATURATION: 33,
 
   set(color) {
     if (!color) return;
