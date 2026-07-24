@@ -26,6 +26,11 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 ### 💬 Quote of the day
 - A short quote from the [dwyl/quotes](https://github.com/dwyl/quotes) collection, refreshed every 12 hours (even while the tab stays open). Hover to reveal the author.
 
+### 🔊 Sonos control
+- Hover the speaker icon (top left, next to the Unsplash ✨ button) for a live control panel of every Sonos room: what's playing, play/pause, volume.
+- **Drag** a room name onto another room's card to group them; drag a grouped room onto empty space in the list to ungroup it.
+- **Click** a card for more controls: per-room volume balance within a group, shuffle/repeat/crossfade, sleep timer, favorites, and the current queue.
+
 ### 🖼 Backgrounds
 - **Default**: an animated radial gradient that slowly cycles through hues, with floating particles.
 - **Unsplash mode** (optional): a new photo every day, picked from your own comma-separated search keywords. The photo's average color becomes the page theme color, image details are shown behind the ✨ button (with a link back to Unsplash and a "reload today's photo" action), and recently shown photos are blacklisted (last 30) to avoid repeats.
@@ -92,6 +97,7 @@ The page itself is fully static; at runtime it may talk to:
 - `wttr.in` — weather (geolocated by IP unless a location is set)
 - `raw.githubusercontent.com` — quote list
 - `api.unsplash.com` / `images.unsplash.com` — only when Unsplash mode is unlocked and enabled
+- `sonos-api.proxy.cloud.jclerc.com` — self-hosted [node-sonos-http-api](https://github.com/jishi/node-sonos-http-api) bridge, only when Sonos control is unlocked
 
 No analytics, no cookies, `referrer: no-referrer`.
 
@@ -104,7 +110,7 @@ python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-The service worker deliberately does **not** register on `localhost`, so you always get fresh files while developing.
+The service worker deliberately does **not** register on `localhost`, `127.0.0.1`, or `::1`, so you always get fresh files while developing — regardless of port.
 
 Notes:
 - `github.json` contains Jekyll front matter and is only rendered on GitHub Pages; locally the update check just fails silently.

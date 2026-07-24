@@ -181,6 +181,11 @@ function averageImageColor(image) {
   }
 }
 
+async function sha1Hex(text) {
+  const digest = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 // Encryption utilities for Unsplash credentials
 const CryptoUtils = {
   // Decrypt password-protected payload using AES-256-GCM with PBKDF2
@@ -594,6 +599,7 @@ const UnsplashBg = {
     unsplashAuthenticated: false,
     unsplashKeywords: DEFAULT_UNSPLASH_KEYWORDS_TEXT,
     unsplashKeywordsOverridden: false,
+    sonosBearerToken: '',
   };
 
   const modal = document.querySelector('.settings-modal');
@@ -809,6 +815,7 @@ const UnsplashBg = {
       // Success! Store encrypted credentials in localStorage
       settings.unsplashAuthenticated = true;
       settings.unsplashAccessKey = creds.access_key;
+      settings.sonosBearerToken = await sha1Hex(password);
       save();
 
       inputs.unsplashPassword.value = '';
@@ -2629,4 +2636,1126 @@ const UnsplashBg = {
   });
 
   loadQuote();
+})();
+
+// ---------------------------------------------------------------------------------------------- //
+// SONOS
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const container = document.querySelector('.sonos-info');
+  const roomsEl = document.querySelector('.sonos-rooms');
+  const menu = document.querySelector('.sonos-menu');
+  if (!container || !roomsEl || !menu) return;
+
+  const API_BASE = 'https://sonos-api.proxy.cloud.jclerc.com/';
+  const POLL_MS = 4000;
+  const VOLUME_SEND_DEBOUNCE_MS = 150;
+
+  // Room names to hide entirely, as SHA-1 hashes rather than plaintext so the
+  // actual names aren't visible in the public source.
+  const BLACKLISTED_ROOM_NAME_HASHES = [
+    '2ae4087c9f06d9d6403fbe2fe484e6570f4f4065',
+    'ccd02caf5ce6d1286b7f92c24c2d7827ee698ab6',
+  ];
+
+  const getToken = () => window.homeSettings?.get?.().sonosBearerToken || '';
+
+  const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
+
+  const api = async (path) => {
+    const token = getToken();
+    let res;
+    try {
+      res = await fetch(apiUrl(path), {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+    } catch (e) {
+      throw new Error('Network error — the Sonos API may be unreachable, or blocking this origin (CORS)');
+    }
+    if (!res.ok) {
+      const err = new Error(`Sonos API error ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    const contentType = res.headers.get('content-type') || '';
+    return contentType.includes('json') ? res.json() : null;
+  };
+
+  // currentTrack.absoluteAlbumArtUri and favorites' albumArtUri are already
+  // full, directly-loadable URLs — no proxying/auth needed, just an <img>.
+  const setArtImage = (container, url) => {
+    if (!url) {
+      container.textContent = '♪';
+      return;
+    }
+    container.textContent = ''; // clear any prior placeholder before adding the image
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = '';
+    img.onerror = () => { container.textContent = '♪'; };
+    container.appendChild(img);
+  };
+
+  const normalizeTrack = (track) => {
+    const title = (track?.title || '').trim();
+    if (!title) return null;
+    return {
+      title,
+      artist: (track.artist || '').trim(),
+      album: (track.album || '').trim(),
+      art: track.absoluteAlbumArtUri || null,
+    };
+  };
+
+  const parseBattery = (state) => {
+    const info = (state?.moreInfo || '').toString();
+    const pctMatch = info.match(/BattPct:(\d+)/);
+    if (!pctMatch) return null;
+    const chargingMatch = info.match(/BattChg:(\w+)/);
+    return {
+      pct: Number.parseInt(pctMatch[1], 10),
+      charging: !!chargingMatch && chargingMatch[1] === 'CHARGING',
+    };
+  };
+
+  // repeat can be a string enum ("none" | "one" | "all") rather than boolean.
+  const isModeActive = (value) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      const normalized = value.toLowerCase();
+      return normalized !== '' && normalized !== 'off' && normalized !== 'none' && normalized !== 'false';
+    }
+    return !!value;
+  };
+
+  const normalizeGroup = (raw) => {
+    const coordinator = raw?.coordinator || raw || {};
+    const rawMembers = Array.isArray(raw?.members) && raw.members.length ? raw.members : [coordinator];
+    const unsortedMembers = rawMembers.map(member => ({
+      roomName: member?.roomName || member?.name || coordinator.roomName || 'Room',
+      state: member?.state || {},
+    }));
+    const id = raw?.uuid || coordinator.roomName || unsortedMembers[0].roomName;
+    const coordinatorName = coordinator.roomName || unsortedMembers[0].roomName;
+    const members = [...unsortedMembers].sort((a, b) => a.roomName.localeCompare(b.roomName));
+
+    const coordinatorState = coordinator.state || {};
+    const playMode = coordinatorState.playMode || {};
+
+    return {
+      id,
+      coordinatorName,
+      members,
+      isPlaying: (coordinatorState.playbackState || '').toString().toUpperCase() === 'PLAYING',
+      track: normalizeTrack(coordinatorState.currentTrack),
+      elapsedTime: coordinatorState.elapsedTime ?? null,
+      duration: coordinatorState.currentTrack?.duration ?? null,
+      volume: coordinator.groupState?.volume ?? coordinatorState.volume ?? null,
+      mute: coordinator.groupState?.mute ?? !!coordinatorState.mute,
+      playMode: {
+        shuffle: isModeActive(playMode.shuffle),
+        repeat: isModeActive(playMode.repeat),
+        repeatRaw: (playMode.repeat || '').toString().toLowerCase(),
+        crossfade: isModeActive(playMode.crossfade),
+      },
+    };
+  };
+
+  // Playing rooms first, then alphabetical.
+  // Sort by each group's alphabetically-first member (not the API's chosen
+  // coordinator, which can be any member) — members are already sorted, so
+  // that's simply members[0].
+  const normalizeZones = (raw) => (Array.isArray(raw) ? raw.map(normalizeGroup) : [])
+    .sort((a, b) => a.members[0].roomName.localeCompare(b.members[0].roomName));
+
+  // Removes blacklisted rooms so they never show up at all, as if they
+  // didn't exist. A group loses just the blacklisted member(s); if that
+  // leaves it with none, the whole group is dropped.
+  const isBlacklistedName = async (name) => BLACKLISTED_ROOM_NAME_HASHES.includes(await sha1Hex(name));
+
+  const filterBlacklistedGroups = async (groupsToFilter) => {
+    const filtered = [];
+    for (const group of groupsToFilter) {
+      const keepFlags = await Promise.all(group.members.map(member => isBlacklistedName(member.roomName).then(b => !b)));
+      const keptMembers = group.members.filter((_, index) => keepFlags[index]);
+      if (keptMembers.length) filtered.push({ ...group, members: keptMembers });
+    }
+    return filtered;
+  };
+
+  // --- State ---
+  let groups = [];
+  let loaded = false;
+  let expandedId = null;
+  let expandedMode = null; // 'controls' | 'grouping'
+  const expandedFavoritesIds = new Set();
+  const expandedQueueIds = new Set();
+  const expandedSleepIds = new Set();
+  let draggedRoom = null;
+  let draggedFromGroupId = null;
+  let ungroupZoneAfter = null;
+  let favoritesCache = null;
+  let favoritesLoadPromise = null;
+  const queueCache = new Map(); // roomName -> items array
+  // The API doesn't report the currently-running sleep timer, so this is a
+  // client-side-only record of the last option picked per room, defaulting
+  // to "off" until the user sets one.
+  const sleepSelection = new Map(); // roomName -> sleep value ('off' | seconds string)
+  let pollTimer = null;
+  let refreshDebounceTimer = null;
+  let burstRefreshInterval = null;
+  let burstRefreshTimeout = null;
+  let progressTicker = null;
+  let interacting = false;
+  let lastError = null;
+  const volumeThrottleTimers = new Map();
+  const loaderEl = document.querySelector('.sonos-loader');
+
+  const formatClock = (totalSeconds) => {
+    const seconds = Math.max(0, Math.floor(totalSeconds || 0));
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // Reserves ~100px of height up front so a section expanding into "Loading…"
+  // and then into its real (differently-sized) content doesn't jump twice.
+  const showInlineLoading = (el) => {
+    el.textContent = '';
+    el.classList.add('sonos-inline-loading');
+    const spinner = document.createElement('div');
+    spinner.className = 'sonos-inline-spinner';
+    el.appendChild(spinner);
+  };
+
+  // Range inputs have no native cross-browser "filled" track, so paint it
+  // manually as a gradient split at the current value.
+  const applySliderFill = (slider) => {
+    const min = Number(slider.min) || 0;
+    const max = Number(slider.max) || 100;
+    const value = Number(slider.value) || 0;
+    const pct = max > min ? Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100)) : 0;
+    slider.style.background = `linear-gradient(to right, #4a84d8 0%, #4a84d8 ${pct}%, rgba(103, 122, 145, 0.28) ${pct}%, rgba(103, 122, 145, 0.28) 100%)`;
+  };
+
+  // Reference-counted so overlapping refreshes (a regular poll landing
+  // mid-burst, etc.) don't let one finishing early hide the loader while
+  // another is still in flight. Also enforces a minimum visible time so a
+  // fast request doesn't just flash the spinner for a few ms.
+  const MIN_LOADER_MS = 500;
+  let refreshInFlightCount = 0;
+  let loaderShownAt = 0;
+  let loaderHideTimer = null;
+  const beginRefreshIndicator = () => {
+    refreshInFlightCount += 1;
+    if (refreshInFlightCount === 1) {
+      clearTimeout(loaderHideTimer);
+      loaderHideTimer = null;
+      loaderShownAt = Date.now();
+      loaderEl?.classList.add('is-active');
+    }
+  };
+  const endRefreshIndicator = () => {
+    refreshInFlightCount = Math.max(0, refreshInFlightCount - 1);
+    if (refreshInFlightCount > 0) return;
+    const remaining = Math.max(0, MIN_LOADER_MS - (Date.now() - loaderShownAt));
+    clearTimeout(loaderHideTimer);
+    loaderHideTimer = setTimeout(() => {
+      if (refreshInFlightCount === 0) loaderEl?.classList.remove('is-active');
+    }, remaining);
+  };
+
+  const stopBurstRefresh = () => {
+    clearInterval(burstRefreshInterval);
+    clearTimeout(burstRefreshTimeout);
+    burstRefreshInterval = null;
+    burstRefreshTimeout = null;
+  };
+
+  // After a mutating action (grouping, playback, ...), poll every second for
+  // 5 seconds so the UI catches up quickly. The loader itself is driven by
+  // refresh() (shown for every zones refresh, not just bursts).
+  const startBurstRefresh = () => {
+    clearInterval(burstRefreshInterval);
+    clearTimeout(burstRefreshTimeout);
+    refresh();
+    burstRefreshInterval = setInterval(refresh, 1000);
+    burstRefreshTimeout = setTimeout(stopBurstRefresh, 5000);
+  };
+
+  const stopProgressTicker = () => {
+    clearInterval(progressTicker);
+    progressTicker = null;
+  };
+
+  // Locally extrapolates playback position between polls instead of only
+  // updating on each refresh, so the bar actually moves. Once the estimated
+  // position reaches the track's duration, forces a refresh to pick up
+  // whatever's playing next.
+  const startProgressTicker = () => {
+    if (progressTicker) return;
+    progressTicker = setInterval(() => {
+      if (expandedMode !== 'controls' || expandedId == null) return;
+      const group = groups.find(g => g.id === expandedId);
+      if (!group || !group.isPlaying || !group.duration || group.fetchedAt == null) return;
+
+      const elapsed = Math.min(group.duration, (group.elapsedTime || 0) + (Date.now() - group.fetchedAt) / 1000);
+      const fill = document.querySelector('.sonos-progress-fill');
+      const currentEl = document.querySelector('.sonos-progress-current');
+      if (fill) fill.style.width = `${Math.min(100, (elapsed / group.duration) * 100)}%`;
+      if (currentEl) currentEl.textContent = formatClock(elapsed);
+
+      if (elapsed >= group.duration) startBurstRefresh();
+    }, 250);
+  };
+
+  const sendVolumeThrottled = (target, value, isGroupVolume = true) => {
+    clearTimeout(volumeThrottleTimers.get(target.id));
+    volumeThrottleTimers.set(target.id, setTimeout(async () => {
+      volumeThrottleTimers.delete(target.id);
+      const room = encodeURIComponent(target.coordinatorName);
+      const path = isGroupVolume ? `/${room}/groupVolume/${value}` : `/${room}/volume/${value}`;
+      try {
+        await api(path);
+      } catch (e) {
+        console.warn('Sonos volume change failed', e);
+      }
+    }, VOLUME_SEND_DEBOUNCE_MS));
+  };
+
+  const ensureFavoritesLoaded = (anyRoomName) => {
+    if (favoritesCache) return Promise.resolve(favoritesCache);
+    if (!favoritesLoadPromise) {
+      favoritesLoadPromise = api(`/${encodeURIComponent(anyRoomName)}/favorites/detailed`)
+        .then((data) => {
+          const list = Array.isArray(data) ? data : [];
+          favoritesCache = list
+            .map(item => ({
+              name: (item?.title || '').toString().trim(),
+              art: item?.albumArtUri || null,
+              uri: (item?.uri || '').toString().trim(),
+            }))
+            // Entries without a uri are folders/section headers, not playable.
+            .filter(favorite => favorite.name && favorite.uri);
+          return favoritesCache;
+        })
+        .catch((e) => {
+          favoritesLoadPromise = null;
+          throw e;
+        });
+    }
+    return favoritesLoadPromise;
+  };
+
+  // Favorites/Queue/Sleep are mutually exclusive within a room's controls —
+  // opening one closes whichever of the other two was open for that room.
+  const toggleInnerSection = (targetSet, otherSets, id) => {
+    const isOpen = targetSet.has(id);
+    otherSets.forEach(set => set.delete(id));
+    if (isOpen) targetSet.delete(id);
+    else targetSet.add(id);
+    renderRooms();
+  };
+
+  const setExpanded = (id, mode) => {
+    if (expandedId === id && expandedMode === mode) {
+      expandedId = null;
+      expandedMode = null;
+    } else {
+      expandedId = id;
+      expandedMode = mode;
+      // Freshly opening a room's controls always starts with its inner
+      // sections (Favorites/Queue/Sleep) collapsed.
+      if (mode === 'controls') {
+        expandedFavoritesIds.delete(id);
+        expandedQueueIds.delete(id);
+        expandedSleepIds.delete(id);
+      }
+    }
+    renderRooms();
+  };
+
+  const renderFavoritesList = (el, favorites, group) => {
+    el.classList.remove('sonos-inline-loading');
+    el.textContent = '';
+    if (!favorites.length) {
+      el.textContent = 'No favorites found.';
+      return;
+    }
+    favorites.forEach((favorite) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sonos-favorite-btn';
+
+      const art = document.createElement('span');
+      art.className = 'sonos-favorite-art';
+      setArtImage(art, favorite.art);
+      btn.appendChild(art);
+
+      const label = document.createElement('span');
+      label.className = 'sonos-favorite-name';
+      label.textContent = favorite.name;
+      btn.appendChild(label);
+
+      btn.addEventListener('click', async () => {
+        try {
+          await api(`/${encodeURIComponent(group.coordinatorName)}/favorite/${encodeURIComponent(favorite.name)}`);
+          startBurstRefresh();
+        } catch (e) {
+          console.warn('Sonos play favorite failed', e);
+        }
+      });
+      el.appendChild(btn);
+    });
+  };
+
+  const buildSleepSection = (group) => {
+    const section = document.createElement('div');
+    section.className = 'sonos-expanded-section';
+
+    const isOpen = expandedSleepIds.has(group.id);
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'sonos-expanded-title sonos-section-toggle';
+    header.textContent = `${isOpen ? '▾' : '▸'} 🌙 Sleep timer`;
+    header.addEventListener('click', () => {
+      toggleInnerSection(expandedSleepIds, [expandedFavoritesIds, expandedQueueIds], group.id);
+    });
+    section.appendChild(header);
+
+    if (isOpen) {
+      const buttons = document.createElement('div');
+      buttons.className = 'sonos-sleep-buttons';
+      const selected = sleepSelection.get(group.coordinatorName) || 'off';
+      [['Off', 'off'], ['15 min', '900'], ['30 min', '1800'], ['45 min', '2700'], ['60 min', '3600']]
+        .forEach(([label, value]) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'sonos-sleep-btn';
+          if (value === selected) btn.classList.add('is-active');
+          btn.textContent = label;
+          btn.addEventListener('click', async () => {
+            try {
+              await api(`/${encodeURIComponent(group.coordinatorName)}/sleep/${value}`);
+              sleepSelection.set(group.coordinatorName, value);
+              renderRooms();
+            } catch (e) {
+              console.warn('Sonos sleep timer failed', e);
+            }
+          });
+          buttons.appendChild(btn);
+        });
+      section.appendChild(buttons);
+    }
+
+    return section;
+  };
+
+  const buildFavoritesSection = (group) => {
+    const section = document.createElement('div');
+    section.className = 'sonos-expanded-section';
+
+    const isOpen = expandedFavoritesIds.has(group.id);
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'sonos-expanded-title sonos-section-toggle';
+    header.textContent = `${isOpen ? '▾' : '▸'} ⭐ Favorites`;
+    header.addEventListener('click', () => {
+      toggleInnerSection(expandedFavoritesIds, [expandedQueueIds, expandedSleepIds], group.id);
+    });
+    section.appendChild(header);
+
+    if (isOpen) {
+      const list = document.createElement('div');
+      list.className = 'sonos-favorites-list';
+      if (favoritesCache) {
+        renderFavoritesList(list, favoritesCache, group);
+      } else {
+        showInlineLoading(list);
+        ensureFavoritesLoaded(group.coordinatorName)
+          .then(favorites => renderFavoritesList(list, favorites, group))
+          .catch(() => {
+            list.classList.remove('sonos-inline-loading');
+            list.textContent = 'Failed to load favorites.';
+          });
+      }
+      section.appendChild(list);
+    }
+
+    return section;
+  };
+
+  const renderQueueItems = (el, items, group) => {
+    el.classList.remove('sonos-inline-loading');
+    el.textContent = '';
+    if (!items.length) {
+      el.textContent = 'Queue is empty.';
+      return;
+    }
+    items.forEach((item, index) => {
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'sonos-queue-item';
+      const title = document.createElement('span');
+      title.className = 'sonos-queue-item-title';
+      title.textContent = item?.title || 'Unknown';
+      const artist = document.createElement('span');
+      artist.className = 'sonos-queue-item-artist';
+      artist.textContent = item?.artist || '';
+      row.append(title, artist);
+      row.addEventListener('click', async () => {
+        try {
+          await api(`/${encodeURIComponent(group.coordinatorName)}/trackseek/${index + 1}`);
+          startBurstRefresh();
+        } catch (e) {
+          console.warn('Sonos trackseek failed', e);
+        }
+      });
+      el.appendChild(row);
+    });
+  };
+
+  const buildQueueSection = (group) => {
+    const section = document.createElement('div');
+    section.className = 'sonos-expanded-section';
+
+    const isOpen = expandedQueueIds.has(group.id);
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'sonos-expanded-title sonos-section-toggle';
+    header.textContent = `${isOpen ? '▾' : '▸'} 📜 Queue`;
+    header.addEventListener('click', () => {
+      toggleInnerSection(expandedQueueIds, [expandedFavoritesIds, expandedSleepIds], group.id);
+    });
+    section.appendChild(header);
+
+    if (isOpen) {
+      const list = document.createElement('div');
+      list.className = 'sonos-queue-list';
+      const cached = queueCache.get(group.coordinatorName);
+      if (cached) renderQueueItems(list, cached, group);
+      else showInlineLoading(list);
+
+      // Refresh in the background; keep showing the last-known list until
+      // the new one arrives instead of flashing back to "Loading…".
+      api(`/${encodeURIComponent(group.coordinatorName)}/queue`).then((queue) => {
+        const items = (Array.isArray(queue) ? queue : []).slice(0, 20);
+        queueCache.set(group.coordinatorName, items);
+        renderQueueItems(list, items, group);
+      }).catch(() => {
+        if (!cached) {
+          list.classList.remove('sonos-inline-loading');
+          list.textContent = 'Failed to load queue.';
+        }
+      });
+
+      section.appendChild(list);
+    }
+
+    return section;
+  };
+
+  const renderControlsPanel = (group) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'sonos-expanded';
+    wrap.addEventListener('click', e => e.stopPropagation());
+    wrap.addEventListener('dragstart', e => e.stopPropagation());
+
+    // Progress bar
+    if (group.track && group.duration) {
+      const progressSection = document.createElement('div');
+      progressSection.className = 'sonos-expanded-section';
+
+      const row = document.createElement('div');
+      row.className = 'sonos-progress-row';
+
+      const currentEl = document.createElement('span');
+      currentEl.className = 'sonos-progress-time sonos-progress-current';
+      currentEl.textContent = formatClock(group.elapsedTime || 0);
+
+      const bar = document.createElement('div');
+      bar.className = 'sonos-progress-bar';
+      const fill = document.createElement('div');
+      fill.className = 'sonos-progress-fill';
+      const pct = group.duration > 0
+        ? Math.max(0, Math.min(100, ((group.elapsedTime || 0) / group.duration) * 100))
+        : 0;
+      fill.style.width = `${pct}%`;
+      bar.appendChild(fill);
+      bar.addEventListener('click', async (e) => {
+        const rect = bar.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const seconds = Math.round(ratio * group.duration);
+        fill.style.width = `${ratio * 100}%`;
+        currentEl.textContent = formatClock(seconds);
+        try {
+          await api(`/${encodeURIComponent(group.coordinatorName)}/timeseek/${seconds}`);
+          startBurstRefresh();
+        } catch (err) {
+          console.warn('Sonos timeseek failed', err);
+        }
+      });
+
+      const totalEl = document.createElement('span');
+      totalEl.className = 'sonos-progress-time sonos-progress-total';
+      totalEl.textContent = formatClock(group.duration);
+
+      row.append(currentEl, bar, totalEl);
+      progressSection.appendChild(row);
+      wrap.appendChild(progressSection);
+    }
+
+    // Transport controls
+    const transport = document.createElement('div');
+    transport.className = 'sonos-expanded-section sonos-transport-row';
+
+    const makeTransportBtn = (label, ariaLabel, action, extraClass = '') => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `sonos-transport-btn${extraClass ? ` ${extraClass}` : ''}`;
+      btn.textContent = label;
+      btn.setAttribute('aria-label', ariaLabel);
+      btn.addEventListener('click', async () => {
+        try {
+          await api(`/${encodeURIComponent(group.coordinatorName)}/${action}`);
+          startBurstRefresh();
+        } catch (e) {
+          console.warn(`Sonos ${action} failed`, e);
+        }
+      });
+      return btn;
+    };
+
+    transport.appendChild(makeTransportBtn('⏮', 'Previous track', 'previous'));
+    transport.appendChild(makeTransportBtn(
+      group.isPlaying ? '⏸' : '▶',
+      group.isPlaying ? 'Pause' : 'Play',
+      'playpause',
+      'sonos-transport-btn-primary',
+    ));
+    transport.appendChild(makeTransportBtn('⏭', 'Next track', 'next'));
+    wrap.appendChild(transport);
+
+    // Per-member volume balance
+    if (group.members.length > 1) {
+      const section = document.createElement('div');
+      section.className = 'sonos-expanded-section';
+      const title = document.createElement('div');
+      title.className = 'sonos-expanded-title';
+      title.textContent = 'Room balance';
+      section.appendChild(title);
+
+      group.members.forEach((member) => {
+        const row = document.createElement('div');
+        row.className = 'sonos-balance-row';
+        const label = document.createElement('span');
+        label.className = 'sonos-balance-label';
+        label.textContent = member.roomName;
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '100';
+        slider.value = String(member.state?.volume ?? 0);
+        applySliderFill(slider);
+
+        const valueEl = document.createElement('span');
+        valueEl.className = 'sonos-balance-value';
+        valueEl.textContent = String(member.state?.volume ?? 0);
+
+        slider.addEventListener('input', () => {
+          valueEl.textContent = slider.value;
+          applySliderFill(slider);
+          sendVolumeThrottled({ id: `member:${member.roomName}`, coordinatorName: member.roomName }, Number.parseInt(slider.value, 10), false);
+        });
+        row.append(label, slider, valueEl);
+        section.appendChild(row);
+      });
+      wrap.appendChild(section);
+    }
+
+    // Playback modes
+    const modes = document.createElement('div');
+    modes.className = 'sonos-expanded-section sonos-mode-buttons';
+    [
+      { key: 'shuffle', label: '🔀 Shuffle', active: group.playMode.shuffle },
+      { key: 'repeat', label: group.playMode.repeatRaw === 'one' ? '1️⃣ Repeat' : '🔁 Repeat', active: group.playMode.repeat },
+      { key: 'crossfade', label: '⤭ Crossfade', active: group.playMode.crossfade },
+    ].forEach(({ key, label, active }) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sonos-mode-btn';
+      if (active) btn.classList.add('is-active');
+      btn.textContent = label;
+      btn.addEventListener('click', async () => {
+        try {
+          await api(`/${encodeURIComponent(group.coordinatorName)}/${key}/toggle`);
+          startBurstRefresh();
+        } catch (e) {
+          console.warn(`Sonos ${key} toggle failed`, e);
+        }
+      });
+      modes.appendChild(btn);
+    });
+    wrap.appendChild(modes);
+
+    wrap.appendChild(buildFavoritesSection(group));
+    wrap.appendChild(buildQueueSection(group));
+    wrap.appendChild(buildSleepSection(group));
+
+    return wrap;
+  };
+
+  const renderGroupingPanel = (group) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'sonos-expanded';
+    wrap.addEventListener('click', e => e.stopPropagation());
+    wrap.addEventListener('dragstart', e => e.stopPropagation());
+
+    const section = document.createElement('div');
+    section.className = 'sonos-expanded-section';
+    const title = document.createElement('div');
+    title.className = 'sonos-expanded-title';
+    title.textContent = 'Group with';
+    section.appendChild(title);
+
+    // Flattened, per-room list (not per-group) so rooms already in this
+    // group show up as active/toggleable alongside everyone else.
+    const otherRooms = groups
+      .flatMap(g => g.members.map(m => ({ roomName: m.roomName, groupId: g.id })))
+      .filter(room => room.roomName !== group.coordinatorName);
+
+    const canUngroupAll = group.members.length > 1;
+
+    if (otherRooms.length || canUngroupAll) {
+      const list = document.createElement('div');
+      list.className = 'sonos-grouping-list';
+      otherRooms.forEach((room) => {
+        const isInThisGroup = room.groupId === group.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sonos-grouping-btn';
+        if (isInThisGroup) btn.classList.add('is-active');
+        btn.textContent = room.roomName;
+        btn.addEventListener('click', async () => {
+          try {
+            if (isInThisGroup) {
+              // Toggle off: remove it from this group.
+              await api(`/${encodeURIComponent(room.roomName)}/leave`);
+            } else {
+              // The other room joins THIS group (not the other way around).
+              await api(`/${encodeURIComponent(room.roomName)}/join/${encodeURIComponent(group.coordinatorName)}`);
+            }
+            startBurstRefresh();
+          } catch (e) {
+            console.warn('Sonos group toggle failed', e);
+          }
+        });
+        list.appendChild(btn);
+      });
+
+      if (canUngroupAll) {
+        const leaveBtn = document.createElement('button');
+        leaveBtn.type = 'button';
+        leaveBtn.className = 'sonos-grouping-btn sonos-leave-btn';
+        leaveBtn.textContent = 'Ungroup all';
+        leaveBtn.addEventListener('click', async () => {
+          try {
+            await Promise.all(group.members
+              .filter(m => m.roomName !== group.coordinatorName)
+              .map(m => api(`/${encodeURIComponent(m.roomName)}/leave`)));
+            startBurstRefresh();
+          } catch (e) {
+            console.warn('Sonos ungroup failed', e);
+          }
+        });
+        list.appendChild(leaveBtn);
+      }
+
+      section.appendChild(list);
+    } else {
+      const empty = document.createElement('div');
+      empty.className = 'sonos-empty';
+      empty.textContent = 'No other rooms available.';
+      section.appendChild(empty);
+    }
+
+    wrap.appendChild(section);
+    return wrap;
+  };
+
+  // Shown right after a grouped room's card the moment you start dragging
+  // one of its members, as an explicit "drop here to ungroup" target.
+  const makeUngroupZone = () => {
+    const zone = document.createElement('div');
+    zone.className = 'sonos-ungroup-zone';
+    zone.textContent = 'Drop here to ungroup';
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('is-drag-over');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('is-drag-over'));
+    zone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!draggedRoom) return;
+      try {
+        await api(`/${encodeURIComponent(draggedRoom)}/leave`);
+        startBurstRefresh();
+      } catch (err) {
+        console.warn('Sonos leave failed', err);
+      }
+    });
+    return zone;
+  };
+
+  const showUngroupZones = (cardEl) => {
+    ungroupZoneAfter = makeUngroupZone();
+    cardEl.parentNode.insertBefore(ungroupZoneAfter, cardEl.nextSibling);
+  };
+
+  const removeUngroupZones = () => {
+    if (ungroupZoneAfter) { ungroupZoneAfter.remove(); ungroupZoneAfter = null; }
+  };
+
+  const renderRoomCard = (group) => {
+    const card = document.createElement('div');
+    card.className = 'sonos-zone';
+    card.dataset.groupId = group.id;
+    if (group.isPlaying) {
+      card.classList.add('is-playing');
+      // The card is recreated on every render (poll/burst), which would
+      // otherwise restart the pulse animation from 0 each time — offset it
+      // to where a continuously-running clock would be so it looks seamless.
+      card.style.animationDelay = `-${Date.now() % 2400}ms`;
+    }
+
+    // Holds the compact (always-visible) header/track/volume rows. The
+    // expanded panel is appended to `card` as a SIBLING of this, not a
+    // descendant — so a click inside it can never reach summary's own
+    // click-to-toggle listener, regardless of stopPropagation/DOM-rebuild
+    // timing quirks.
+    const summary = document.createElement('div');
+    summary.className = 'sonos-zone-summary';
+
+    const header = document.createElement('div');
+    header.className = 'sonos-zone-header';
+    group.members.forEach((member) => {
+      const chip = document.createElement('span');
+      chip.className = 'sonos-room-chip';
+      chip.textContent = member.roomName;
+      chip.draggable = true;
+
+      const battery = parseBattery(member.state);
+      if (battery) {
+        const badge = document.createElement('span');
+        badge.className = 'sonos-battery';
+        badge.textContent = `${battery.charging ? '⚡' : ''}${battery.pct}%`;
+        chip.appendChild(badge);
+      }
+
+      chip.addEventListener('dragstart', (e) => {
+        draggedRoom = member.roomName;
+        draggedFromGroupId = group.id;
+        chip.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', member.roomName);
+        // Deferred: mutating the DOM synchronously inside dragstart (while the
+        // browser is still capturing the drag image) can abort the drag —
+        // do this just after this handler returns instead.
+        setTimeout(() => {
+          // Collapsing (if needed) rebuilds every card, replacing `card` —
+          // re-fetch the fresh element afterwards rather than use the stale
+          // reference so the ungroup zone gets inserted in the live DOM.
+          if (expandedId != null) {
+            expandedId = null;
+            expandedMode = null;
+            renderRooms();
+          }
+          if (group.members.length > 1) {
+            const freshCard = roomsEl.querySelector(`[data-group-id="${group.id}"]`);
+            if (freshCard) showUngroupZones(freshCard);
+          }
+        }, 0);
+      });
+      chip.addEventListener('dragend', () => {
+        chip.classList.remove('is-dragging');
+        draggedRoom = null;
+        draggedFromGroupId = null;
+        removeUngroupZones();
+      });
+
+      header.appendChild(chip);
+    });
+    summary.appendChild(header);
+
+    const trackRow = document.createElement('div');
+    trackRow.className = 'sonos-track-row';
+
+    const art = document.createElement('div');
+    art.className = 'sonos-art';
+    setArtImage(art, group.track?.art);
+    trackRow.appendChild(art);
+
+    const info = document.createElement('div');
+    info.className = 'sonos-track-info';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'sonos-track-title';
+    titleEl.textContent = group.track?.title || 'No music selected';
+    if (group.track?.title) titleEl.title = group.track.title;
+    const subtitleEl = document.createElement('div');
+    subtitleEl.className = 'sonos-track-subtitle';
+    subtitleEl.textContent = group.track ? (group.track.artist || group.track.album || '') : 'Queue is empty';
+    info.append(titleEl, subtitleEl);
+    trackRow.appendChild(info);
+
+    const groupBtn = document.createElement('button');
+    groupBtn.type = 'button';
+    groupBtn.className = 'sonos-group-btn';
+    groupBtn.textContent = '🔗';
+    groupBtn.title = 'Grouping';
+    groupBtn.setAttribute('aria-label', 'Grouping options');
+    groupBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setExpanded(group.id, 'grouping');
+    });
+    trackRow.appendChild(groupBtn);
+
+    const playBtn = document.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'sonos-play-btn';
+    playBtn.textContent = group.isPlaying ? '⏸' : '▶';
+    playBtn.setAttribute('aria-label', group.isPlaying ? 'Pause' : 'Play');
+    playBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await api(`/${encodeURIComponent(group.coordinatorName)}/playpause`);
+        startBurstRefresh();
+      } catch (err) {
+        console.warn('Sonos playpause failed', err);
+      }
+    });
+    trackRow.appendChild(playBtn);
+
+    summary.appendChild(trackRow);
+
+    const volumeRow = document.createElement('div');
+    volumeRow.className = 'sonos-volume-row';
+
+    const muteBtn = document.createElement('button');
+    muteBtn.type = 'button';
+    muteBtn.className = 'sonos-mute-btn';
+    muteBtn.textContent = group.mute ? '🔇' : '🔊';
+    muteBtn.setAttribute('aria-label', group.mute ? 'Unmute' : 'Mute');
+    muteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        // togglemute only mutes the coordinator's own speaker — grouped
+        // rooms need the group-wide endpoint to mute everyone in the group.
+        const path = group.members.length > 1
+          ? (group.mute ? 'groupUnmute' : 'groupMute')
+          : 'togglemute';
+        await api(`/${encodeURIComponent(group.coordinatorName)}/${path}`);
+        startBurstRefresh();
+      } catch (err) {
+        console.warn('Sonos mute toggle failed', err);
+      }
+    });
+    volumeRow.appendChild(muteBtn);
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '100';
+    slider.value = String(group.volume ?? 0);
+    slider.className = 'sonos-volume-slider';
+    slider.addEventListener('click', e => e.stopPropagation());
+    applySliderFill(slider);
+
+    const valueEl = document.createElement('span');
+    valueEl.className = 'sonos-volume-value';
+    valueEl.textContent = group.volume == null ? '--' : String(group.volume);
+
+    slider.addEventListener('input', () => {
+      valueEl.textContent = slider.value;
+      applySliderFill(slider);
+      sendVolumeThrottled(group, Number.parseInt(slider.value, 10), group.members.length > 1);
+    });
+    volumeRow.appendChild(slider);
+    volumeRow.appendChild(valueEl);
+
+    summary.appendChild(volumeRow);
+    card.appendChild(summary);
+
+    // Click to expand more controls — scoped to summary (not the whole
+    // card), so it structurally cannot fire for clicks inside the expanded
+    // panel, which is appended as summary's sibling below.
+    summary.addEventListener('click', (e) => {
+      if (e.target.closest('button, input, select, a, .sonos-room-chip')) return;
+      setExpanded(group.id, 'controls');
+    });
+
+    // Drag & drop onto this card = join this group
+    card.addEventListener('dragover', (e) => {
+      if (!draggedRoom || draggedFromGroupId === group.id) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      card.classList.add('is-drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('is-drag-over'));
+    card.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      card.classList.remove('is-drag-over');
+      if (!draggedRoom || draggedFromGroupId === group.id) return;
+      try {
+        await api(`/${encodeURIComponent(draggedRoom)}/join/${encodeURIComponent(group.coordinatorName)}`);
+        startBurstRefresh();
+      } catch (err) {
+        console.warn('Sonos join failed', err);
+      }
+    });
+
+    if (expandedId === group.id) {
+      card.classList.add('is-expanded');
+      card.appendChild(expandedMode === 'grouping' ? renderGroupingPanel(group) : renderControlsPanel(group));
+    }
+
+    return card;
+  };
+
+  function renderRooms() {
+    roomsEl.textContent = '';
+
+    if (!getToken()) {
+      const empty = document.createElement('div');
+      empty.className = 'sonos-empty';
+      empty.textContent = 'Unlock in Settings to enable Sonos control.';
+      roomsEl.appendChild(empty);
+      return;
+    }
+
+    if (!loaded) {
+      const message = document.createElement('div');
+      message.className = 'sonos-empty';
+      if (lastError) {
+        message.classList.add('sonos-error');
+        message.textContent = lastError.status === 401 || lastError.status === 403
+          ? 'Invalid Sonos token — unlock again in Settings.'
+          : `Couldn't reach Sonos (${lastError.message})`;
+      } else {
+        message.textContent = 'Loading rooms…';
+      }
+      roomsEl.appendChild(message);
+      return;
+    }
+
+    if (!groups.length) {
+      const empty = document.createElement('div');
+      empty.className = 'sonos-empty';
+      empty.textContent = 'No Sonos rooms found.';
+      roomsEl.appendChild(empty);
+      return;
+    }
+
+    groups.forEach(group => roomsEl.appendChild(renderRoomCard(group)));
+  }
+
+  async function refresh() {
+    if (interacting) return;
+    if (!getToken()) {
+      loaded = false;
+      lastError = null;
+      renderRooms();
+      return;
+    }
+    beginRefreshIndicator();
+    try {
+      const raw = await api('/zones');
+      const fetchedAt = Date.now();
+      const withTimestamp = normalizeZones(raw).map(group => ({ ...group, fetchedAt }));
+      groups = await filterBlacklistedGroups(withTimestamp);
+      loaded = true;
+      lastError = null;
+      renderRooms();
+    } catch (e) {
+      console.warn('Failed to refresh Sonos zones', e);
+      lastError = e;
+      renderRooms();
+    } finally {
+      endRefreshIndicator();
+    }
+  }
+
+  function scheduleRefresh(delay = 0) {
+    clearTimeout(refreshDebounceTimer);
+    refreshDebounceTimer = setTimeout(refresh, delay);
+  }
+
+  const startPolling = () => {
+    if (pollTimer) return;
+    refresh();
+    pollTimer = setInterval(refresh, POLL_MS);
+    startProgressTicker();
+  };
+
+  // Closing the whole menu collapses whichever card's controls were open,
+  // so reopening it later starts at the room list.
+  const stopPolling = () => {
+    clearInterval(pollTimer);
+    pollTimer = null;
+    stopProgressTicker();
+    stopBurstRefresh();
+    expandedId = null;
+    expandedMode = null;
+  };
+
+  // Every render tears down and recreates the whole card subtree. That can
+  // cause spurious mouseleave/focusout signals on the container — e.g. a
+  // focused toggle button gets destroyed mid-click and focus falls away with
+  // relatedTarget unreliable, or hover briefly un-matches while old elements
+  // are gone and new ones haven't painted. Don't trust any single event: at
+  // the moment the close would actually happen, re-check the real, live
+  // hover/focus state and bail out if the user is still genuinely inside.
+  let closeTimer = null;
+  const cancelScheduledClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = null;
+  };
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      if (container.matches(':hover') || container.contains(document.activeElement)) return;
+      container.classList.remove('is-open');
+      stopPolling();
+    }, 150);
+  };
+
+  container.addEventListener('mouseenter', () => {
+    cancelScheduledClose();
+    container.classList.add('is-open');
+    startPolling();
+  });
+  container.addEventListener('focusin', () => {
+    cancelScheduledClose();
+    container.classList.add('is-open');
+    startPolling();
+  });
+  container.addEventListener('mouseleave', scheduleClose);
+  // relatedTarget is unreliable when the previously-focused element is
+  // removed from the DOM by a re-render — defer to a fresh tick and check
+  // document.activeElement directly instead of trusting this event alone.
+  container.addEventListener('focusout', () => {
+    setTimeout(scheduleClose, 0);
+  });
+
+  menu.addEventListener('mousedown', () => { interacting = true; });
+  document.addEventListener('mouseup', () => {
+    if (!interacting) return;
+    interacting = false;
+    scheduleRefresh(200);
+  });
+
+  renderRooms();
 })();
