@@ -1893,12 +1893,35 @@ code {
 }
 
 .sonos-battery {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   font-size: 0.68rem;
   font-weight: 600;
   color: #5a6a81;
   background: rgba(103, 122, 145, 0.12);
   border-radius: 6px;
   padding: 1px 5px;
+}
+
+.sonos-battery-bolt {
+  color: #d9a441;
+}
+
+.sonos-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  flex: 0 0 auto;
+}
+
+.sonos-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .sonos-track-row {

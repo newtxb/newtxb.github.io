@@ -2682,18 +2682,46 @@ const UnsplashBg = {
     return contentType.includes('json') ? res.json() : null;
   };
 
+  // Inline icon set (in place of emoji) — small outline glyphs, 24x24 viewBox,
+  // styled via currentColor/1em so they inherit each button's color and size.
+  const ICON_PATHS = {
+    play: '<polygon points="6 3 20 12 6 21 6 3"/>',
+    pause: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+    previous: '<polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>',
+    next: '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>',
+    link: '<path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/>',
+    volumeUp: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+    volumeMute: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>',
+    shuffle: '<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>',
+    repeat: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+    repeatOne: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/>',
+    crossfade: '<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>',
+    bolt: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    queue: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  };
+
+  const icon = (name, extraClass = '') => {
+    const span = document.createElement('span');
+    span.className = `sonos-icon${extraClass ? ` ${extraClass}` : ''}`;
+    span.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name]}</svg>`;
+    return span;
+  };
+
   // currentTrack.absoluteAlbumArtUri and favorites' albumArtUri are already
   // full, directly-loadable URLs — no proxying/auth needed, just an <img>.
   const setArtImage = (container, url) => {
     if (!url) {
-      container.textContent = '♪';
+      container.replaceChildren(icon('music'));
       return;
     }
-    container.textContent = ''; // clear any prior placeholder before adding the image
+    container.replaceChildren(); // clear any prior placeholder before adding the image
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
-    img.onerror = () => { container.textContent = '♪'; };
+    img.onerror = () => { container.replaceChildren(icon('music')); };
     container.appendChild(img);
   };
 
@@ -3018,7 +3046,7 @@ const UnsplashBg = {
     const header = document.createElement('button');
     header.type = 'button';
     header.className = 'sonos-expanded-title sonos-section-toggle';
-    header.textContent = `${isOpen ? '▾' : '▸'} 🌙 Sleep timer`;
+    header.append(`${isOpen ? '▾' : '▸'} `, icon('moon'), ' Sleep timer');
     header.addEventListener('click', () => {
       toggleInnerSection(expandedSleepIds, [expandedFavoritesIds, expandedQueueIds], group.id);
     });
@@ -3060,7 +3088,7 @@ const UnsplashBg = {
     const header = document.createElement('button');
     header.type = 'button';
     header.className = 'sonos-expanded-title sonos-section-toggle';
-    header.textContent = `${isOpen ? '▾' : '▸'} ⭐ Favorites`;
+    header.append(`${isOpen ? '▾' : '▸'} `, icon('star'), ' Favorites');
     header.addEventListener('click', () => {
       toggleInnerSection(expandedFavoritesIds, [expandedQueueIds, expandedSleepIds], group.id);
     });
@@ -3124,7 +3152,7 @@ const UnsplashBg = {
     const header = document.createElement('button');
     header.type = 'button';
     header.className = 'sonos-expanded-title sonos-section-toggle';
-    header.textContent = `${isOpen ? '▾' : '▸'} 📜 Queue`;
+    header.append(`${isOpen ? '▾' : '▸'} `, icon('queue'), ' Queue');
     header.addEventListener('click', () => {
       toggleInnerSection(expandedQueueIds, [expandedFavoritesIds, expandedSleepIds], group.id);
     });
@@ -3210,11 +3238,11 @@ const UnsplashBg = {
     const transport = document.createElement('div');
     transport.className = 'sonos-expanded-section sonos-transport-row';
 
-    const makeTransportBtn = (label, ariaLabel, action, extraClass = '') => {
+    const makeTransportBtn = (iconName, ariaLabel, action, extraClass = '') => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `sonos-transport-btn${extraClass ? ` ${extraClass}` : ''}`;
-      btn.textContent = label;
+      btn.appendChild(icon(iconName));
       btn.setAttribute('aria-label', ariaLabel);
       btn.addEventListener('click', async () => {
         try {
@@ -3227,14 +3255,14 @@ const UnsplashBg = {
       return btn;
     };
 
-    transport.appendChild(makeTransportBtn('⏮', 'Previous track', 'previous'));
+    transport.appendChild(makeTransportBtn('previous', 'Previous track', 'previous'));
     transport.appendChild(makeTransportBtn(
-      group.isPlaying ? '⏸' : '▶',
+      group.isPlaying ? 'pause' : 'play',
       group.isPlaying ? 'Pause' : 'Play',
       'playpause',
       'sonos-transport-btn-primary',
     ));
-    transport.appendChild(makeTransportBtn('⏭', 'Next track', 'next'));
+    transport.appendChild(makeTransportBtn('next', 'Next track', 'next'));
     wrap.appendChild(transport);
 
     // Per-member volume balance
@@ -3278,15 +3306,15 @@ const UnsplashBg = {
     const modes = document.createElement('div');
     modes.className = 'sonos-expanded-section sonos-mode-buttons';
     [
-      { key: 'shuffle', label: '🔀 Shuffle', active: group.playMode.shuffle },
-      { key: 'repeat', label: group.playMode.repeatRaw === 'one' ? '1️⃣ Repeat' : '🔁 Repeat', active: group.playMode.repeat },
-      { key: 'crossfade', label: '⤭ Crossfade', active: group.playMode.crossfade },
-    ].forEach(({ key, label, active }) => {
+      { key: 'shuffle', iconName: 'shuffle', label: 'Shuffle', active: group.playMode.shuffle },
+      { key: 'repeat', iconName: group.playMode.repeatRaw === 'one' ? 'repeatOne' : 'repeat', label: 'Repeat', active: group.playMode.repeat },
+      { key: 'crossfade', iconName: 'crossfade', label: 'Crossfade', active: group.playMode.crossfade },
+    ].forEach(({ key, iconName, label, active }) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sonos-mode-btn';
       if (active) btn.classList.add('is-active');
-      btn.textContent = label;
+      btn.append(icon(iconName), ` ${label}`);
       btn.addEventListener('click', async () => {
         try {
           await api(`/${encodeURIComponent(group.coordinatorName)}/${key}/toggle`);
@@ -3451,7 +3479,8 @@ const UnsplashBg = {
       if (battery) {
         const badge = document.createElement('span');
         badge.className = 'sonos-battery';
-        badge.textContent = `${battery.charging ? '⚡' : ''}${battery.pct}%`;
+        if (battery.charging) badge.appendChild(icon('bolt', 'sonos-battery-bolt'));
+        badge.append(`${battery.pct}%`);
         chip.appendChild(badge);
       }
 
@@ -3513,7 +3542,7 @@ const UnsplashBg = {
     const groupBtn = document.createElement('button');
     groupBtn.type = 'button';
     groupBtn.className = 'sonos-group-btn';
-    groupBtn.textContent = '🔗';
+    groupBtn.appendChild(icon('link'));
     groupBtn.title = 'Grouping';
     groupBtn.setAttribute('aria-label', 'Grouping options');
     groupBtn.addEventListener('click', (e) => {
@@ -3525,7 +3554,7 @@ const UnsplashBg = {
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
     playBtn.className = 'sonos-play-btn';
-    playBtn.textContent = group.isPlaying ? '⏸' : '▶';
+    playBtn.appendChild(icon(group.isPlaying ? 'pause' : 'play'));
     playBtn.setAttribute('aria-label', group.isPlaying ? 'Pause' : 'Play');
     playBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -3546,7 +3575,7 @@ const UnsplashBg = {
     const muteBtn = document.createElement('button');
     muteBtn.type = 'button';
     muteBtn.className = 'sonos-mute-btn';
-    muteBtn.textContent = group.mute ? '🔇' : '🔊';
+    muteBtn.appendChild(icon(group.mute ? 'volumeMute' : 'volumeUp'));
     muteBtn.setAttribute('aria-label', group.mute ? 'Unmute' : 'Mute');
     muteBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
