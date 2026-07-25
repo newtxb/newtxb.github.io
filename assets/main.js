@@ -919,18 +919,13 @@ const UnsplashBg = {
     buttons.unlockUnsplash?.click();
   });
 
-  const resetBlacklistHistory = async () => {
+  // Drops today's cached image and fetches a fresh one, without touching the
+  // blacklist — the current photo is already blacklisted from when it was
+  // first loaded, so it (and every other recently shown photo) stays excluded.
+  const reloadTodaysPhoto = async () => {
     if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
 
-    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.disabled = true;
-    const originalLabel = buttons.resetUnsplashPhoto?.textContent || 'Reset history';
-    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = 'Clearing...';
-
     try {
-      // Clear the photo blacklist history
-      PhotoBlacklist.clear();
-
-      // Reload today's image with the cleared history
       const keywords = keywordStringToArray(settings.unsplashKeywords || defaults.unsplashKeywords);
 
       const today = new Date().toDateString();
@@ -940,11 +935,31 @@ const UnsplashBg = {
 
       await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
     } catch (e) {
+      console.warn('Failed to reload today\'s photo:', e);
+    } finally {
+      syncInputs();
+      document.dispatchEvent(new CustomEvent('unsplash:reloadFinished'));
+    }
+  };
+
+  // Wipes the full photo blacklist, then reloads today's photo. Unlike
+  // reloadTodaysPhoto(), this forgets every recently shown photo, allowing
+  // them to reappear.
+  const resetBlacklistHistory = async () => {
+    if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
+
+    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.disabled = true;
+    const originalLabel = buttons.resetUnsplashPhoto?.textContent || 'Reset history';
+    if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = 'Clearing...';
+
+    try {
+      PhotoBlacklist.clear();
+      await reloadTodaysPhoto();
+    } catch (e) {
       console.warn('Failed to reset blacklist history:', e);
     } finally {
       if (buttons.resetUnsplashPhoto) buttons.resetUnsplashPhoto.textContent = originalLabel;
       syncInputs();
-      document.dispatchEvent(new CustomEvent('unsplash:reloadFinished'));
     }
   };
 
@@ -957,7 +972,7 @@ const UnsplashBg = {
   });
 
   document.addEventListener('unsplash:reloadToday', async () => {
-    await resetBlacklistHistory();
+    await reloadTodaysPhoto();
   });
 
   const commitUnsplashKeywords = () => {
@@ -2976,7 +2991,7 @@ const UnsplashBg = {
   // mid-burst, etc.) don't let one finishing early hide the loader while
   // another is still in flight. Also enforces a minimum visible time so a
   // fast request doesn't just flash the spinner for a few ms.
-  const MIN_LOADER_MS = 500;
+  const MIN_LOADER_MS = 1000;
   let refreshInFlightCount = 0;
   let loaderShownAt = 0;
   let loaderHideTimer = null;
@@ -4014,7 +4029,7 @@ const UnsplashBg = {
 
   const loaderEl = document.querySelector('.hue-loader');
 
-  const MIN_LOADER_MS = 500;
+  const MIN_LOADER_MS = 1000;
   let refreshInFlightCount = 0;
   let loaderShownAt = 0;
   let loaderHideTimer = null;

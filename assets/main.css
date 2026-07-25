@@ -170,18 +170,22 @@ html {
   transition: backdrop-filter 1s ease-in-out, opacity .16s ease-in-out, transform .16s ease-in-out;
 }
 
-.unsplash-info-menu {
+.unsplash-menu-wrapper {
   position: absolute;
-  top: calc(100% - 1px);
+  top: 100%;
   left: 0;
-  width: min(310px, calc(100vw - 36px));
+  width: min(340px, calc(100vw - 6px));
+  padding-top: 8px;
+  padding-right: 30px;
+  padding-bottom: 30px;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
 }
 
-.unsplash-info:hover .unsplash-info-menu,
-.unsplash-info:focus-within .unsplash-info-menu {
+.unsplash-info:hover .unsplash-menu-wrapper,
+.unsplash-info:focus-within .unsplash-menu-wrapper {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -212,6 +216,7 @@ html {
   opacity: 0;
   pointer-events: none;
   transform: translateY(4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
 }
 
 .calendar:hover .calendar-menu-wrapper,
@@ -219,7 +224,6 @@ html {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
 }
 
 .calendar-menu-title {
@@ -1667,17 +1671,25 @@ code {
   opacity: 1;
 }
 
-.sonos-menu {
+.sonos-menu-wrapper {
   position: absolute;
-  top: calc(100% - 1px);
+  top: 100%;
   left: 0;
-  width: min(380px, calc(100vw - 36px));
-  max-height: min(620px, calc(100vh - 32px));
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: min(410px, calc(100vw - 6px));
+  max-height: min(660px, calc(100vh - 32px));
+  padding-top: 8px;
+  padding-right: 30px;
+  padding-bottom: 30px;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.sonos-menu {
+  max-height: min(620px, calc(100vh - 62px));
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Thin, translucent, Apple-like scrollbars — scoped to this menu only */
@@ -1710,9 +1722,9 @@ code {
   background-color: rgba(103, 122, 145, 0.55);
 }
 
-.sonos-info:hover .sonos-menu,
-.sonos-info:focus-within .sonos-menu,
-.sonos-info.is-open .sonos-menu {
+.sonos-info:hover .sonos-menu-wrapper,
+.sonos-info:focus-within .sonos-menu-wrapper,
+.sonos-info.is-open .sonos-menu-wrapper {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -2395,8 +2407,8 @@ code {
 }
 
 @media (max-width: 640px) {
-  .sonos-menu {
-    width: min(320px, calc(100vw - 20px));
+  .sonos-menu-wrapper {
+    width: min(350px, calc(100vw - 20px));
   }
 }
 
@@ -2444,17 +2456,25 @@ code {
   opacity: 1;
 }
 
-.hue-menu {
+.hue-menu-wrapper {
   position: absolute;
-  top: calc(100% - 1px);
+  top: 100%;
   left: 0;
-  width: min(380px, calc(100vw - 36px));
-  max-height: min(620px, calc(100vh - 32px));
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: min(410px, calc(100vw - 6px));
+  max-height: min(660px, calc(100vh - 32px));
+  padding-top: 8px;
+  padding-right: 30px;
+  padding-bottom: 30px;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.hue-menu {
+  max-height: min(620px, calc(100vh - 62px));
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(103, 122, 145, 0.4) transparent;
 }
@@ -2478,9 +2498,9 @@ code {
   background-color: rgba(103, 122, 145, 0.55);
 }
 
-.hue-info:hover .hue-menu,
-.hue-info:focus-within .hue-menu,
-.hue-info.is-open .hue-menu {
+.hue-info:hover .hue-menu-wrapper,
+.hue-info:focus-within .hue-menu-wrapper,
+.hue-info.is-open .hue-menu-wrapper {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -2907,7 +2927,7 @@ code {
 }
 
 @media (max-width: 640px) {
-  .hue-menu {
-    width: min(320px, calc(100vw - 20px));
+  .hue-menu-wrapper {
+    width: min(350px, calc(100vw - 20px));
   }
 }
