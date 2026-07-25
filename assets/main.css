@@ -193,6 +193,123 @@ html {
   background-color: rgba(103, 122, 145, 0.55);
 }
 
+/* Skeleton placeholders shown inside the panel menus while their data is in flight,
+   instead of a "Loading…" line. Shared by Unsplash / Sonos / Hue. */
+.skeleton {
+  border-radius: 5px;
+  background-color: rgba(103, 122, 145, 0.17);
+  /* Translucent highlight sweeping left to right over the flat base colour */
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* The bars are decorative (aria-hidden); this carries the status text for the
+   aria-live regions wrapping each menu. */
+.skeleton-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Stand-in for a Sonos zone / Hue room card. The placeholder carries the real card's
+   own class too (.sonos-zone / .hue-room), so the frame and geometry match exactly and
+   nothing shifts when the data lands. */
+.panel-skeleton-card {
+  pointer-events: none;
+}
+
+/* Sized like the padded, bordered .sonos-room-chip */
+.panel-skeleton-chip {
+  width: 108px;
+  height: 27px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+/* .hue-room-header is a plain line of text, so its placeholder is shorter */
+.hue-room.panel-skeleton-card .panel-skeleton-chip {
+  width: 88px;
+  height: 17px;
+}
+
+.panel-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.panel-skeleton-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex: 0 0 auto;
+}
+
+.panel-skeleton-lines {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.panel-skeleton-lines .skeleton {
+  height: 0.62rem;
+}
+
+.panel-skeleton-lines .skeleton:last-child {
+  width: 55%;
+}
+
+.panel-skeleton-round {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.panel-skeleton-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.panel-skeleton-mini {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+}
+
+.panel-skeleton-bar {
+  flex: 1 1 auto;
+  height: 4px;
+  border-radius: 2px;
+}
+
 .unsplash-menu-wrapper {
   position: absolute;
   top: 100%;
@@ -681,6 +798,21 @@ html {
   color: #243145;
   /* 0.86 * 1.4 * 3 */
   min-height: 3.612rem;
+}
+
+/* Stands in for 1.5 lines of image details: one full bar, one half-width */
+.unsplash-info-skeleton {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.unsplash-info-skeleton .skeleton {
+  height: 0.62rem;
+}
+
+.unsplash-info-skeleton .skeleton:last-child {
+  width: 45%;
 }
 
 .unsplash-info-actions {
@@ -1863,7 +1995,6 @@ code {
   font-size: 0.83rem;
   color: #999;
   padding: 4px 2px;
-  min-height: 150px;
 }
 
 .sonos-error {
@@ -2566,7 +2697,6 @@ code {
   font-size: 0.83rem;
   color: #999;
   padding: 4px 2px;
-  min-height: 150px;
 }
 
 .hue-error {

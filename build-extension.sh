@@ -42,4 +42,5 @@ cp assets/google-suggest.ext.js "$STAGE/assets/google-suggest.js"
 rm -f "$OUT"
 (cd "$STAGE" && zip -qr "$OLDPWD/$OUT" $FILES)
 
-echo "Wrote $OUT ($(du -h "$OUT" | cut -f1))"
+echo "Wrote $OUT ($(du -h "$OUT" | cut -f1)) to Downloads"
+mv "$OUT" "$HOME/Downloads"

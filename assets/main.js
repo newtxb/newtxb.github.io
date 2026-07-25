@@ -228,6 +228,65 @@ async function sha1Hex(text) {
   return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
+// Shimmering placeholders for the panel menus (Unsplash / Sonos / Hue) while their data
+// is still loading. The bars are decorative, so each builder marks them aria-hidden and
+// callers pair them with label() for the surrounding aria-live region.
+const Skeleton = {
+  bar(className) {
+    const el = document.createElement('div');
+    el.className = className ? `skeleton ${className}` : 'skeleton';
+    return el;
+  },
+
+  label(text) {
+    const el = document.createElement('span');
+    el.className = 'skeleton-sr-only';
+    el.textContent = text;
+    return el;
+  },
+
+  // Two bars, the second one shorter — roughly a line and a half of text.
+  textLines(className) {
+    const wrap = document.createElement('div');
+    wrap.className = className;
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.append(this.bar(), this.bar());
+    return wrap;
+  },
+
+  // A Sonos zone / Hue room card without its data: name chip, artwork with two text
+  // lines and a round button, then a slider row. `cardClass` is the real card's class so
+  // the placeholder keeps the same frame.
+  card(cardClass) {
+    const card = document.createElement('div');
+    card.className = `${cardClass} panel-skeleton-card`;
+    card.setAttribute('aria-hidden', 'true');
+    card.appendChild(this.bar('panel-skeleton-chip'));
+
+    const row = document.createElement('div');
+    row.className = 'panel-skeleton-row';
+    row.append(
+      this.bar('panel-skeleton-thumb'),
+      this.textLines('panel-skeleton-lines'),
+      this.bar('panel-skeleton-round'),
+    );
+    card.appendChild(row);
+
+    const sliderRow = document.createElement('div');
+    sliderRow.className = 'panel-skeleton-slider-row';
+    sliderRow.append(this.bar('panel-skeleton-mini'), this.bar('panel-skeleton-bar'));
+    card.appendChild(sliderRow);
+
+    return card;
+  },
+
+  cards(cardClass, count = 2) {
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < count; index += 1) fragment.appendChild(this.card(cardClass));
+    return fragment;
+  },
+};
+
 // Encryption utilities for Unsplash credentials
 const CryptoUtils = {
   // Decrypt password-protected payload using AES-256-GCM with PBKDF2
@@ -359,6 +418,17 @@ const UnsplashBg = {
   THEME_COLOR_KEY: 'unsplash-theme-color',
 
   currentInfo: null,
+  // True while loadDailyImage() runs. The badge only shows its skeleton while this is
+  // set, so a failed load falls back to text instead of shimmering forever.
+  loading: false,
+
+  setLoading(value) {
+    if (this.loading === value) return;
+    this.loading = value;
+    document.dispatchEvent(new CustomEvent('unsplash:loadingChanged', {
+      detail: { loading: value },
+    }));
+  },
 
   setStoredThemeColor(color) {
     if (!color) return;
@@ -504,6 +574,15 @@ const UnsplashBg = {
   },
 
   async loadDailyImage(accessKey, keywords) {
+    this.setLoading(true);
+    try {
+      await this.fetchAndDisplayDailyImage(accessKey, keywords);
+    } finally {
+      this.setLoading(false);
+    }
+  },
+
+  async fetchAndDisplayDailyImage(accessKey, keywords) {
     const today = new Date().toDateString();
     const cacheKey = `unsplash-bg-${today}`;
 
@@ -925,6 +1004,10 @@ const UnsplashBg = {
   const reloadTodaysPhoto = async () => {
     if (!(settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey)) return;
 
+    // Marked as loading before the info is dropped, so the badge goes straight to its
+    // skeleton instead of flashing the "no details" text in between.
+    UnsplashBg.setLoading(true);
+
     try {
       const keywords = keywordStringToArray(settings.unsplashKeywords || defaults.unsplashKeywords);
 
@@ -937,6 +1020,7 @@ const UnsplashBg = {
     } catch (e) {
       console.warn('Failed to reload today\'s photo:', e);
     } finally {
+      UnsplashBg.setLoading(false);
       syncInputs();
       document.dispatchEvent(new CustomEvent('unsplash:reloadFinished'));
     }
@@ -1158,9 +1242,18 @@ const UnsplashBg = {
 
   if (!container || !textNode || !linkNode || !reloadNode) return;
 
+  const renderSkeleton = () => {
+    textNode.textContent = '';
+    textNode.append(
+      Skeleton.label('Loading image details…'),
+      Skeleton.textLines('unsplash-info-skeleton'),
+    );
+  };
+
   const setFromInfo = (info) => {
     if (!info) {
-      textNode.textContent = 'Image details not yet available...';
+      if (UnsplashBg.loading) renderSkeleton();
+      else textNode.textContent = 'Image details not yet available...';
       linkNode.href = '#';
       linkNode.setAttribute('aria-disabled', 'true');
       reloadNode.disabled = true;
@@ -1196,6 +1289,12 @@ const UnsplashBg = {
   document.addEventListener('unsplash:imageInfoChanged', (e) => {
     setFromInfo(e.detail?.info || null);
     syncEnabledState();
+  });
+
+  // Swaps the skeleton in when a load starts, and back out to text if it ends without
+  // ever producing image details.
+  document.addEventListener('unsplash:loadingChanged', () => {
+    if (!UnsplashBg.currentInfo) setFromInfo(null);
   });
 
   document.addEventListener('unsplash:modeChanged', () => {
@@ -3809,16 +3908,16 @@ const UnsplashBg = {
     }
 
     if (!loaded) {
-      const message = document.createElement('div');
-      message.className = 'sonos-empty';
-      if (lastError) {
-        message.classList.add('sonos-error');
-        message.textContent = lastError.status === 401 || lastError.status === 403
-          ? 'Invalid Sonos token — unlock again in Settings.'
-          : `Couldn't reach Sonos (${lastError.message})`;
-      } else {
-        message.textContent = 'Loading rooms…';
+      if (!lastError) {
+        roomsEl.append(Skeleton.label('Loading rooms…'), Skeleton.cards('sonos-zone'));
+        return;
       }
+
+      const message = document.createElement('div');
+      message.className = 'sonos-empty sonos-error';
+      message.textContent = lastError.status === 401 || lastError.status === 403
+        ? 'Invalid Sonos token — unlock again in Settings.'
+        : `Couldn't reach Sonos (${lastError.message})`;
       roomsEl.appendChild(message);
       return;
     }
@@ -4643,16 +4742,16 @@ const UnsplashBg = {
     }
 
     if (!loaded) {
-      const message = document.createElement('div');
-      message.className = 'hue-empty';
-      if (lastError) {
-        message.classList.add('hue-error');
-        message.textContent = lastError.status === 401 || lastError.status === 403
-          ? 'Invalid Hue token — unlock again in Settings.'
-          : `Couldn't reach Hue (${lastError.message})`;
-      } else {
-        message.textContent = 'Loading rooms…';
+      if (!lastError) {
+        roomsEl.append(Skeleton.label('Loading rooms…'), Skeleton.cards('hue-room'));
+        return;
       }
+
+      const message = document.createElement('div');
+      message.className = 'hue-empty hue-error';
+      message.textContent = lastError.status === 401 || lastError.status === 403
+        ? 'Invalid Hue token — unlock again in Settings.'
+        : `Couldn't reach Hue (${lastError.message})`;
       roomsEl.appendChild(message);
       return;
     }
