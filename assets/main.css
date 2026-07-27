@@ -255,6 +255,43 @@ html {
   height: 17px;
 }
 
+/* A Bankin card has no chip at all: a square logo with two text lines and the
+   total on the right, then account rows — so the shared parts are
+   re-proportioned rather than given a separate builder. */
+.bankin-bank.panel-skeleton-card .panel-skeleton-chip {
+  display: none;
+}
+
+.bankin-bank.panel-skeleton-card .panel-skeleton-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+}
+
+.bankin-bank.panel-skeleton-card .panel-skeleton-round {
+  width: 72px;
+  height: 15px;
+  border-radius: 5px;
+}
+
+.bankin-bank.panel-skeleton-card .panel-skeleton-slider-row {
+  margin-top: 15px;
+}
+
+.bankin-bank.panel-skeleton-card .panel-skeleton-mini {
+  width: 96px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.bankin-bank.panel-skeleton-card .panel-skeleton-bar {
+  flex: 0 0 auto;
+  width: 62px;
+  height: 10px;
+  border-radius: 5px;
+  margin-left: auto;
+}
+
 .panel-skeleton-row {
   display: flex;
   align-items: center;
@@ -3089,6 +3126,315 @@ code {
 
 @media (max-width: 640px) {
   .hue-menu-wrapper {
+    width: min(350px, calc(100vw - 20px));
+  }
+}
+
+/* Bankin */
+
+.bankin-info {
+  position: relative;
+}
+
+.bankin-info-trigger {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: transform .12s ease-in-out, opacity .12s ease-in-out;
+}
+
+.bankin-info-trigger::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 21px 21px;
+  /* Vault door: body, dial with its cross handle, lever on the right, two feet.
+     Stroked a touch thinner than the other triggers (1.6 vs 1.75) — at 21px the
+     dial's four quadrants close up into a blob otherwise. */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='3' width='19' height='16.5' rx='2.5'/%3E%3Ccircle cx='10.4' cy='11.25' r='4.3'/%3E%3Cline x1='10.4' y1='6.95' x2='10.4' y2='15.55'/%3E%3Cline x1='6.1' y1='11.25' x2='14.7' y2='11.25'/%3E%3Cline x1='17.6' y1='8.9' x2='17.6' y2='13.6'/%3E%3Cline x1='6' y1='19.5' x2='6' y2='21.5'/%3E%3Cline x1='18' y1='19.5' x2='18' y2='21.5'/%3E%3C/svg%3E");
+  opacity: 0.9;
+}
+
+.bankin-info-trigger:hover,
+.bankin-info-trigger:focus-visible {
+  outline: none;
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.bankin-info-trigger:hover::before,
+.bankin-info-trigger:focus-visible::before {
+  opacity: 1;
+}
+
+.bankin-menu-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: min(420px, calc(100vw - 6px));
+  max-height: min(660px, calc(100vh - 32px));
+  padding-top: 8px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .16s ease-in-out, transform .16s ease-in-out;
+}
+
+.bankin-menu {
+  max-height: min(620px, calc(100vh - 80px));
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.bankin-info:hover .bankin-menu-wrapper,
+.bankin-info:focus-within .bankin-menu-wrapper,
+.bankin-info.is-open .bankin-menu-wrapper {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.bankin-menu-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #5a6a81;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* The grand total shares the title row but reads as secondary info, so it drops
+   the uppercase treatment and lightens right down, and sits flush right. The
+   loader is ordered before it in the markup so it stays next to the "Bankin"
+   label like the Sonos/Hue ones, rather than being shoved out to the edge. */
+.bankin-total {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: #a3aebd;
+  text-align: right;
+}
+
+.bankin-loader {
+  display: none;
+  width: 11px;
+  height: 11px;
+  border: 2px solid rgba(90, 106, 129, 0.28);
+  border-top-color: #5a6a81;
+  border-radius: 50%;
+  animation: sonos-spin 0.7s linear infinite;
+}
+
+.bankin-loader.is-active {
+  display: inline-block;
+}
+
+.bankin-empty {
+  font-size: 0.83rem;
+  color: #999;
+  padding: 4px 2px;
+}
+
+.bankin-error {
+  color: #a34040;
+}
+
+.bankin-stale {
+  font-size: 0.72rem;
+  color: #97a3b3;
+  padding: 2px 2px 0;
+}
+
+.bankin-banks {
+  display: grid;
+  gap: 8px;
+}
+
+.bankin-bank {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(103, 122, 145, 0.18);
+  transition: border-color .15s ease-in-out, background-color .15s ease-in-out;
+}
+
+.bankin-bank.is-clickable {
+  cursor: pointer;
+}
+
+.bankin-bank.is-clickable:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(103, 122, 145, 0.32);
+}
+
+.bankin-bank:focus-visible {
+  outline: 2px solid rgba(103, 122, 145, 0.45);
+  outline-offset: 1px;
+}
+
+/* Only the frame turns yellow — the balances underneath are still accurate as
+   of the last successful sync, just stale. */
+.bankin-bank.has-issue {
+  border-color: rgba(214, 158, 46, 0.6);
+  /*background: rgba(254, 250, 240, 0.68);*/
+}
+
+.bankin-bank.has-issue.is-clickable:hover {
+  /*background: rgba(254, 248, 234, 0.85);*/
+  border-color: rgba(214, 158, 46, 0.75);
+}
+
+.bankin-bank-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.bankin-bank-logo {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  border-radius: 5px;
+  /* The logos are square but not all edge-to-edge, so contain rather than cover
+     — cropping a wordmark would be worse than a little padding around it. */
+  object-fit: contain;
+}
+
+/* Stand-in for a bank with no logo file, keeping the row geometry identical */
+.bankin-bank-logo.is-placeholder {
+  background: rgba(103, 122, 145, 0.16);
+}
+
+.bankin-bank-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bankin-bank-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c3b52;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bankin-bank-updated {
+  font-size: 0.72rem;
+  color: #8593a6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bankin-bank-total {
+  flex: 0 0 auto;
+  font-size: 0.94rem;
+  /*font-weight: 700;*/
+  color: #8593a6;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Several currencies won't fit on one line next to the bank name */
+.bankin-bank-total.is-multi {
+  font-size: 0.78rem;
+  max-width: 45%;
+  white-space: normal;
+}
+
+.bankin-accounts {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(103, 122, 145, 0.16);
+  display: grid;
+  gap: 4px;
+}
+
+.bankin-account {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 0.8rem;
+}
+
+.bankin-account-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #4c5b71;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bankin-account-amount {
+  flex: 0 0 auto;
+  font-weight: 600;
+  color: #2c3b52;
+  font-variant-numeric: tabular-nums;
+}
+
+.bankin-account-amount.is-negative {
+  color: #a34040;
+}
+
+.bankin-more {
+  margin-top: 6px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #6d7c92;
+}
+
+.bankin-bank.is-clickable:hover .bankin-more {
+  color: #3a4a60;
+}
+
+/* Bled out over the card's own padding so it sits flush against the card's
+   edges — an attached strip, not a separate block (the card clips overflow, so
+   its rounded bottom corners do the shaping). */
+.bankin-bank-issue {
+  margin: 9px -10px -9px;
+  padding: 6px 10px 7px;
+  background: rgba(103, 122, 145, 0.15);
+  border-top: 1px solid rgba(214, 158, 46, 0.4);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #5f6d81;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: default;
+}
+
+.bankin-bank-issue .bankin-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  line-height: 0;
+  margin-top: 1px;
+  color: #b08415;
+}
+
+@media (max-width: 640px) {
+  .bankin-menu-wrapper {
     width: min(350px, calc(100vw - 20px));
   }
 }

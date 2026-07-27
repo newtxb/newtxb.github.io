@@ -21,6 +21,16 @@ assets/favicon.png
 assets/icon-16.png
 assets/icon-48.png
 assets/icon-128.png
+assets/img/banks/american-express.png
+assets/img/banks/boursobank.png
+assets/img/banks/credit-agricole.png
+assets/img/banks/fortuneo.png
+assets/img/banks/hello-bank.png
+assets/img/banks/lydia.png
+assets/img/banks/n26.png
+assets/img/banks/natixis.png
+assets/img/banks/paypal.png
+assets/img/banks/revolut.png
 "
 
 for f in $FILES; do

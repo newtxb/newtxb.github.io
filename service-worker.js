@@ -3,12 +3,20 @@
 const PRECACHE = 'precache-v1';
 const UNSPLASH_CACHE = 'unsplash-daily-v1';
 
+const BANK_LOGOS = [
+  'american-express', 'boursobank', 'credit-agricole', 'fortuneo', 'hello-bank',
+  'lydia', 'n26', 'natixis', 'paypal', 'revolut',
+].map(name => `assets/img/banks/${name}.png`);
+
 const PRECACHE_URLS = [
   'index.html',
   './',
   'assets/main.css',
   'assets/main.js',
   'assets/favicon.png',
+  // Small enough to be worth having offline, and the Bankin panel looks broken
+  // without them
+  ...BANK_LOGOS,
 ].map(url => new Request(url, { cache: 'no-cache' }));
 
 // Clear everything we have, cache again, and we are ready!
