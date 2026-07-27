@@ -53,7 +53,7 @@ Click the gear (top right) to toggle the date / quote / weather rows, set your u
 ### 📦 Offline & updates
 - A service worker precaches the app shell and the bank logos (cache-first), so new tabs open instantly with no network.
 - The current Unsplash photo is also cached for offline use (only one image kept at a time).
-- On load and every 30 minutes while the tab is open, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears.
+- On load and every 30 minutes while the tab is open, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears. (Skipped in the Chrome extension — Chrome updates it instead.)
 
 ## Chrome extension
 
@@ -74,8 +74,10 @@ That runtime detection is what makes loading the raw source folder unpacked work
 *is* the `fetch()`-only implementation — the JSONP `<script src>` doesn't ship at all, not even
 as an unreachable branch.
 
-The service worker (app-shell precaching + update toast) also doesn't register in the extension,
-since it already bundles every file locally — there's nothing to precache.
+The service worker (app-shell precaching) also doesn't register in the extension, since it already
+bundles every file locally — there's nothing to precache. The `github.json` version check is
+skipped for the same reason: `github.json` isn't in the packaged zip, and Chrome takes care of
+updating the extension itself.
 
 Everything else (weather, quotes, Sonos, Hue, Bankin, Unsplash backgrounds, settings) already used
 plain `fetch()`/`localStorage` and needed no changes.

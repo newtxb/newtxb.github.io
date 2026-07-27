@@ -23,6 +23,10 @@ function formatKeywordString(keywords) {
   return keywordStringToArray(keywords).join(', ');
 }
 
+// Packaged as a Chrome extension: assets are bundled locally and updates go through Chrome,
+// so the service worker and the github.json version check are both pointless there.
+const IS_EXTENSION = window.location.protocol === 'chrome-extension:';
+
 const DEFAULT_UNSPLASH_KEYWORDS = [
   'china',
   'korea',
@@ -649,12 +653,9 @@ const UnsplashBg = {
 // ---------------------------------------------------------------------------------------------- //
 
 (() => {
-  // Packaged as a Chrome extension: files are already bundled locally, no need to precache them,
-  // and page-scoped service workers aren't a good fit for extension pages.
-  const isExtension = window.location.protocol === 'chrome-extension:';
   const isLocal = ['localhost', '127.0.0.1', '[::1]', '::1'].indexOf(window.location.hostname) !== -1;
 
-  if ('serviceWorker' in navigator && !isExtension && !isLocal) {
+  if ('serviceWorker' in navigator && !IS_EXTENSION && !isLocal) {
     navigator.serviceWorker.register('service-worker.js');
   }
 })();
@@ -664,6 +665,9 @@ const UnsplashBg = {
 // ---------------------------------------------------------------------------------------------- //
 
 (async () => {
+  // Chrome handles extension updates itself, and github.json isn't even packaged in the bundle.
+  if (IS_EXTENSION) return;
+
   const VERSION_KEY = 'current-version';
   const PRECACHE = 'precache-v1';
   const CHECK_INTERVAL = 30 * 60 * 1000;
