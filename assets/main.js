@@ -2924,16 +2924,18 @@ const UnsplashBg = {
 
   // currentTrack.absoluteAlbumArtUri and favorites' albumArtUri are already
   // full, directly-loadable URLs — no proxying/auth needed, just an <img>.
+  // The placeholder icon always stays in the DOM as the backdrop and the artwork
+  // is layered on top of it (see .sonos-art in the CSS), so a URL that never
+  // loads — or half-loads, or 404s from cache without firing onerror — still
+  // leaves the note visible instead of an empty square.
   const setArtImage = (container, url, placeholderIcon = 'music') => {
-    if (!url) {
-      container.replaceChildren(icon(placeholderIcon));
-      return;
-    }
-    container.replaceChildren(); // clear any prior placeholder before adding the image
+    container.replaceChildren(icon(placeholderIcon, 'sonos-art-placeholder'));
+    if (!url) return;
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
-    img.onerror = () => { container.replaceChildren(icon(placeholderIcon)); };
+    // Hide the broken-image glyph so it can't sit over the note.
+    img.onerror = () => { img.remove(); };
     container.appendChild(img);
   };
 
