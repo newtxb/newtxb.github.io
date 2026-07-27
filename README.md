@@ -35,6 +35,14 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 - Hover the bulb icon (next to the Sonos 🔊 button) for a live control panel of every Hue room: on/off, brightness.
 - **Click** a card for more controls: individual lights within the room (on/off + brightness each), and scenes to recall.
 
+### 🏦 Bankin
+- Hover the bank icon (next to the Hue 💡 button) for every bank account aggregated by [Bankin'](https://bankin.com), grouped into one card per bank: logo, name, total held there, and when it last synced. The panel header shows the grand total.
+- Accounts hidden in Bankin are excluded everywhere, including from the totals.
+- Cards are ordered by bank name, with banks holding nothing at all pushed to the bottom; accounts within a card list current accounts first, then alphabetically.
+- Cards show current accounts by default; when a bank holds other kinds of account it gets a **+ n more accounts** hint — **click** the card to reveal all of them.
+- A bank whose sync is broken gets a yellow border and the bank's own explanation attached under the card (bad credentials, strong authentication to renew, …). Its balances still show, as of the last successful sync.
+- Balances are fetched at most once an hour and cached in `localStorage`, so a new tab paints the last known totals instantly and usually without a request. Accounts in different currencies are totalled per currency rather than added together.
+
 ### 🖼 Backgrounds
 - **Default**: an animated radial gradient that slowly cycles through hues, with floating particles.
 - **Unsplash mode** (optional): a new photo every day, picked from your own comma-separated search keywords. The photo's average color becomes the page theme color, image details are shown behind the ✨ button (with a link back to Unsplash and a "reload today's photo" action), and recently shown photos are blacklisted (last 30) to avoid repeats.
@@ -43,7 +51,7 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 Click the gear (top right) to toggle the date / quote / weather rows, set your username and weather location, and manage Unsplash mode. Everything is stored locally in `localStorage`.
 
 ### 📦 Offline & updates
-- A service worker precaches the app shell (cache-first), so new tabs open instantly with no network.
+- A service worker precaches the app shell and the bank logos (cache-first), so new tabs open instantly with no network.
 - The current Unsplash photo is also cached for offline use (only one image kept at a time).
 - On load and every 30 minutes while the tab is open, the app compares the deployed version in [`github.json`](github.json) (filled by Jekyll with the GitHub Pages build revision) against the local one; when it changes, caches are refreshed and an update notification appears.
 
@@ -69,8 +77,8 @@ as an unreachable branch.
 The service worker (app-shell precaching + update toast) also doesn't register in the extension,
 since it already bundles every file locally — there's nothing to precache.
 
-Everything else (weather, quotes, Sonos, Hue, Unsplash backgrounds, settings) already used plain
-`fetch()`/`localStorage` and needed no changes.
+Everything else (weather, quotes, Sonos, Hue, Bankin, Unsplash backgrounds, settings) already used
+plain `fetch()`/`localStorage` and needed no changes.
 
 ## Project layout
 
@@ -85,7 +93,8 @@ Everything else (weather, quotes, Sonos, Hue, Unsplash backgrounds, settings) al
 │   │                          #   if run as the Chrome extension (self-detects at runtime)
 │   ├── google-suggest.ext.js  # Same, for the extension (fetch via proxy)
 │   ├── favicon.png
-│   └── icon-{16,48,128}.png  # Extension icons (generated from favicon.png)
+│   ├── icon-{16,48,128}.png  # Extension icons (generated from favicon.png)
+│   └── img/banks/*.png       # Bank logos for the Bankin panel (square, named after the bank)
 ├── service-worker.js   # Precache app shell + daily Unsplash image cache (website only)
 └── github.json         # Jekyll template → exposes the Pages build revision as version
 ```
@@ -108,6 +117,7 @@ Everything else (weather, quotes, Sonos, Hue, Unsplash backgrounds, settings) al
 | Quote | Quote of the day fetch & cache |
 | Sonos | Room/group control panel — see [🔊 Sonos control](#-sonos-control) |
 | Hue | Room/light control panel — see [💡 Hue control](#-hue-control) |
+| Bankin | Bank accounts panel — see [🏦 Bankin](#-bankin) |
 
 Modules communicate via `document` custom events (`settings:usernameChanged`, `unsplash:modeChanged`, …) and a single read-only accessor `window.homeSettings.get()` — there is no shared mutable state.
 
@@ -124,6 +134,7 @@ Everything lives in `localStorage` (plus the two service-worker caches `precache
 | `unsplash-bg-<date>` | Today's photo URL, info & theme color | 1 day (older entries purged) |
 | `unsplash-photo-blacklist` | Last 30 photo IDs | Rolling |
 | `unsplash-theme-color` | Last extracted theme color (applied instantly on load) | Permanent |
+| `bankin-accounts-cache` | Cached bank accounts (shown instantly, refetched when stale) | 1 h |
 
 ## External services
 

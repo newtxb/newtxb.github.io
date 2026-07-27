@@ -4856,3 +4856,561 @@ const UnsplashBg = {
 
   renderRooms();
 })();
+
+
+// ---------------------------------------------------------------------------------------------- //
+// BANKIN
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const container = document.querySelector('.bankin-info');
+  const banksEl = document.querySelector('.bankin-banks');
+  const totalEl = document.querySelector('.bankin-total');
+  if (!container || !banksEl || !totalEl) return;
+
+  const API_BASE = 'https://bankin-api.proxy.cloud.jclerc.com/';
+  // Bankin' itself only re-syncs each bank a few times a day, so anything more
+  // frequent than hourly would just re-download identical balances.
+  const CACHE_TTL_MS = 60 * 60 * 1000;
+  const CACHE_KEY = 'bankin-accounts-cache';
+  const MAX_PAGES = 10;
+
+  // Accounts reference their bank as a bare `{ id }` — no name, no logo, and no
+  // endpoint here to resolve one — so the display name and logo file for every
+  // connected bank live in this table. Unknown IDs fall back to the raw ID and
+  // no logo at all (see bankMeta below).
+  const LOGO_BASE = 'assets/img/banks/';
+  const BANKS = {
+    117: { name: 'Crédit Agricole', logo: 'credit-agricole.png' },
+    122: { name: 'BoursoBank', logo: 'boursobank.png' },
+    126: { name: 'American Express', logo: 'american-express.png' },
+    128: { name: 'Fortuneo', logo: 'fortuneo.png' },
+    156: { name: 'Hello bank!', logo: 'hello-bank.png' },
+    399: { name: 'PayPal', logo: 'paypal.png' },
+    413: { name: 'N26', logo: 'n26.png' },
+    418: { name: 'Natixis', logo: 'natixis.png' },
+    422: { name: 'Revolut', logo: 'revolut.png' },
+    436: { name: 'Lydia', logo: 'lydia.png' },
+    488: { name: 'PayPal', logo: 'paypal.png' },
+  };
+
+  const GENERIC_ISSUE = 'Synchronization issue — this bank needs to be reconnected in Bankin.';
+
+  const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
+
+  // Hide the trigger entirely until unlocked, rather than showing it with an
+  // "unlock in Settings" message inside — same as Sonos and Hue.
+  const updateTriggerVisibility = () => {
+    container.style.display = getToken() ? '' : 'none';
+  };
+  updateTriggerVisibility();
+
+  const apiUrl = path => new URL(String(path).replace(/^\//, ''), API_BASE).toString();
+
+  const api = async (path) => {
+    const token = getToken();
+    let res;
+    try {
+      res = await fetch(apiUrl(path), {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+    } catch (e) {
+      throw new Error('Network error — the Bankin API may be unreachable, or blocking this origin (CORS)');
+    }
+    if (!res.ok) {
+      const err = new Error(`Bankin API error ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    // The proxy answers a rejected bearer with a plain-text 200 body rather than
+    // a 401, so a non-JSON content type is the only signal that auth failed.
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('json')) {
+      const err = new Error('Bankin API rejected the token');
+      err.status = 401;
+      throw err;
+    }
+    return res.json();
+  };
+
+  const fetchAllAccounts = async () => {
+    const resources = [];
+    let path = 'accounts.json';
+    for (let page = 0; page < MAX_PAGES && path; page += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const payload = await api(path);
+      if (Array.isArray(payload?.resources)) resources.push(...payload.resources);
+      const next = payload?.pagination?.next_uri;
+      // Only follow pagination that stays on the proxy — the bearer must never
+      // be sent to whatever other host a next_uri might name.
+      path = next && new URL(next, API_BASE).origin === new URL(API_BASE).origin ? next : null;
+    }
+    return resources;
+  };
+
+  // --- Cache ---
+  const readCache = () => {
+    try {
+      const raw = JSON.parse(window.localStorage.getItem(CACHE_KEY));
+      if (!raw || !Array.isArray(raw.resources) || typeof raw.fetchedAt !== 'number') return null;
+      return raw;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const writeCache = (resources) => {
+    try {
+      window.localStorage.setItem(CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), resources }));
+    } catch (e) {
+      // Storage full or unavailable — the next open simply refetches.
+    }
+  };
+
+  const clearCache = () => {
+    try {
+      window.localStorage.removeItem(CACHE_KEY);
+    } catch (e) {
+      // Nothing to do; state is reset by the caller either way.
+    }
+  };
+
+  // --- Formatting ---
+  // Symbol goes after the amount ("945.89 €"), so the number is formatted on its
+  // own rather than with Intl's `style: 'currency'` — which puts the symbol
+  // wherever the browser's locale wants it. Currencies without a symbol here
+  // just show their ISO code, which reads fine in the same position.
+  const CURRENCY_SYMBOLS = {
+    EUR: '€',
+    USD: '$',
+    GBP: '£',
+    CHF: 'CHF',
+    AUD: 'A$',
+    CAD: 'C$',
+    JPY: '¥',
+  };
+
+  const amountFormatter = new Intl.NumberFormat('default', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const formatMoney = (amount, currency) => (
+    `${amountFormatter.format(amount)} ${CURRENCY_SYMBOLS[currency] || currency}`
+  );
+
+  // Balances in different currencies can't be added together, so they're
+  // totalled separately and shown side by side, biggest holding first.
+  const sumByCurrency = (accounts) => {
+    const totals = new Map();
+    accounts.forEach((account) => {
+      const currency = account.currency_code || 'EUR';
+      totals.set(currency, (totals.get(currency) || 0) + (Number(account.balance) || 0));
+    });
+    return [...totals.entries()]
+      .map(([currency, amount]) => ({ currency, amount }))
+      .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
+  };
+
+  const formatTotals = totals => (
+    totals.length ? totals.map(t => formatMoney(t.amount, t.currency)).join(' · ') : '—'
+  );
+
+  const formatWhen = (timestamp) => {
+    if (!timestamp) return 'never';
+    const minutes = Math.round((Date.now() - timestamp) / 60000);
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.round(hours / 24);
+    if (days === 1) return 'yesterday';
+    if (days < 30) return `${days} days ago`;
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('default', {
+      month: 'short',
+      day: 'numeric',
+      // A bare "May 5" would be ambiguous once it's a year or more stale.
+      ...(date.getFullYear() === new Date().getFullYear() ? {} : { year: 'numeric' }),
+    });
+  };
+
+  // --- Normalization ---
+  const timestampOf = account => (
+    Date.parse(account.last_successful_refresh || account.last_refresh || account.updated_at || '') || 0
+  );
+
+  // custom_name is "<bank>_<label>" (e.g. "Fortuneo_Compte_Joint"), which reads
+  // far better than the bank's own verbose name ("Compte Courant M Clerc
+  // Jonathanou M Delorme DO") once the redundant bank prefix is dropped.
+  const accountLabel = (account) => {
+    const custom = (account.custom_name || '').trim();
+    if (custom.includes('_')) {
+      const label = custom.slice(custom.indexOf('_') + 1).replace(/_/g, ' ').trim();
+      if (label) return label;
+    }
+    return custom || account.name || 'Account';
+  };
+
+  const bankMeta = bankId => BANKS[bankId] || { name: `Bank #${bankId}`, logo: null };
+
+  // status 0 / "OK" means the last sync went through; anything else is a
+  // credentials or strong-authentication problem needing action in Bankin.
+  const hasSyncIssue = account => (
+    (account.status ?? 0) !== 0 || (account.status_code_info || 'OK') !== 'OK'
+  );
+
+  // Current accounts first, then alphabetically by the label actually displayed.
+  const sortAccounts = accounts => [...accounts].sort((a, b) => {
+    const aChecking = a.classification === 'CHECKING_ACCOUNT' ? 0 : 1;
+    const bChecking = b.classification === 'CHECKING_ACCOUNT' ? 0 : 1;
+    if (aChecking !== bChecking) return aChecking - bChecking;
+    return accountLabel(a).localeCompare(accountLabel(b));
+  });
+
+  // Card order, in three tiers: banks with a current account, then the rest
+  // (employee savings plans and the like), then anything holding nothing at all
+  // — those are still worth showing, since a broken sync may be exactly why they
+  // read zero, but they shouldn't push real balances down the panel.
+  const bankTier = (bank) => {
+    if (bank.totals.every(t => t.amount === 0)) return 2;
+    return bank.hasChecking ? 0 : 1;
+  };
+
+  // Within a tier, biggest holdings first. A mixed-currency bank is ranked on the
+  // raw sum of its balances — meaningless as an amount, but stable to sort on.
+  const bankSortTotal = bank => bank.totals.reduce((sum, t) => sum + t.amount, 0);
+
+  const normalizeBanks = (resources) => {
+    const groups = new Map();
+    (Array.isArray(resources) ? resources : [])
+      .filter(account => account && !account.hide)
+      .forEach((account) => {
+        const bankId = String(account.bank?.id ?? 'unknown');
+        if (!groups.has(bankId)) groups.set(bankId, []);
+        groups.get(bankId).push(account);
+      });
+
+    return [...groups.entries()]
+      .map(([bankId, accounts]) => {
+        const meta = bankMeta(bankId);
+        const checking = accounts.filter(a => a.classification === 'CHECKING_ACCOUNT');
+        // A bank holding no current account at all (an employee savings plan,
+        // say) would otherwise render as an empty card, so it shows everything.
+        const primary = checking.length ? checking : accounts;
+        const broken = accounts.find(hasSyncIssue);
+
+        return {
+          id: bankId,
+          name: meta.name,
+          logo: meta.logo,
+          hasChecking: checking.length > 0,
+          accounts: sortAccounts(accounts),
+          primary: sortAccounts(primary),
+          extraCount: accounts.length - primary.length,
+          totals: sumByCurrency(accounts),
+          lastUpdate: accounts.reduce((max, a) => Math.max(max, timestampOf(a)), 0),
+          issue: broken ? (broken.status_code_description || GENERIC_ISSUE) : null,
+        };
+      })
+      .sort((a, b) => {
+        const byTier = bankTier(a) - bankTier(b);
+        if (byTier) return byTier;
+        const byTotal = bankSortTotal(b) - bankSortTotal(a);
+        if (byTotal) return byTotal;
+        // Only reachable within the empty tier, where every total is 0.
+        return a.name.localeCompare(b.name);
+      });
+  };
+
+  // --- State ---
+  let banks = [];
+  let grandTotals = [];
+  let loaded = false;
+  let lastError = null;
+  let fetchedAt = 0;
+  let inFlight = null;
+  const expandedIds = new Set();
+
+  const loaderEl = document.querySelector('.bankin-loader');
+  const MIN_LOADER_MS = 1000;
+  let loaderShownAt = 0;
+  let loaderHideTimer = null;
+  const beginRefreshIndicator = () => {
+    clearTimeout(loaderHideTimer);
+    loaderHideTimer = null;
+    loaderShownAt = Date.now();
+    loaderEl?.classList.add('is-active');
+  };
+  const endRefreshIndicator = () => {
+    const remaining = Math.max(0, MIN_LOADER_MS - (Date.now() - loaderShownAt));
+    clearTimeout(loaderHideTimer);
+    loaderHideTimer = setTimeout(() => {
+      if (!inFlight) loaderEl?.classList.remove('is-active');
+    }, remaining);
+  };
+
+  const warningIcon = () => {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'bankin-icon';
+    wrapper.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    return wrapper;
+  };
+
+  // --- Render ---
+  const renderAccountRow = (account) => {
+    const row = document.createElement('div');
+    row.className = 'bankin-account';
+
+    const label = document.createElement('span');
+    label.className = 'bankin-account-name';
+    label.textContent = accountLabel(account);
+    // The bank's own account name, which the label above deliberately shortens.
+    if (account.name) label.title = account.name;
+    row.appendChild(label);
+
+    const amount = document.createElement('span');
+    amount.className = 'bankin-account-amount';
+    if ((Number(account.balance) || 0) < 0) amount.classList.add('is-negative');
+    amount.textContent = formatMoney(Number(account.balance) || 0, account.currency_code || 'EUR');
+    row.appendChild(amount);
+
+    return row;
+  };
+
+  const renderBankCard = (bank) => {
+    const isExpanded = expandedIds.has(bank.id);
+    const canExpand = bank.extraCount > 0;
+
+    const card = document.createElement('div');
+    card.className = 'bankin-bank';
+    card.dataset.bankId = bank.id;
+    if (bank.issue) card.classList.add('has-issue');
+    if (isExpanded) card.classList.add('is-expanded');
+
+    const header = document.createElement('div');
+    header.className = 'bankin-bank-header';
+
+    if (bank.logo) {
+      const logo = document.createElement('img');
+      logo.className = 'bankin-bank-logo';
+      logo.src = `${LOGO_BASE}${bank.logo}`;
+      // The bank name is spelled out right next to it, so the logo is decorative.
+      logo.alt = '';
+      logo.width = 20;
+      logo.height = 20;
+      header.appendChild(logo);
+    } else {
+      // No logo on file for this bank ID — keep the slot so the name and total
+      // stay aligned with every other card.
+      const placeholder = document.createElement('span');
+      placeholder.className = 'bankin-bank-logo is-placeholder';
+      placeholder.setAttribute('aria-hidden', 'true');
+      header.appendChild(placeholder);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'bankin-bank-info';
+    const name = document.createElement('div');
+    name.className = 'bankin-bank-name';
+    name.textContent = bank.name;
+    const updated = document.createElement('div');
+    updated.className = 'bankin-bank-updated';
+    updated.textContent = `Updated ${formatWhen(bank.lastUpdate)}`;
+    info.append(name, updated);
+    header.appendChild(info);
+
+    const total = document.createElement('div');
+    total.className = 'bankin-bank-total';
+    if (bank.totals.length > 1) total.classList.add('is-multi');
+    total.textContent = formatTotals(bank.totals);
+    header.appendChild(total);
+
+    card.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'bankin-accounts';
+    (isExpanded ? bank.accounts : bank.primary)
+      .forEach(account => list.appendChild(renderAccountRow(account)));
+    card.appendChild(list);
+
+    if (canExpand) {
+      const more = document.createElement('div');
+      more.className = 'bankin-more';
+      more.textContent = isExpanded
+        ? '− Show less'
+        : `+ ${bank.extraCount} more account${bank.extraCount === 1 ? '' : 's'}`;
+      card.appendChild(more);
+
+      card.classList.add('is-clickable');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+      const toggle = () => {
+        if (isExpanded) expandedIds.delete(bank.id);
+        else expandedIds.add(bank.id);
+        render();
+      };
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        toggle();
+      });
+    }
+
+    if (bank.issue) {
+      // Bled out to the card's edges (which clip it), so it reads as a strip
+      // attached beneath the card rather than a separate block.
+      const issue = document.createElement('div');
+      issue.className = 'bankin-bank-issue';
+      issue.append(warningIcon(), bank.issue);
+      card.appendChild(issue);
+    }
+
+    return card;
+  };
+
+  function render() {
+    totalEl.textContent = loaded ? formatTotals(grandTotals) : '';
+    banksEl.textContent = '';
+
+    if (!getToken()) {
+      const empty = document.createElement('div');
+      empty.className = 'bankin-empty';
+      empty.textContent = 'Unlock in Settings to enable Bankin.';
+      banksEl.appendChild(empty);
+      return;
+    }
+
+    if (!loaded) {
+      if (!lastError) {
+        banksEl.append(Skeleton.label('Loading accounts…'), Skeleton.cards('bankin-bank'));
+        return;
+      }
+
+      const message = document.createElement('div');
+      message.className = 'bankin-empty bankin-error';
+      message.textContent = lastError.status === 401 || lastError.status === 403
+        ? 'Invalid Bankin token — unlock again in Settings.'
+        : `Couldn't reach Bankin (${lastError.message})`;
+      banksEl.appendChild(message);
+      return;
+    }
+
+    if (!banks.length) {
+      const empty = document.createElement('div');
+      empty.className = 'bankin-empty';
+      empty.textContent = 'No visible accounts.';
+      banksEl.appendChild(empty);
+      return;
+    }
+
+    banks.forEach(bank => banksEl.appendChild(renderBankCard(bank)));
+
+    // A failed refresh keeps the cached balances on screen rather than blanking
+    // them — this just says so, and how old they are.
+    if (lastError) {
+      const stale = document.createElement('div');
+      stale.className = 'bankin-stale';
+      stale.textContent = `Couldn't refresh — showing data from ${formatWhen(fetchedAt)}`;
+      banksEl.appendChild(stale);
+    }
+  }
+
+  const applyResources = (resources, timestamp) => {
+    banks = normalizeBanks(resources);
+    grandTotals = sumByCurrency(banks.flatMap(bank => bank.accounts));
+    fetchedAt = timestamp;
+    loaded = true;
+  };
+
+  const resetState = () => {
+    banks = [];
+    grandTotals = [];
+    loaded = false;
+    lastError = null;
+    fetchedAt = 0;
+    expandedIds.clear();
+  };
+
+  function refresh({ force = false } = {}) {
+    if (!getToken()) {
+      resetState();
+      render();
+      return Promise.resolve();
+    }
+    if (inFlight) return inFlight;
+    if (!force && loaded && Date.now() - fetchedAt < CACHE_TTL_MS) return Promise.resolve();
+
+    beginRefreshIndicator();
+    inFlight = (async () => {
+      try {
+        const resources = await fetchAllAccounts();
+        writeCache(resources);
+        applyResources(resources, Date.now());
+        lastError = null;
+      } catch (e) {
+        console.warn('Failed to refresh Bankin accounts', e);
+        lastError = e;
+      } finally {
+        inFlight = null;
+        endRefreshIndicator();
+        render();
+      }
+    })();
+    return inFlight;
+  }
+
+  document.addEventListener('settings:apiBearerTokenChanged', () => {
+    updateTriggerVisibility();
+    // A new token may well be a different Bankin account, so nothing cached
+    // under the old one can be trusted.
+    clearCache();
+    resetState();
+    render();
+    refresh();
+  });
+
+  // Same close-scheduling dance as Sonos/Hue: every render tears down the whole
+  // card subtree, so re-check the live hover/focus state when the close fires.
+  let closeTimer = null;
+  const cancelScheduledClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = null;
+  };
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      if (container.matches(':hover') || container.contains(document.activeElement)) return;
+      container.classList.remove('is-open');
+      if (expandedIds.size) {
+        expandedIds.clear();
+        render();
+      }
+    }, 150);
+  };
+
+  const open = () => {
+    cancelScheduledClose();
+    container.classList.add('is-open');
+    // No-ops while the cached data is still under an hour old.
+    refresh();
+  };
+
+  container.addEventListener('mouseenter', open);
+  container.addEventListener('focusin', open);
+  container.addEventListener('mouseleave', scheduleClose);
+  container.addEventListener('focusout', () => {
+    setTimeout(scheduleClose, 0);
+  });
+
+  // Paint whatever the last visit stored before going anywhere near the network,
+  // so the total is on screen instantly; the refresh below then does nothing at
+  // all while that data is under an hour old.
+  const cached = readCache();
+  if (cached) applyResources(cached.resources, cached.fetchedAt);
+  render();
+  refresh();
+  setInterval(() => refresh(), CACHE_TTL_MS);
+})();
