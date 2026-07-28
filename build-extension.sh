@@ -11,6 +11,7 @@ set -e
 cd "$(dirname "$0")"
 
 OUT="extension.zip"
+MANIFEST="manifest.json"
 FILES="
 manifest.json
 index.html
@@ -40,6 +41,17 @@ for f in $FILES; do
   fi
 done
 
+# Bump the manifest patch version (1.1.1 -> 1.1.2) so each build ships a new version.
+OLD_VERSION="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([0-9.]*\)".*/\1/p' "$MANIFEST" | head -1)"
+if [ -z "$OLD_VERSION" ]; then
+  echo "Could not read version from $MANIFEST" >&2
+  exit 1
+fi
+NEW_VERSION="$(echo "$OLD_VERSION" | awk -F. -v OFS=. '{ $NF = $NF + 1; print }')"
+sed "s/\"version\"[[:space:]]*:[[:space:]]*\"$OLD_VERSION\"/\"version\": \"$NEW_VERSION\"/" "$MANIFEST" > "$MANIFEST.tmp"
+mv "$MANIFEST.tmp" "$MANIFEST"
+echo "Version $OLD_VERSION -> $NEW_VERSION"
+
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
@@ -52,5 +64,5 @@ cp assets/google-suggest.ext.js "$STAGE/assets/google-suggest.js"
 rm -f "$OUT"
 (cd "$STAGE" && zip -qr "$OLDPWD/$OUT" $FILES)
 
-echo "Wrote $OUT ($(du -h "$OUT" | cut -f1)) to Downloads"
+echo "Wrote $OUT v$NEW_VERSION ($(du -h "$OUT" | cut -f1)) to Downloads"
 mv "$OUT" "$HOME/Downloads"
