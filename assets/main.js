@@ -32,6 +32,7 @@ const DEFAULT_UNSPLASH_KEYWORDS = [
   'korea',
   'taiwan',
   'taipei',
+  'jiufen',
   'keelung',
   'hong kong',
   'seoul',
@@ -199,8 +200,8 @@ function averageImageColor(image) {
   const context = canvas.getContext('2d', { willReadFrequently: true });
   if (!context) return null;
 
-  const cropHeight = Math.min(500, image.naturalHeight || image.height);
-  context.drawImage(image, 0, 0, image.naturalWidth || image.width, cropHeight, 0, 0, size, size);
+  // Squash the whole image into the small canvas so every pixel contributes to the average.
+  context.drawImage(image, 0, 0, size, size);
 
   try {
     const { data } = context.getImageData(0, 0, size, size);
@@ -535,7 +536,10 @@ const UnsplashBg = {
     }
   },
 
-  async preloadAndDisplay(imageUrl) {
+  // `applyThemeColor` is false for a freshly fetched image: recolouring the background on
+  // the very load that also reveals the photo reads as two jumps (default -> accent ->
+  // photo). The colour is still stored, so the next visit picks it up from the cache.
+  async preloadAndDisplay(imageUrl, applyThemeColor = true) {
     return new Promise((resolve) => {
       const bgEl = document.querySelector('.background');
       if (bgEl) {
@@ -549,7 +553,7 @@ const UnsplashBg = {
       img.onload = () => {
         const themeColor = averageImageColor(img);
         if (themeColor) {
-          ThemeColor.set(themeColor);
+          if (applyThemeColor) ThemeColor.set(themeColor);
           this.setStoredThemeColor(themeColor);
         }
 
@@ -624,7 +628,7 @@ const UnsplashBg = {
     const imageUrl = image.urls.full;
     const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
     this.notifySwCacheImage(imageUrl);
-    const themeColor = await this.preloadAndDisplay(imageUrl);
+    const themeColor = await this.preloadAndDisplay(imageUrl, false);
 
     // Cache it
     localStorage.setItem(cacheKey, JSON.stringify({
@@ -639,12 +643,6 @@ const UnsplashBg = {
     PhotoBlacklist.add(image.id);
 
     this.setCurrentInfo(info);
-
-    // Display it
-    if (themeColor) {
-      ThemeColor.set(themeColor);
-      this.setStoredThemeColor(themeColor);
-    }
   }
 };
 
