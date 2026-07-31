@@ -1663,6 +1663,9 @@ const UnsplashBg = {
   };
 
   renderEveryMinute();
+  // Hidden in the markup so the placeholder digits never show, revealed now that they hold
+  // the real time
+  clock.style.display = '';
   window.addEventListener('focus', render);
   document.addEventListener('settings:usernameChanged', () => render(false));
 
