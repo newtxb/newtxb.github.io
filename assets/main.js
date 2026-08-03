@@ -5061,11 +5061,18 @@ const UnsplashBg = {
 
   const bankMeta = bankId => BANKS[bankId] || { name: `Bank #${bankId}`, logo: null };
 
-  // status 0 / "OK" means the last sync went through; anything else is a
-  // credentials or strong-authentication problem needing action in Bankin.
-  const hasSyncIssue = account => (
-    (account.status ?? 0) !== 0 || (account.status_code_info || 'OK') !== 'OK'
-  );
+  // Bankin's status_code_info is the reliable sync health indicator. Some
+  // accounts can expose a non-zero numeric status while still reporting "OK".
+  const hasSyncIssue = (account) => {
+    const code = (account.status_code_info || 'OK').trim();
+    if (code !== 'OK') return true;
+
+    // Keep a fallback for non-OK numeric statuses only when Bankin also gives
+    // a concrete description, avoiding generic false positives.
+    const hasStatus = (account.status ?? 0) !== 0;
+    const hasDescription = Boolean((account.status_code_description || '').trim());
+    return hasStatus && hasDescription;
+  };
 
   // Current accounts first, then alphabetically by the label actually displayed.
   const sortAccounts = accounts => [...accounts].sort((a, b) => {
