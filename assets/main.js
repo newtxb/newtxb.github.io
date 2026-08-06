@@ -574,20 +574,58 @@ const UnsplashBg = {
           }, 100);
         }
 
-        resolve(themeColor);
+        resolve({ loaded: true, themeColor });
       };
-      img.onerror = resolve;
+      // A failed load (e.g. no network yet at browser startup) resolves with
+      // loaded=false so callers can retry instead of silently giving up.
+      img.onerror = () => resolve({ loaded: false, themeColor: null });
       img.src = imageUrl;
     });
   },
 
+  // Returns true once the daily image has been displayed, false if it couldn't
+  // be loaded (typically because the network wasn't available).
   async loadDailyImage(accessKey, keywords) {
     this.setLoading(true);
     try {
-      await this.fetchAndDisplayDailyImage(accessKey, keywords);
+      return await this.fetchAndDisplayDailyImage(accessKey, keywords);
     } finally {
       this.setLoading(false);
     }
+  },
+
+  // Chrome can open the new tab page at browser startup before its network
+  // stack is ready, and any load can hit a transient network blip (waking from
+  // sleep, VPN connecting, flaky wifi). The service worker only helps once an
+  // image is already cached — the first fetch of a new day's image still needs
+  // the network — so retry here, immediately when the browser reports it's back
+  // online and otherwise with a bounded backoff.
+  async loadDailyImageWithRetry(accessKey, keywords) {
+    if (await this.loadDailyImage(accessKey, keywords)) return true;
+
+    const backoffMs = [1000, 2000, 4000, 8000, 15000, 30000];
+    for (const delay of backoffMs) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.waitForRetryOpportunity(delay);
+      // eslint-disable-next-line no-await-in-loop
+      if (await this.loadDailyImage(accessKey, keywords)) return true;
+    }
+    return false;
+  },
+
+  // Resolves after `delay` ms, or sooner if the browser fires an `online`
+  // event, whichever comes first.
+  waitForRetryOpportunity(delay) {
+    return new Promise((resolve) => {
+      let timer = null;
+      const done = () => {
+        window.removeEventListener('online', done);
+        if (timer) clearTimeout(timer);
+        resolve();
+      };
+      timer = setTimeout(done, delay);
+      window.addEventListener('online', done);
+    });
   },
 
   async fetchAndDisplayDailyImage(accessKey, keywords) {
@@ -612,23 +650,24 @@ const UnsplashBg = {
         this.setStoredThemeColor(imageData.themeColor);
       }
       this.notifySwCacheImage(imageData.url);
-      const themeColor = await this.preloadAndDisplay(imageData.url);
+      const { loaded, themeColor } = await this.preloadAndDisplay(imageData.url);
+      if (!loaded) return false;
       if (themeColor && themeColor !== imageData.themeColor) {
         imageData.themeColor = themeColor;
         localStorage.setItem(cacheKey, JSON.stringify(imageData));
       }
-      return;
+      return true;
     }
 
     // Fetch new image
     const image = await this.getUnsplashImage(keywords, accessKey);
-    if (!image) return;
+    if (!image) return false;
 
     // Use the full photo URL
     const imageUrl = image.urls.full;
     const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
     this.notifySwCacheImage(imageUrl);
-    const themeColor = await this.preloadAndDisplay(imageUrl, false);
+    const { loaded, themeColor } = await this.preloadAndDisplay(imageUrl, false);
 
     // Cache it
     localStorage.setItem(cacheKey, JSON.stringify({
@@ -643,6 +682,7 @@ const UnsplashBg = {
     PhotoBlacklist.add(image.id);
 
     this.setCurrentInfo(info);
+    return loaded;
   }
 };
 
@@ -1178,7 +1218,10 @@ const UnsplashBg = {
       try {
         setUnsplashModeState(true);
         UnsplashBg.applyStoredThemeColor();
-        await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
+        // Retry on failure: at browser startup the network may not be ready yet
+        // (extension new-tab), and any first load of a new day's image can hit a
+        // transient network blip the service worker can't mask.
+        await UnsplashBg.loadDailyImageWithRetry(settings.unsplashAccessKey, keywords);
       } catch (e) {
         console.warn('Failed to load initial Unsplash image:', e);
         setUnsplashModeState(false);
