@@ -4909,6 +4909,329 @@ const UnsplashBg = {
 
 
 // ---------------------------------------------------------------------------------------------- //
+// ALMANAX
+// ---------------------------------------------------------------------------------------------- //
+
+(async () => {
+  const container = document.querySelector('.almanax-info');
+  const contentEl = document.querySelector('.almanax-content');
+  const dateEl = document.querySelector('.almanax-date');
+  const prevBtn = document.querySelector('.almanax-prev');
+  const nextBtn = document.querySelector('.almanax-next');
+  const completeBtn = document.querySelector('.almanax-complete-btn');
+  if (!container || !contentEl || !dateEl || !prevBtn || !nextBtn || !completeBtn) return;
+
+  const DATA_URL = 'assets/almanax-data.json';
+  const STORAGE_KEY = 'almanax-completed-days-v1';
+  const SYNC_KEY = 'almanaxCompletedDaysV1';
+  const isSyncAvailable = IS_EXTENSION
+    && typeof chrome !== 'undefined'
+    && !!chrome.storage
+    && !!chrome.storage.sync;
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const todayDate = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  const normalizeCompletionKeys = (value) => {
+    const list = Array.isArray(value) ? value : [];
+    return [...new Set(list.filter(key => /^\d{4}-\d{2}-\d{2}$/.test(key)))];
+  };
+
+  const readLocalCompletion = () => {
+    try {
+      const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+      if (Array.isArray(parsed)) return normalizeCompletionKeys(parsed);
+      if (parsed && typeof parsed === 'object') return normalizeCompletionKeys(parsed.days);
+    } catch (e) {
+      // Ignore malformed local cache.
+    }
+    return [];
+  };
+
+  const writeLocalCompletion = (keys) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ days: normalizeCompletionKeys(keys) }));
+    } catch (e) {
+      // Ignore storage failures.
+    }
+  };
+
+  const readSyncCompletion = () => new Promise((resolve) => {
+    if (!isSyncAvailable) {
+      resolve([]);
+      return;
+    }
+    chrome.storage.sync.get([SYNC_KEY], (result) => {
+      const runtimeError = chrome.runtime?.lastError;
+      if (runtimeError) {
+        resolve([]);
+        return;
+      }
+      resolve(normalizeCompletionKeys(result?.[SYNC_KEY]));
+    });
+  });
+
+  const writeSyncCompletion = (keys) => new Promise((resolve) => {
+    if (!isSyncAvailable) {
+      resolve();
+      return;
+    }
+    chrome.storage.sync.set({ [SYNC_KEY]: normalizeCompletionKeys(keys) }, () => resolve());
+  });
+
+  const copyText = async (text) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  };
+
+  const formatReward = (kamas) => `${(Number(kamas) || 0).toLocaleString('fr-FR')} kamas`;
+
+  const formatDate = (date) => {
+    const [month, day] = date.split('-').map(value => Number.parseInt(value, 10));
+    const dateObj = new Date(currentYear, month - 1, day);
+    return dateObj.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+    });
+  };
+
+  const dayKey = date => `${currentYear}-${date}`;
+
+  let entries = [];
+  let currentIndex = 0;
+  let completed = new Set();
+  let copyHintResetTimer = null;
+
+  const setEmpty = (message) => {
+    contentEl.textContent = '';
+    const msg = document.createElement('div');
+    msg.className = 'almanax-empty';
+    msg.textContent = message;
+    contentEl.appendChild(msg);
+  };
+
+  const render = () => {
+    if (!entries.length) {
+      dateEl.textContent = 'Almanax indisponible';
+      setEmpty('Aucune donnée Almanax disponible.');
+      completeBtn.style.display = 'none';
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      return;
+    }
+
+    prevBtn.disabled = false;
+    nextBtn.disabled = false;
+    completeBtn.style.display = '';
+
+    const entry = entries[currentIndex];
+    const isToday = entry.date === todayDate;
+
+    dateEl.textContent = '';
+    if (isToday) {
+      const pill = document.createElement('span');
+      pill.className = 'almanax-today-pill';
+      pill.textContent = "Aujourd'hui";
+      dateEl.appendChild(pill);
+    }
+    const dateText = document.createElement('span');
+    dateText.className = 'almanax-date-text';
+    dateText.textContent = capitalize(formatDate(entry.date));
+    dateEl.appendChild(dateText);
+
+    contentEl.textContent = '';
+
+    // Offering card: image + copyable name with quantity chip
+    const offeringCard = document.createElement('div');
+    offeringCard.className = 'almanax-card almanax-offering';
+
+    if (entry.imageUrl) {
+      const image = document.createElement('img');
+      image.className = 'almanax-offering-img';
+      image.src = entry.imageUrl;
+      image.alt = `Offrande ${entry.item}`;
+      image.loading = 'lazy';
+      offeringCard.appendChild(image);
+    }
+
+    const offeringBody = document.createElement('div');
+    offeringBody.className = 'almanax-offering-body';
+
+    const offeringLabel = document.createElement('span');
+    offeringLabel.className = 'almanax-label';
+    offeringLabel.textContent = 'Offrande requise';
+    offeringBody.appendChild(offeringLabel);
+
+    const nameBtn = document.createElement('button');
+    nameBtn.type = 'button';
+    nameBtn.className = 'almanax-offering-name';
+    nameBtn.title = entry.item;
+
+    const qtyChip = document.createElement('span');
+    qtyChip.className = 'almanax-qty';
+    qtyChip.textContent = `×${entry.quantite}`;
+
+    const nameText = document.createElement('span');
+    nameText.className = 'almanax-offering-name-text';
+    nameText.textContent = entry.item;
+
+    const copyIcon = document.createElement('span');
+    copyIcon.className = 'almanax-copy-icon';
+    copyIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+    nameBtn.append(qtyChip, nameText, copyIcon);
+
+    const copyHint = document.createElement('span');
+    copyHint.className = 'almanax-copy-hint';
+    copyHint.textContent = 'Cliquer pour copier le nom';
+
+    nameBtn.addEventListener('click', async () => {
+      try {
+        await copyText(entry.item);
+        copyHint.textContent = 'Nom copié !';
+        copyHint.classList.add('is-copied');
+        clearTimeout(copyHintResetTimer);
+        copyHintResetTimer = setTimeout(() => {
+          copyHint.textContent = 'Cliquer pour copier le nom';
+          copyHint.classList.remove('is-copied');
+        }, 1500);
+      } catch (e) {
+        copyHint.textContent = 'Copie impossible';
+      }
+    });
+
+    offeringBody.append(nameBtn, copyHint);
+    offeringCard.appendChild(offeringBody);
+    contentEl.appendChild(offeringCard);
+
+    // Bonus card
+    const bonusCard = document.createElement('div');
+    bonusCard.className = 'almanax-card';
+    const bonusLabel = document.createElement('span');
+    bonusLabel.className = 'almanax-label';
+    bonusLabel.textContent = 'Bonus du jour';
+    bonusCard.appendChild(bonusLabel);
+    if (entry.bonusTitre) {
+      const bonusTitle = document.createElement('strong');
+      bonusTitle.className = 'almanax-bonus-title';
+      bonusTitle.textContent = entry.bonusTitre;
+      bonusCard.appendChild(bonusTitle);
+    }
+    const bonusText = document.createElement('div');
+    bonusText.className = 'almanax-bonus-text';
+    bonusText.textContent = entry.bonus;
+    bonusCard.appendChild(bonusText);
+    contentEl.appendChild(bonusCard);
+
+    // Reward card: kama badge
+    const rewardCard = document.createElement('div');
+    rewardCard.className = 'almanax-card';
+    const rewardLabel = document.createElement('span');
+    rewardLabel.className = 'almanax-label';
+    rewardLabel.textContent = 'Récompense';
+    const rewardBadge = document.createElement('div');
+    rewardBadge.className = 'almanax-reward';
+    const coin = document.createElement('span');
+    coin.className = 'almanax-reward-coin';
+    coin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.6 10.4h3.1a1.8 1.8 0 0 1 0 3.6H9.9"/></svg>';
+    const rewardValue = document.createElement('span');
+    rewardValue.textContent = formatReward(entry.kamas);
+    rewardBadge.append(coin, rewardValue);
+    rewardCard.append(rewardLabel, rewardBadge);
+    contentEl.appendChild(rewardCard);
+
+    const completedForDate = completed.has(dayKey(entry.date));
+    completeBtn.classList.toggle('is-complete', completedForDate);
+    completeBtn.textContent = '';
+    const checkIcon = document.createElement('span');
+    checkIcon.className = 'almanax-complete-check';
+    checkIcon.innerHTML = completedForDate
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>';
+    completeBtn.append(checkIcon, document.createTextNode(completedForDate ? 'Fait pour cette date' : 'Marquer comme fait'));
+  };
+
+  const saveCompleted = async () => {
+    const keys = [...completed];
+    writeLocalCompletion(keys);
+    await writeSyncCompletion(keys);
+  };
+
+  const loadData = async () => {
+    const response = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Almanax data fetch error ${response.status}`);
+    const payload = await response.json();
+    const list = Array.isArray(payload?.entries) ? payload.entries : [];
+    entries = list
+      .filter(entry => entry && typeof entry.date === 'string')
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const todayIndex = entries.findIndex(entry => entry.date === todayDate);
+    currentIndex = todayIndex >= 0 ? todayIndex : 0;
+  };
+
+  prevBtn.addEventListener('click', () => {
+    if (!entries.length) return;
+    currentIndex = (currentIndex - 1 + entries.length) % entries.length;
+    render();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (!entries.length) return;
+    currentIndex = (currentIndex + 1) % entries.length;
+    render();
+  });
+
+  completeBtn.addEventListener('click', async () => {
+    if (!entries.length) return;
+    const entry = entries[currentIndex];
+    const key = dayKey(entry.date);
+    if (completed.has(key)) completed.delete(key);
+    else completed.add(key);
+    render();
+    try {
+      await saveCompleted();
+    } catch (e) {
+      console.warn('Failed to save Almanax completion', e);
+    }
+  });
+
+  try {
+    const [localDone, syncDone] = await Promise.all([
+      Promise.resolve(readLocalCompletion()),
+      readSyncCompletion(),
+    ]);
+    completed = new Set(normalizeCompletionKeys([...localDone, ...syncDone]));
+    await saveCompleted();
+  } catch (e) {
+    completed = new Set(normalizeCompletionKeys(readLocalCompletion()));
+  }
+
+  try {
+    await loadData();
+    render();
+  } catch (e) {
+    console.warn('Failed to load Almanax data', e);
+    entries = [];
+    render();
+    setEmpty('Impossible de charger les données Almanax.');
+  }
+})();
+
+
+// ---------------------------------------------------------------------------------------------- //
 // BANKIN
 // ---------------------------------------------------------------------------------------------- //
 
