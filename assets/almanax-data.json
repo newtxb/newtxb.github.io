@@ -1,0 +1,3304 @@
+{
+  "generatedAt": "2026-08-09T07:44:32.668Z",
+  "sources": {
+    "dpln": "https://www.dofuspourlesnoobs.com/calendrier-de-lalmanax.html",
+    "kamas": "https://dofuswiki.fandom.com/wiki/Almanax/Offerings",
+    "base": "https://raw.githubusercontent.com/bmangeat/almanax-tracker/refs/heads/main/data/almanax.json"
+  },
+  "entries": [
+    {
+      "date": "01-01",
+      "item": "Métronome du Début-Temps",
+      "quantite": 1,
+      "bonusTitre": "Jour de l'an",
+      "bonus": "Onome attend les aventuriers qui veulent célébrer la nouvelle année près du temple de Xélor. Sa bénédiction accorde un sortilège temporaire, le bond du Début-Temps, que vous serez capable de lancer durant 12 heures.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january1.png"
+    },
+    {
+      "date": "01-02",
+      "item": "Michette",
+      "quantite": 4,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Paysans économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january2.png"
+    },
+    {
+      "date": "01-03",
+      "item": "Capuche d'Armécréante",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de la Tempête de l'Eliocalypse.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january3.png"
+    },
+    {
+      "date": "01-04",
+      "item": "Cœur de Crapeur",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone des Larmes d'Ouronigride.",
+      "kamas": 16140,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january4.png"
+    },
+    {
+      "date": "01-05",
+      "item": "Frostiz",
+      "quantite": 10,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Frostiz récupérées par les Paysans sont augmentées de 200 %.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january5.png"
+    },
+    {
+      "date": "01-06",
+      "item": "Poils de Barbe du Grand Pa Wabbit",
+      "quantite": 6,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près de l'atelier des paysans du village d'Amakna. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Farine assassine.",
+      "kamas": 2111,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january6.png"
+    },
+    {
+      "date": "01-07",
+      "item": "Boue du Boo",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Gadouilleux.",
+      "kamas": 615,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january7.png"
+    },
+    {
+      "date": "01-08",
+      "item": "Serviette de Plage",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Château Ensablé.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january8.png"
+    },
+    {
+      "date": "01-09",
+      "item": "Épée Sacrée",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans la ville de Bonta est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january9.png"
+    },
+    {
+      "date": "01-10",
+      "item": "Ceinture de Célérité",
+      "quantite": 1,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des abreuvoirs est doublé.",
+      "kamas": 1253,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january10.png"
+    },
+    {
+      "date": "01-11",
+      "item": "Miroir de Dopeul",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Dopeuls.",
+      "kamas": 1231,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january11.png"
+    },
+    {
+      "date": "01-12",
+      "item": "Argent",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités d'Argent récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 4200,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january12.png"
+    },
+    {
+      "date": "01-13",
+      "item": "Bave de Nessil",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans les 4 zones des remparts du Château Harebourg et dans la Tour de la Clepsydre.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january13.png"
+    },
+    {
+      "date": "01-14",
+      "item": "Bois de Tremble",
+      "quantite": 10,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Tremble récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january14.png"
+    },
+    {
+      "date": "01-15",
+      "item": "Botte trouée",
+      "quantite": 10,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Bworks de Cania.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january15.png"
+    },
+    {
+      "date": "01-16",
+      "item": "Relique Familiale",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone de la Bordure de Brâkmar.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january16.png"
+    },
+    {
+      "date": "01-17",
+      "item": "Glande d'Arak-haï",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Arak-haï.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january17.png"
+    },
+    {
+      "date": "01-18",
+      "item": "Poisson-Chaton",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de poissons récupérées par les Pêcheurs de tous niveaux sont augmentées de 100 %.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january18.png"
+    },
+    {
+      "date": "01-19",
+      "item": "Pagne d'Alashasss",
+      "quantite": 2,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les gains d'experience son augmentés de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone Crocuzko.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january19.png"
+    },
+    {
+      "date": "01-20",
+      "item": "Poil de Rat Brâkmarien",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Rats Brâkmariens.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january20.png"
+    },
+    {
+      "date": "01-21",
+      "item": "Bouteille de Gloutoburg",
+      "quantite": 1,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Alchimistes ont 25 % de chances de créer un second objet.",
+      "kamas": 11984,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january21.png"
+    },
+    {
+      "date": "01-22",
+      "item": "Ortie",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités d'Ortie récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january22.png"
+    },
+    {
+      "date": "01-23",
+      "item": "Rune So",
+      "quantite": 2,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Sculptemages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer une arme.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january23.png"
+    },
+    {
+      "date": "01-24",
+      "item": "Bourgeon d'Abraknyde Sombre Irascible",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de la Clairière du Chêne Mou.",
+      "kamas": 9741,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january24.png"
+    },
+    {
+      "date": "01-25",
+      "item": "Tibia de Koalak Fossoyeur",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone du Cimetière Primitif.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january25.png"
+    },
+    {
+      "date": "01-26",
+      "item": "Bois de Chêne",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Chêne récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january26.png"
+    },
+    {
+      "date": "01-27",
+      "item": "Carasau",
+      "quantite": 4,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Paysans ont 25 % de chances de créer un second objet.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january27.png"
+    },
+    {
+      "date": "01-28",
+      "item": "Queue de Rat du Gang",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Repaire de Sphincter Cell.",
+      "kamas": 11654,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january28.png"
+    },
+    {
+      "date": "01-29",
+      "item": "Laine de Bouftou",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone du Coin des Bouftous.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january29.png"
+    },
+    {
+      "date": "01-30",
+      "item": "Bourse Suspecte",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Bandits, dont les Artisans sombres.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january30.png"
+    },
+    {
+      "date": "01-31",
+      "item": "Menthe Sauvage",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Menthe Sauvage récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/january31.png"
+    },
+    {
+      "date": "02-01",
+      "item": "Blessure du Sacrieur",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience et butin en larmes",
+      "bonus": "Les gains d'expérience lors des combats contre les monstres et les chances d'obtenir du butin sont augmentés de 50 % pour tous les aventuriers qui sont sous l'influence d'une Idole de Tolgnas.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february1.png"
+    },
+    {
+      "date": "02-02",
+      "item": "Brioche à la viande de bouftou",
+      "quantite": 2,
+      "bonusTitre": "La Grande Bouffe",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur toutes les créatures considérées comme des Bouftous, y compris les boufmouths et les boufcouls. De plus, les gains d'expérience sont augmentés de 50 % pour les Chasseurs, les Paysans et les Pêcheurs.",
+      "kamas": 4771,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february2.png"
+    },
+    {
+      "date": "02-03",
+      "item": "Bombe de Graboule",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Magik Riktus.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february3.png"
+    },
+    {
+      "date": "02-04",
+      "item": "Molaire de Blérice",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone des Crocs de verre.",
+      "kamas": 19944,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february4.png"
+    },
+    {
+      "date": "02-05",
+      "item": "Fil de Néfileuse",
+      "quantite": 6,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans les donjons de niveau 80 à 110.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february5.png"
+    },
+    {
+      "date": "02-06",
+      "item": "Marteau de Boisaille",
+      "quantite": 2,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Forgerons économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february6.png"
+    },
+    {
+      "date": "02-07",
+      "item": "Lamelle de Champa Vert",
+      "quantite": 6,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone du Bord de la Forêt Maléfique.",
+      "kamas": 1143,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february7.png"
+    },
+    {
+      "date": "02-08",
+      "item": "Bois de Frêne",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Frêne récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february8.png"
+    },
+    {
+      "date": "02-09",
+      "item": "Tignasse de Kanihilan",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon de la Grotte de Kanigroula.",
+      "kamas": 13721,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february9.png"
+    },
+    {
+      "date": "02-10",
+      "item": "Pic de dragodinde dorée",
+      "quantite": 6,
+      "bonusTitre": "Montures endurantes",
+      "bonus": "Toutes les montures qui naissent ce jour auront la capacité Endurante.",
+      "kamas": 3628,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february10.png"
+    },
+    {
+      "date": "02-11",
+      "item": "Bar Rikain",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Bar Rikain et de Tanche récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 7190,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february11.png"
+    },
+    {
+      "date": "02-12",
+      "item": "Poils de Mulounoké",
+      "quantite": 5,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Mulous.",
+      "kamas": 5563,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february12.png"
+    },
+    {
+      "date": "02-13",
+      "item": "Cuivre",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Cuivre récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february13.png"
+    },
+    {
+      "date": "02-14",
+      "item": "Shigekax Passion",
+      "quantite": 9,
+      "bonusTitre": "Expérience amoureuse",
+      "bonus": "Tous les personnages atteints par la Malédiction du Ballotin voient leurs gains d'expérience augmentés de 100 % lors des combats contre les monstres.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february14.png"
+    },
+    {
+      "date": "02-15",
+      "item": "Potion de Vieillesse",
+      "quantite": 1,
+      "bonusTitre": "Coffre au trésor",
+      "bonus": "Une quête de chasse au trésor de Güss est disponible aujourd'hui auprès de Dhain, à la Malle aux trésors. Nom de la quête : Chasse au trésor de Güss.",
+      "kamas": 11984,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february15.png"
+    },
+    {
+      "date": "02-16",
+      "item": "Beignet Astrubien",
+      "quantite": 6,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Chasseurs économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february16.png"
+    },
+    {
+      "date": "02-17",
+      "item": "Bottes Karnaval",
+      "quantite": 1,
+      "bonusTitre": "Cadeaux surprises",
+      "bonus": "Des Pochettes-Surprises ont été ajoutées aux butins des monstres. Lorsqu'elles sont utilisées, elles permettent d'obtenir des Beignets de Karnaval ou bien de se retrouver déguisé en monstre Tout-Fou.",
+      "kamas": 17240,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/fitsef.png"
+    },
+    {
+      "date": "02-18",
+      "item": "Écorce d'Abrakne Sombre",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Abraknydiens Sombres.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february18.png"
+    },
+    {
+      "date": "02-19",
+      "item": "Carpe d'Iem",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Poisson-Chaton et de Carpe d'Iem récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february19.png"
+    },
+    {
+      "date": "02-20",
+      "item": "Croupion du Bitouf aérien",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans les zones du Feuillage et du Tronc de l'arbre Hakam.",
+      "kamas": 13062,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february20.png"
+    },
+    {
+      "date": "02-21",
+      "item": "Bière bwork",
+      "quantite": 9,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans les zones du Village des Bworks et du Campement des Bworks.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february21.png"
+    },
+    {
+      "date": "02-22",
+      "item": "Peau de Dragueuse",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone du Sanctuaire des Dragoeufs.",
+      "kamas": 7872,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february22.png"
+    },
+    {
+      "date": "02-23",
+      "item": "Corne de Malbois",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Tertre du long sommeil.",
+      "kamas": 12116,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february23.png"
+    },
+    {
+      "date": "02-24",
+      "item": "Cuir d'Eskoglyphe",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les salles de la Base Abyssale.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february24.png"
+    },
+    {
+      "date": "02-25",
+      "item": "Goulobule rouge",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon du Manoir de Katrepat.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february25.png"
+    },
+    {
+      "date": "02-26",
+      "item": "Armure de Blindur",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Marteaux-Aigris.",
+      "kamas": 19153,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february26.png"
+    },
+    {
+      "date": "02-27",
+      "item": "Marinade Sucrée-Salée",
+      "quantite": 4,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Saignante et de Viande Persillée récupérées par les Chasseurs sont augmentées de 125 %.",
+      "kamas": 14601,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february27.png"
+    },
+    {
+      "date": "02-28",
+      "item": "Plume de Domoizelle",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon de l'Arbre de Moon.",
+      "kamas": 5563,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february28.png"
+    },
+    {
+      "date": "02-29",
+      "item": "Nageoire de Compétition",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience et butin pour tous",
+      "bonus": "Les gains d'expérience et les chances d'obtenir du butin sont augmentés de 75 % lors des combats contre les monstres. De plus, les gains d'expérience sont augmentés de 50 % pour tous les métiers.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/february29.png"
+    },
+    {
+      "date": "03-01",
+      "item": "La Chaîne Nhanor Kibrill",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Bijoutiers économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march1.png"
+    },
+    {
+      "date": "03-02",
+      "item": "Crâne d'Aventurier",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans la zone de la Vallée de la Morh'Kitu.",
+      "kamas": 7630,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march2.png"
+    },
+    {
+      "date": "03-03",
+      "item": "Bois de Charme",
+      "quantite": 20,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Charme et de Bois de Bambou Sombre récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 7190,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march3.png"
+    },
+    {
+      "date": "03-04",
+      "item": "Volve de Fistulor",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Sylvesprits.",
+      "kamas": 17987,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march4.png"
+    },
+    {
+      "date": "03-05",
+      "item": "Poil de Gliglitch",
+      "quantite": 3,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone des Landes de Cania.",
+      "kamas": 12116,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march5.png"
+    },
+    {
+      "date": "03-06",
+      "item": "Baguette de Glace",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans la ville de la Bourgade est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march6.png"
+    },
+    {
+      "date": "03-07",
+      "item": "Tête de lance de Fangshu",
+      "quantite": 4,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Kozaru.",
+      "kamas": 10599,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march7.png"
+    },
+    {
+      "date": "03-08",
+      "item": "Patte de Wabbit",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Wabbits, Wabbits mutants et Gawde du Wa.",
+      "kamas": 1627,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march8.png"
+    },
+    {
+      "date": "03-09",
+      "item": "Houblon",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Houblon récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march9.png"
+    },
+    {
+      "date": "03-10",
+      "item": "Petit Extrait de Foudroyeur",
+      "quantite": 5,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des foudroyeurs est doublé.",
+      "kamas": 1165,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march10.png"
+    },
+    {
+      "date": "03-11",
+      "item": "Dent de Crocodaille",
+      "quantite": 8,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones des Marécages d'Amakna, des Marécages nauséabonds et des Marécages sans fond.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march11.png"
+    },
+    {
+      "date": "03-12",
+      "item": "Poisson Pané Frit",
+      "quantite": 3,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Pêcheurs économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march12.png"
+    },
+    {
+      "date": "03-13",
+      "item": "Œil de Harrogant",
+      "quantite": 2,
+      "bonusTitre": "Expérience Robillesque",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % sur tous les gardiens de donjon.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march13.png"
+    },
+    {
+      "date": "03-14",
+      "item": "Trèfle à 5 feuilles",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Trèfles à 5 Feuilles récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march14.png"
+    },
+    {
+      "date": "03-15",
+      "item": "Gratrooll",
+      "quantite": 5,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Troolls de Litneg.",
+      "kamas": 7872,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march15.png"
+    },
+    {
+      "date": "03-16",
+      "item": "Jouet de Gamine Zoth",
+      "quantite": 4,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Zoths.",
+      "kamas": 8774,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march16.png"
+    },
+    {
+      "date": "03-17",
+      "item": "Cape du Piou Vert",
+      "quantite": 1,
+      "bonusTitre": "Fortune des Leprechauns",
+      "bonus": "Les aventuriers en quête de binouzetons peuvent récupérer deux fois plus de pièces sur les Leprechauns.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march17.png"
+    },
+    {
+      "date": "03-18",
+      "item": "Rune Fui",
+      "quantite": 2,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Façomages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer un objet.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march18.png"
+    },
+    {
+      "date": "03-19",
+      "item": "Manganèse",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Manganèse récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march19.png"
+    },
+    {
+      "date": "03-20",
+      "item": "Queue de Mantaze",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le Vaisseau du Capitaine Meno.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march20.png"
+    },
+    {
+      "date": "03-21",
+      "item": "Œil de Feutôme",
+      "quantite": 2,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 100 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Caserne du Jour sans fin.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march21.png"
+    },
+    {
+      "date": "03-22",
+      "item": "Incus de Verglasseur",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans la Forgefroide de Missiz Frizz.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march22.png"
+    },
+    {
+      "date": "03-23",
+      "item": "Gravure de Crachin",
+      "quantite": 1,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des bois de tous types est augmentée de 100 %.",
+      "kamas": 3276,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march23.png"
+    },
+    {
+      "date": "03-24",
+      "item": "Ailes de Scarafeuille Blanc",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Scarafeuilles.",
+      "kamas": 1099,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march24.png"
+    },
+    {
+      "date": "03-25",
+      "item": "Antenne de Bacterrib",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Krobes.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march25.png"
+    },
+    {
+      "date": "03-26",
+      "item": "Incisive de Glourmand",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Gloursons.",
+      "kamas": 19944,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march26.png"
+    },
+    {
+      "date": "03-27",
+      "item": "Papillote au Citron",
+      "quantite": 4,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Minérale et de Viande Frelatée récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 1781,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march27.png"
+    },
+    {
+      "date": "03-28",
+      "item": "Canine de Kanimate",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le Transporteur de Sylargh.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march28.png"
+    },
+    {
+      "date": "03-29",
+      "item": "Boulon de Cybwork",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans la Grotte du Bworker.",
+      "kamas": 17240,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march29.png"
+    },
+    {
+      "date": "03-30",
+      "item": "Queue de Fennex",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Animaux du désert.",
+      "kamas": 3980,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march30.png"
+    },
+    {
+      "date": "03-31",
+      "item": "Dent de Larve Émeraude",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon des Larves.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/march31.png"
+    },
+    {
+      "date": "04-01",
+      "item": "Fluide Glacial",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience et butin sur les créatures marines",
+      "bonus": "Les gains d'expérience et les chances d'obtenir du butin sont augmentés de 50 % sur tous les monstres considérés comme des créatures marines (pichons, monstres des plages, corailleurs, crustorails, tortues de Moon, crabe Hijacob, gélikan, Kralamoure Géant, monstres des abysses de Sufokia, Mercemers, Submergés, Crocodailles de Crocuzko).",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april1.png"
+    },
+    {
+      "date": "04-02",
+      "item": "Petit Extrait d'Abreuvoir",
+      "quantite": 5,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone du Territoire Cacterre.",
+      "kamas": 4200,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april2.png"
+    },
+    {
+      "date": "04-03",
+      "item": "Lanterne usée",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone du Mont des Tombeaux.",
+      "kamas": 15436,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april3.png"
+    },
+    {
+      "date": "04-04",
+      "item": "Ceinture de Sécurité",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans la ville de Sufokia est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april4.png"
+    },
+    {
+      "date": "04-05",
+      "item": "Œuf de Dragoeuf Calcaire",
+      "quantite": 1,
+      "bonusTitre": "Quête répétable et chocomania",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près du sanctuaire des Zobals. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Qui vole un oeuf cherche l'embrouille. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 30 % dans toutes les zones de l'Île de Pwâk.",
+      "kamas": 1407,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/etnop.png"
+    },
+    {
+      "date": "04-06",
+      "item": "Canine de Mergranlou",
+      "quantite": 5,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone des Hauts des Hurlements.",
+      "kamas": 5563,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april6.png"
+    },
+    {
+      "date": "04-07",
+      "item": "Orge",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités d'Orge récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april7.png"
+    },
+    {
+      "date": "04-08",
+      "item": "Carapace Verte",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone de la Plage de la Tortue.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april8.png"
+    },
+    {
+      "date": "04-09",
+      "item": "Plume de Gobvious",
+      "quantite": 5,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Théâtre de Dramak.",
+      "kamas": 5343,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april9.png"
+    },
+    {
+      "date": "04-10",
+      "item": "Anneau Fortifiant",
+      "quantite": 2,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des baffeurs et doublé.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april10.png"
+    },
+    {
+      "date": "04-11",
+      "item": "Bout de Blop Coco",
+      "quantite": 6,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone du Lac de Cania.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april11.png"
+    },
+    {
+      "date": "04-12",
+      "item": "Os de Jiangshi-Nobi",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Armée de Brume.",
+      "kamas": 13721,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april12.png"
+    },
+    {
+      "date": "04-13",
+      "item": "Bois de Kaliptus",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois d'Ébène et de Bois de Kaliptus récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 6377,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april13.png"
+    },
+    {
+      "date": "04-14",
+      "item": "Plume du Kwak de Vent",
+      "quantite": 4,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le Nid du Kwakwa.",
+      "kamas": 1407,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april14.png"
+    },
+    {
+      "date": "04-15",
+      "item": "Clef du Château Ensablé",
+      "quantite": 1,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Bricoleurs ont 25 % de chances de créer un second objet.",
+      "kamas": 1165,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april15.png"
+    },
+    {
+      "date": "04-16",
+      "item": "Greuvette",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Greuvette et de Crabe Sourimi récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april16.png"
+    },
+    {
+      "date": "04-17",
+      "item": "Multygely",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone de la péninsule des Gelées.",
+      "kamas": 4507,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april17.png"
+    },
+    {
+      "date": "04-18",
+      "item": "Cuir de Cuirboule",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon des Salons privés de Klime.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april18.png"
+    },
+    {
+      "date": "04-19",
+      "item": "Or",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités d'Or récupérées par les Mineurs sont augmentées de 150 %.",
+      "kamas": 7190,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april19.png"
+    },
+    {
+      "date": "04-20",
+      "item": "Nectar de l'Orient",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Plantalas.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april20.png"
+    },
+    {
+      "date": "04-21",
+      "item": "Boule polie",
+      "quantite": 1,
+      "bonusTitre": "Coffre au trésor",
+      "bonus": "Une quête de chasse au trésor de Scheik est disponible aujourd'hui auprès de Dhain, à la Malle aux trésors. Nom de la quête : Chasse au trésor de Scheik.",
+      "kamas": 5871,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april21.png"
+    },
+    {
+      "date": "04-22",
+      "item": "Dent de Tilamproie",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Monstres des ruines sous-marines.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april22.png"
+    },
+    {
+      "date": "04-23",
+      "item": "Bave de Ouassingue",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Monstres des Tourbières.",
+      "kamas": 5761,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april23.png"
+    },
+    {
+      "date": "04-24",
+      "item": "Clef du Nid du Kwakwa",
+      "quantite": 1,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone de la Montagne des Craqueleurs.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april24.png"
+    },
+    {
+      "date": "04-25",
+      "item": "Viande Rassie",
+      "quantite": 6,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Rassie et de Viande Exsudative récupérées par les Chasseurs sont augmentées de 125 %.",
+      "kamas": 4947,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april25.png"
+    },
+    {
+      "date": "04-26",
+      "item": "Kamatrix",
+      "quantite": 1,
+      "bonusTitre": "Quêtes et kamas",
+      "bonus": "Les gains de kamas sont augmentés de 100 % pour toutes les quêtes.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april26.png"
+    },
+    {
+      "date": "04-27",
+      "item": "Oreille de Foufayteur",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Ruffians de Cania.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april27.png"
+    },
+    {
+      "date": "04-28",
+      "item": "Cristal",
+      "quantite": 1,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de minerai récupérées par les Mineurs de tous niveaux sont augmentées de 100 %.",
+      "kamas": 2374,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april28.png"
+    },
+    {
+      "date": "04-29",
+      "item": "Plume de Tofu",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Tofus.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april29.png"
+    },
+    {
+      "date": "04-30",
+      "item": "Graine de Pandouille",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Plantes récupérées par les Alchimistes de tous niveaux sont augmentées de 100 %.",
+      "kamas": 4200,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/april30.png"
+    },
+    {
+      "date": "05-01",
+      "item": "Capsule Explosive",
+      "quantite": 2,
+      "bonusTitre": "Fabrique Féérique",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % pour tous les métiers. De plus, pour chaque Fée d'Artifice fabriquée, les personnages ont 25 % de chances de créer une seconde Fée et 15 % de chances d'économiser des ingrédients. Ils peuvent aussi récupérer 2 fois plus de Capsules Explosives en combattant des Bworks Mages.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may1.png"
+    },
+    {
+      "date": "05-02",
+      "item": "Langue de Champodonte",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon du Temple du Grand Ougah.",
+      "kamas": 17240,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may2.png"
+    },
+    {
+      "date": "05-03",
+      "item": "Croupion de Truchmuche",
+      "quantite": 4,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 75 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone du Cirque de Cania.",
+      "kamas": 8510,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may3.png"
+    },
+    {
+      "date": "05-04",
+      "item": "Longue-vue de Gob-Trotteur",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Gobelins d'Amakna.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may4.png"
+    },
+    {
+      "date": "05-05",
+      "item": "Fragment de Pierre Pointue",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone des Plaines Rocheuses.",
+      "kamas": 2748,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may5.png"
+    },
+    {
+      "date": "05-06",
+      "item": "Bois d'Érable",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bombu et d'Érable récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may6.png"
+    },
+    {
+      "date": "05-07",
+      "item": "Dent de Klémort",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans les donjons de la Tour de Solar et de la Tour de Bethel.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may7.png"
+    },
+    {
+      "date": "05-08",
+      "item": "Pomme de Terre",
+      "quantite": 20,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près du château d'Amakna. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Le fabuleux festin d'Amélie Poêlon.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may8.png"
+    },
+    {
+      "date": "05-09",
+      "item": "Pierre Médicinale",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone du Canyon Sauvage.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may9.png"
+    },
+    {
+      "date": "05-10",
+      "item": "Petit Extrait de Baffeur",
+      "quantite": 5,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Éleveurs économisent 15% de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may10.png"
+    },
+    {
+      "date": "05-11",
+      "item": "Fiole à élément",
+      "quantite": 1,
+      "bonusTitre": "Expérience des métiers",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % pour les métiers de forgemagie d'armes (Forgemage et Sculptemage).",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may11.png"
+    },
+    {
+      "date": "05-12",
+      "item": "Malt",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Malt récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 4200,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may12.png"
+    },
+    {
+      "date": "05-13",
+      "item": "Dédicace de Skeunk pour Émeraude",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Repaire de Skeunk.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may13.png"
+    },
+    {
+      "date": "05-14",
+      "item": "Bouclier de Bowisse",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans le village et la forêt d'Amakna est augmentée.",
+      "kamas": 4529,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may14.png"
+    },
+    {
+      "date": "05-15",
+      "item": "Sac du Petit Récolteur",
+      "quantite": 1,
+      "bonusTitre": "Nature généreuse",
+      "bonus": "La vitesse d'apparition des ressources de tous types est augmentée de 100 %. De plus, les récolteurs peuvent récupérer des Fleurs de Rosal ou des Fringales de Silouate en affrontant les Protecteurs de ressources.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/alikindoy.png"
+    },
+    {
+      "date": "05-16",
+      "item": "Belladone",
+      "quantite": 40,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des fleurs et des plantes cueillies par les Alchimistes est augmentée de 100 %.",
+      "kamas": 7190,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may16.png"
+    },
+    {
+      "date": "05-17",
+      "item": "Étoffe du Roissingue",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Monstres des Tourbières.",
+      "kamas": 21154,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may17.png"
+    },
+    {
+      "date": "05-18",
+      "item": "Pollen de Bulbiflore",
+      "quantite": 3,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 100 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de Plantala.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may18.png"
+    },
+    {
+      "date": "05-19",
+      "item": "Étain",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités d'Étain et de Silicate récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may19.png"
+    },
+    {
+      "date": "05-20",
+      "item": "Bouclier Tonbarien",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Façonneurs économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 1407,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may20.png"
+    },
+    {
+      "date": "05-21",
+      "item": "Capouze des Champs",
+      "quantite": 1,
+      "bonusTitre": "Expérience des métiers",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % pour les métiers de fabrication de vêtements et de parures (Bijoutier, Cordonnier et Tailleur).",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may21.png"
+    },
+    {
+      "date": "05-22",
+      "item": "Sac du Petit Aventurier",
+      "quantite": 1,
+      "bonusTitre": "Expérience des quêtes",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % pour toutes les quêtes.",
+      "kamas": 2352,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may22.png"
+    },
+    {
+      "date": "05-23",
+      "item": "Brochet",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Brochet, de Perche et de Lotte récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may23.png"
+    },
+    {
+      "date": "05-24",
+      "item": "Seigle",
+      "quantite": 40,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des ressources est augmentée de 150 % dans la zone des Champs de Cania.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may24.png"
+    },
+    {
+      "date": "05-25",
+      "item": "Cawotte",
+      "quantite": 2,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui à l'est de l'atelier des bûcherons de la forêt d'Amakna. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Que le Gwan Kwic me cwoque.",
+      "kamas": 13391,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/toun.png"
+    },
+    {
+      "date": "05-26",
+      "item": "Corne de Gamino",
+      "quantite": 4,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone du Labyrinthe du Minotoror.",
+      "kamas": 8927,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may26.png"
+    },
+    {
+      "date": "05-27",
+      "item": "Tanche en Matelote",
+      "quantite": 2,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Pêcheurs ont 25 % de chances de créer un second objet.",
+      "kamas": 17987,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may27.png"
+    },
+    {
+      "date": "05-28",
+      "item": "Viande Sanguinolente",
+      "quantite": 6,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Sanguinolente récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 3980,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may28.png"
+    },
+    {
+      "date": "05-29",
+      "item": "Miséricorde du Chafer d'Élite",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans les zones du Cimetière des Torturés et du Cimetière des Héros.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may29.png"
+    },
+    {
+      "date": "05-30",
+      "item": "Rune Pui",
+      "quantite": 3,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Forgemages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer une arme.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may30.png"
+    },
+    {
+      "date": "05-31",
+      "item": "Lamelle de Dramanite",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon de l'Antre du Korriandre.",
+      "kamas": 17987,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/may31.png"
+    },
+    {
+      "date": "06-01",
+      "item": "Pince de Crabe",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Monstres des plages.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june1.png"
+    },
+    {
+      "date": "06-02",
+      "item": "Biscotte",
+      "quantite": 2,
+      "bonusTitre": "Vœu de pauvreté",
+      "bonus": "Des Sébiles d'Elgero ont été ajoutées aux butins des monstres des donjons. Lorsqu'elles sont utilisées, elles font disparaître les kamas... et permettent de bénéficier d'un effet aléatoire de charité bien ordonnée.",
+      "kamas": 3980,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june2.png"
+    },
+    {
+      "date": "06-03",
+      "item": "Graine de la Discorde",
+      "quantite": 6,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans les donjons de niveau 40 à 70.",
+      "kamas": 1231,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june3.png"
+    },
+    {
+      "date": "06-04",
+      "item": "Bouclier du Bouftou",
+      "quantite": 1,
+      "bonusTitre": "Gardiens de la nature",
+      "bonus": "Les protecteurs de ressources ont 5 fois plus de chances d'apparaître pendant les activités de récolte. De plus, la vitesse d'apparition des Archimonstres est augmentée de 200 %.",
+      "kamas": 1165,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june4.png"
+    },
+    {
+      "date": "06-05",
+      "item": "Coquille de Virustine",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Krobes.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june5.png"
+    },
+    {
+      "date": "06-06",
+      "item": "Œil de Cycloïde",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le Donjon du Comte Harebourg.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june6.png"
+    },
+    {
+      "date": "06-07",
+      "item": "Griffe de Blérauve",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Bléros.",
+      "kamas": 19944,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june7.png"
+    },
+    {
+      "date": "06-08",
+      "item": "Roue de Tivelo",
+      "quantite": 6,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 75 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Route des Roulottes.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june8.png"
+    },
+    {
+      "date": "06-09",
+      "item": "Orchidée Freyesque",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités d'Orchidée Freyesque récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june9.png"
+    },
+    {
+      "date": "06-10",
+      "item": "Lailait d’amande",
+      "quantite": 1,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des mangeoires est doublé.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june10.png"
+    },
+    {
+      "date": "06-11",
+      "item": "Bouteille de Bouchonnois",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le Camp du Comte Razof.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june11.png"
+    },
+    {
+      "date": "06-12",
+      "item": "Sang de Harpo",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de l'Aquadôme de Merkator.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june12.png"
+    },
+    {
+      "date": "06-13",
+      "item": "Bois de Bambou",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bambou récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 3562,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june13.png"
+    },
+    {
+      "date": "06-14",
+      "item": "Clef des Champs",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Bricoleurs ont 15 % de chances d'économiser des ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june14.png"
+    },
+    {
+      "date": "06-15",
+      "item": "Coccyx du Corailleur",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans laGrotte Hesque.",
+      "kamas": 1407,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june15.png"
+    },
+    {
+      "date": "06-16",
+      "item": "Coquille de Dragoeuf Ardoise",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones de la Presqu'île des Dragoeufs.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june16.png"
+    },
+    {
+      "date": "06-17",
+      "item": "Racine d'Abraknyde",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Abraknydiens.",
+      "kamas": 1407,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june17.png"
+    },
+    {
+      "date": "06-18",
+      "item": "Cendrepierre",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Cendrepierre récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 8993,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june18.png"
+    },
+    {
+      "date": "06-19",
+      "item": "Peau de Crachefoux",
+      "quantite": 4,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone de Feudala.",
+      "kamas": 10599,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june19.png"
+    },
+    {
+      "date": "06-20",
+      "item": "Blé",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Blé récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june20.png"
+    },
+    {
+      "date": "06-21",
+      "item": "Tambour de Gobaladée",
+      "quantite": 6,
+      "bonusTitre": "Du miel dans les oreilles",
+      "bonus": "Les amateurs de musique peuvent récupérer deux fois plus de pollenectar sur les créatures du Monde des Douze (hors dimensions, zones sous-marines et intérieurs).",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june21.png"
+    },
+    {
+      "date": "06-22",
+      "item": "Pince de Crustorail",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones de la Plage de Corail.",
+      "kamas": 1297,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june22.png"
+    },
+    {
+      "date": "06-23",
+      "item": "Appendice Démoniaque",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Possédés.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june23.png"
+    },
+    {
+      "date": "06-24",
+      "item": "Peau de Larve Champêtre",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de typeAnimaux des champs.",
+      "kamas": 2396,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june24.png"
+    },
+    {
+      "date": "06-25",
+      "item": "Eau Ferrugineuse",
+      "quantite": 1,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des ressources est augmentée de 150 % dans la zone de la Mine Istairameur.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june25.png"
+    },
+    {
+      "date": "06-26",
+      "item": "Bouclier Volant",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués sur l'île de Pandala est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june26.png"
+    },
+    {
+      "date": "06-27",
+      "item": "Tentacule de Grofond",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le Temple de Koutoulou.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june27.png"
+    },
+    {
+      "date": "06-28",
+      "item": "Grenat de Momistik",
+      "quantite": 2,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 75 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Pyramide Maudite.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june28.png"
+    },
+    {
+      "date": "06-29",
+      "item": "Viande Noire",
+      "quantite": 2,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Gâtée et de Viande Noire récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 19944,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june29.png"
+    },
+    {
+      "date": "06-30",
+      "item": "Bonnet de Gobaliste",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans l'Akadémie des Gobs.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/june30.png"
+    },
+    {
+      "date": "07-01",
+      "item": "Écaille de Dragoss Charbon",
+      "quantite": 5,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Dragoss.",
+      "kamas": 5563,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july1.png"
+    },
+    {
+      "date": "07-02",
+      "item": "Œuf de Tofubine",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Tofulailler Royal.",
+      "kamas": 7762,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july2.png"
+    },
+    {
+      "date": "07-03",
+      "item": "Potion Raide Dite",
+      "quantite": 3,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Alchimistes ont 15 % de chances d'économiser des ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 747,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july3.png"
+    },
+    {
+      "date": "07-04",
+      "item": "Friture Amaknéenne",
+      "quantite": 4,
+      "bonusTitre": "Rêve amaknéen",
+      "bonus": "Les gains d'expérience et les chances d'obtenir du butin sont augmentés de 50 % sur tous les monstres présents dans les zones du royaume d'Amakna. De plus, un bonus de 75 % est ajouté aux chances d'obtenir du butin dans les Songes.",
+      "kamas": 3584,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july4.png"
+    },
+    {
+      "date": "07-05",
+      "item": "Poils magiques de Tanuki",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon de l'Atelier du Tanukouï San.",
+      "kamas": 9191,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july5.png"
+    },
+    {
+      "date": "07-06",
+      "item": "Truite",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Goujon et de Truite récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july6.png"
+    },
+    {
+      "date": "07-07",
+      "item": "Maïs",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Maïs et de Millet récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 7190,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july7.png"
+    },
+    {
+      "date": "07-08",
+      "item": "Nœud de Marin",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Pirates de Moon.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july8.png"
+    },
+    {
+      "date": "07-09",
+      "item": "Rune Pod",
+      "quantite": 2,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Cordomages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer un objet.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july9.png"
+    },
+    {
+      "date": "07-10",
+      "item": "Arc Sifflant",
+      "quantite": 1,
+      "bonusTitre": "Montures amoureuses",
+      "bonus": "Toutes les montures qui naissent ce jour aurant la capacité Amoureuse.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july10.png"
+    },
+    {
+      "date": "07-11",
+      "item": "Bauxite",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Bauxite récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 5585,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july11.png"
+    },
+    {
+      "date": "07-12",
+      "item": "Poils de barbe de Barbélier",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Clan Martegel.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july12.png"
+    },
+    {
+      "date": "07-13",
+      "item": "Eau de Kwapa",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon de la Vallée de la Dame des eaux.",
+      "kamas": 9191,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july13.png"
+    },
+    {
+      "date": "07-14",
+      "item": "Chaînes Brisées",
+      "quantite": 6,
+      "bonusTitre": "Expérience du Kolizéum",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % lors des combats du Kolizéum.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july14.png"
+    },
+    {
+      "date": "07-15",
+      "item": "Viande Goûtue",
+      "quantite": 2,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Goûtue récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july15.png"
+    },
+    {
+      "date": "07-16",
+      "item": "Boue Vénérable",
+      "quantite": 2,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans les zones des forêts de Vulkania.",
+      "kamas": 16866,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july16.png"
+    },
+    {
+      "date": "07-17",
+      "item": "Peau de Larve Verte",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone des Prairies d'Astrub.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july17.png"
+    },
+    {
+      "date": "07-18",
+      "item": "Mauvaise Pioche",
+      "quantite": 1,
+      "bonusTitre": "Concassage",
+      "bonus": "Pour chaque rune obtenue en brisant des objets, les concasseurs ont 10 % de chances de créer une seconde rune.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july18.png"
+    },
+    {
+      "date": "07-19",
+      "item": "Peau de Trithon",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon du Palais de Dantinea.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july19.png"
+    },
+    {
+      "date": "07-20",
+      "item": "Huile de Tournesol Sauvage",
+      "quantite": 1,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des céréales récoltées par les Paysans est augmentée de 100 %.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july20.png"
+    },
+    {
+      "date": "07-21",
+      "item": "Fragment de pépite de Sakaï",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Gobelins de Sakaï.",
+      "kamas": 18955,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july21.png"
+    },
+    {
+      "date": "07-22",
+      "item": "Sardine à l'Étouffée",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans les zones du Port de givre et de La Bourgade.",
+      "kamas": 3144,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july22.png"
+    },
+    {
+      "date": "07-23",
+      "item": "Chacha",
+      "quantite": 1,
+      "bonusTitre": "Expérience des familiers",
+      "bonus": "Les gains d'expérience des familiers sont augmentés de 50 %.",
+      "kamas": 747,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july23.png"
+    },
+    {
+      "date": "07-24",
+      "item": "Bois d'Orme",
+      "quantite": 10,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bambou Sacré et d'Orme récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 8993,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july24.png"
+    },
+    {
+      "date": "07-25",
+      "item": "Furoncle de la Mama Bwork",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans la zone de Gisgoul.",
+      "kamas": 17240,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july25.png"
+    },
+    {
+      "date": "07-26",
+      "item": "Pic de Malépik",
+      "quantite": 3,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones de l'Orée enchantée et du Dédale du Dark Vlad.",
+      "kamas": 12116,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july26.png"
+    },
+    {
+      "date": "07-27",
+      "item": "Boulette de Viande",
+      "quantite": 6,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Hachée et de Viande Faisandée récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july27.png"
+    },
+    {
+      "date": "07-28",
+      "item": "Lame brisée de Lichangoro",
+      "quantite": 4,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon du Dojo du Vent.",
+      "kamas": 10599,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july28.png"
+    },
+    {
+      "date": "07-29",
+      "item": "Jus de Cacterre",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon de laCaverne d'El Piko.",
+      "kamas": 9191,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july29.png"
+    },
+    {
+      "date": "07-30",
+      "item": "Cuir de Boostache Prépubère",
+      "quantite": 3,
+      "bonusTitre": "Troollez manège",
+      "bonus": "Les gains d'expérience et les chances d'obtenir du butin sont augmentés de 100 % dans le donjon de la Maison Fantôme. De plus, Leonzi Trool attend les aventuriers à la Foire du Trool. Sa bénédiction permet de trooller à tout va (bonus d'initiative et coups critiques durant 15 combats).",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july30.png"
+    },
+    {
+      "date": "07-31",
+      "item": "Flèche de Crâmbo",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Chassouilleurs.",
+      "kamas": 19153,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/july31.png"
+    },
+    {
+      "date": "08-01",
+      "item": "Sauge",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Sauge récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august1.png"
+    },
+    {
+      "date": "08-02",
+      "item": "Plume de Truchideur",
+      "quantite": 4,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Truches.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august2.png"
+    },
+    {
+      "date": "08-03",
+      "item": "Potion de cité : Bonta",
+      "quantite": 3,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui au sud des portes de Bonta. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Bon comme du bon pain.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august3.png"
+    },
+    {
+      "date": "08-04",
+      "item": "Cendres Matures",
+      "quantite": 4,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le Cratère Minus.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august4.png"
+    },
+    {
+      "date": "08-05",
+      "item": "Poisskaille",
+      "quantite": 10,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Poisskaille récupérées par les Pêcheurs sont augmentées de 200 %.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august5.png"
+    },
+    {
+      "date": "08-06",
+      "item": "Crème à bronzer",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone des Calanques d'Astrub.",
+      "kamas": 329,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august6.png"
+    },
+    {
+      "date": "08-07",
+      "item": "Racine de Tronkoblop",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de l'Antre du Blop Multicolore Royal.",
+      "kamas": 2111,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august7.png"
+    },
+    {
+      "date": "08-08",
+      "item": "Aluminite",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Mineurs ont 15 % de chances d'économiser des ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august8.png"
+    },
+    {
+      "date": "08-09",
+      "item": "Pétale de Tournesol Sauvage",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Plantes des champs.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august9.png"
+    },
+    {
+      "date": "08-10",
+      "item": "Petit Extrait de Mangeoire",
+      "quantite": 5,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Éleveurs ont 25% de chances de créer un second objet.",
+      "kamas": 6355,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august10.png"
+    },
+    {
+      "date": "08-11",
+      "item": "Kapokaza",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone du Mont des Tombeaux.",
+      "kamas": 15436,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august11.png"
+    },
+    {
+      "date": "08-12",
+      "item": "Viande de Brousse",
+      "quantite": 4,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Macérée et de Viande de Brousse récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 12732,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august12.png"
+    },
+    {
+      "date": "08-13",
+      "item": "Flaque Vénérable",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Monstres de Vulkania.",
+      "kamas": 16866,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august13.png"
+    },
+    {
+      "date": "08-14",
+      "item": "Œil de Crocodaille albinos",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Crocodailles de Crocuzko.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august14.png"
+    },
+    {
+      "date": "08-15",
+      "item": "Paupière d'Étoile",
+      "quantite": 6,
+      "bonusTitre": "Anomalies en folie",
+      "bonus": "Les gains d'expérience, les chances d'obtenir du butin et le butin généré par les Percepteurs sont augmentés de 100 % dans toutes les zones influencées par une anomalie temporelle.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august15.png"
+    },
+    {
+      "date": "08-16",
+      "item": "Ginseng",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités deGinseng et de Graines de Pandouille récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 5585,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august16.png"
+    },
+    {
+      "date": "08-17",
+      "item": "Bronze",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Bronze récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august17.png"
+    },
+    {
+      "date": "08-18",
+      "item": "Corne de Typhomet",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Ravageurs.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august18.png"
+    },
+    {
+      "date": "08-19",
+      "item": "Bottes de Satisfaction",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans la ville d'Astrub est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august19.png"
+    },
+    {
+      "date": "08-20",
+      "item": "Viande Avariée",
+      "quantite": 6,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Ladre et de Viande Avariée récupérées par les Chasseurs sont augmentées de 125 %.",
+      "kamas": 3144,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august20.png"
+    },
+    {
+      "date": "08-21",
+      "item": "Terre Stérile",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans les 4 donjons de l'Eliocalypse (Arbre, Blessures, Désert et Sentence).",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august21.png"
+    },
+    {
+      "date": "08-22",
+      "item": "Morue",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Morue et d'Espadon récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 8070,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august22.png"
+    },
+    {
+      "date": "08-23",
+      "item": "Poils de Boulglours",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans les zones du Mont Torrideau et de la Ruche des Gloursons.",
+      "kamas": 19944,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august23.png"
+    },
+    {
+      "date": "08-24",
+      "item": "Pustule de Rat Sio",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon de la Sousouricière du Rat Noir.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august24.png"
+    },
+    {
+      "date": "08-25",
+      "item": "Millet",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de céréales récupérées par les Paysans de tous niveaux sont augmentées de 100 %.",
+      "kamas": 8993,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august25.png"
+    },
+    {
+      "date": "08-26",
+      "item": "Collier d'esclave",
+      "quantite": 1,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans les donjons de niveau 200.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august26.png"
+    },
+    {
+      "date": "08-27",
+      "item": "Requin Marteau-Faucille",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Raie Bleue et de Requin Marteau-Faucille récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 6377,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august27.png"
+    },
+    {
+      "date": "08-28",
+      "item": "Bois de Noyer",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Noyer récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august28fix1.png"
+    },
+    {
+      "date": "08-29",
+      "item": "Fleur de Blopignon",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon du Clos des Blops.",
+      "kamas": 2111,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august29.png"
+    },
+    {
+      "date": "08-30",
+      "item": "Peau de Don Dorgan",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Porcos.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august30.png"
+    },
+    {
+      "date": "08-31",
+      "item": "Rune Ré Eau",
+      "quantite": 4,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Costumages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer un objet.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/august31.png"
+    },
+    {
+      "date": "09-01",
+      "item": "Épine d'Armuguet",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon de la Chambre des maléfices.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september1.png"
+    },
+    {
+      "date": "09-02",
+      "item": "Potion de Mini Soin Supérieure",
+      "quantite": 4,
+      "bonusTitre": "Vitalité débordante",
+      "bonus": "La régénération des Points de Vie est augmentée de 300 % (hors combat), et les soins par consommables (vie et énergie) sont augmentés de 100 %.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september2.png"
+    },
+    {
+      "date": "09-03",
+      "item": "Pétale d'encre",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Yokianzhi d'encre et Yokianzhi de papier.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september3.png"
+    },
+    {
+      "date": "09-04",
+      "item": "Planche Contreplaquée",
+      "quantite": 1,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Bûcherons ont 10 % de chances de créer un second objet.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september4.png"
+    },
+    {
+      "date": "09-05",
+      "item": "Plume du Serpiplume",
+      "quantite": 4,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans la zone et le donjon du Labyrinthe du Minotoror (et son centre).",
+      "kamas": 8927,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september5.png"
+    },
+    {
+      "date": "09-06",
+      "item": "Poil de Renarbo",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Corbacs.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september6.png"
+    },
+    {
+      "date": "09-07",
+      "item": "Sépale de Nerbe",
+      "quantite": 4,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Florifaune obscure.",
+      "kamas": 10027,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september7.png"
+    },
+    {
+      "date": "09-08",
+      "item": "Écume de mer",
+      "quantite": 10,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des ressources est augmentée de 150 % dans les zones des Profondeurs de Sufokia.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september8.png"
+    },
+    {
+      "date": "09-09",
+      "item": "Trident Cassé",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone de la Plaine des Porkass.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september9.png"
+    },
+    {
+      "date": "09-10",
+      "item": "Petit Extrait de Caresseur",
+      "quantite": 5,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des caresseurs est doublé.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september10.png"
+    },
+    {
+      "date": "09-11",
+      "item": "Sueur de dragodinde",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone du Territoire des Dragodindes Sauvages.",
+      "kamas": 3628,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september11.png"
+    },
+    {
+      "date": "09-12",
+      "item": "Flamme Spectrale",
+      "quantite": 6,
+      "bonusTitre": "Bonta et Brâkmar",
+      "bonus": "Les récompenses en points d'expérience des quêtes d'alignement sont augmentées de 100 %. De plus, une quête répétable spéciale est disponible aujourd'hui à l'intérieur des milices de Bonta ou de Brâkmar. Réalisable à partir du niveau 20 par les personnages alignés, elle est indépendante de la quête d'offrande. Nom de la quête : Troubles à Bonta. (Être d'alignement Bontarien) Nom de la quête : Troubles à Brâkmar. (Être d'alignement Brâkmarien)",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september12.png"
+    },
+    {
+      "date": "09-13",
+      "item": "Lin",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Lin récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 2001,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september13.png"
+    },
+    {
+      "date": "09-14",
+      "item": "Sueur Froide de Fantôme",
+      "quantite": 6,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Bordure de Brâkmar.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september14.png"
+    },
+    {
+      "date": "09-15",
+      "item": "Bractée de Drosérâle",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Laboratoire de Nileza.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september15.png"
+    },
+    {
+      "date": "09-16",
+      "item": "Carapace de Ver des Sables",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans les zones de la Gorge des Vents Hurlants et de la Cité Oubliée.",
+      "kamas": 15436,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september16.png"
+    },
+    {
+      "date": "09-17",
+      "item": "Substrat de Buisson",
+      "quantite": 1,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des ressources est augmentée de 150 % dans la zone de la Forêt d'Amakna.",
+      "kamas": 1165,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september17.png"
+    },
+    {
+      "date": "09-18",
+      "item": "Os de Chafer",
+      "quantite": 9,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le Donjon des Squelettes.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september18.png"
+    },
+    {
+      "date": "09-19",
+      "item": "Rhum de Qualité",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience et butin sur les pirates",
+      "bonus": "Les gains d'expérience et les chances d'obtenir du butin sont augmentés de 50 % sur tous les monstres considérés comme des pirates.",
+      "kamas": 4551,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september19.png"
+    },
+    {
+      "date": "09-20",
+      "item": "Mijoté Récréatif",
+      "quantite": 4,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Fraîche et de Viande Maigre récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 21594,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september20.png"
+    },
+    {
+      "date": "09-21",
+      "item": "Épée d'Ha",
+      "quantite": 1,
+      "bonusTitre": "Objets de qualité",
+      "bonus": "La qualité des objets fabriqués dans la ville de Brâkmar est augmentée.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september21.png"
+    },
+    {
+      "date": "09-22",
+      "item": "Sable Fin",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone des Dunes des ossements.",
+      "kamas": 3980,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september22.png"
+    },
+    {
+      "date": "09-23",
+      "item": "Crinière fleurie",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Herboricoles.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september23.png"
+    },
+    {
+      "date": "09-24",
+      "item": "Pépite",
+      "quantite": 3,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans tous les donjons.",
+      "kamas": 1495,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september24.png"
+    },
+    {
+      "date": "09-25",
+      "item": "Crabe Surprise",
+      "quantite": 3,
+      "bonusTitre": "Cadeaux surprises",
+      "bonus": "Des Présents surprenants ont été ajoutés aux butins des monstres des donjons. Lorsqu'ils sont utilisés, ils permettent d'obtenir une bonne ou mauvaise surprise.",
+      "kamas": 945,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september25.png"
+    },
+    {
+      "date": "09-26",
+      "item": "Obsidienne",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Dolomite et d'Obsidienne récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september26.png"
+    },
+    {
+      "date": "09-27",
+      "item": "Tresse du Poolay",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon de la Canopée du Kimbo.",
+      "kamas": 10599,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september27.png"
+    },
+    {
+      "date": "09-28",
+      "item": "Arc Déroutant",
+      "quantite": 1,
+      "bonusTitre": "Coffre au trésor",
+      "bonus": "Une quête de chasse au trésor de Sad est disponible aujourd'hui auprès de Dhain, à la Malle aux trésors. Nom de la quête : Chasse au trésor de Sad.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september28.png"
+    },
+    {
+      "date": "09-29",
+      "item": "Mât de Fantômat",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les fantômes de l'Équipage du Grolandais.",
+      "kamas": 12732,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september29.png"
+    },
+    {
+      "date": "09-30",
+      "item": "Dent en Or de Craqueleur",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon des Pitons rocheux des Craqueleurs.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/september30.png"
+    },
+    {
+      "date": "10-01",
+      "item": "Aquarakne de Crânonier",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les soldats de la Fratrie des Oubliés : les Calcinés et les Submergés.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october1.png"
+    },
+    {
+      "date": "10-02",
+      "item": "Bois de Pin",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Pin et de Bois d'Oliviolet récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october2.png"
+    },
+    {
+      "date": "10-03",
+      "item": "Arc Holic",
+      "quantite": 1,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près de la fontaine du village d'Amakna. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : La fête aux tire-fesses.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october3.png"
+    },
+    {
+      "date": "10-04",
+      "item": "Pom de pin",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone de la Futaie enneigée.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october4.png"
+    },
+    {
+      "date": "10-05",
+      "item": "Kralamoure",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités de Poisson Pané, de Sardine Brillante et de Kralamoure récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october5.png"
+    },
+    {
+      "date": "10-06",
+      "item": "Étamine de Floribonde",
+      "quantite": 4,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 100 % dans le donjon du Laboratoire du Tynril.",
+      "kamas": 10445,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october6.png"
+    },
+    {
+      "date": "10-07",
+      "item": "Pic de Ravageur",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone du Cauchemar des Ravageurs.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october7.png"
+    },
+    {
+      "date": "10-08",
+      "item": "Viande Saignante",
+      "quantite": 5,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de viande récupérées par les Chasseurs de tous niveaux sont augmentées de 100 %.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october8.png"
+    },
+    {
+      "date": "10-09",
+      "item": "Poils de Pétartifoux",
+      "quantite": 4,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les créatures de type Firefoux.",
+      "kamas": 10599,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october9.png"
+    },
+    {
+      "date": "10-10",
+      "item": "Dent de dragodinde",
+      "quantite": 6,
+      "bonusTitre": "Montures sages",
+      "bonus": "Toutes les montures qui naissent ce jour auront la capacité Sage.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october10.png"
+    },
+    {
+      "date": "10-11",
+      "item": "Kolérat Mort",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone de la Désolation de Sidimote.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october11.png"
+    },
+    {
+      "date": "10-12",
+      "item": "Parmentier à l'Oignon",
+      "quantite": 4,
+      "bonusTitre": "Génération montante",
+      "bonus": "Lors des accouplements de montures, un bonus de 20% est ajouté aux chances d'obtenir la génération cible.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/takeza.png"
+    },
+    {
+      "date": "10-13",
+      "item": "Concombre",
+      "quantite": 4,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Kwapa.",
+      "kamas": 9191,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october13.png"
+    },
+    {
+      "date": "10-14",
+      "item": "Masque de la Vengeance",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de la Pyramide d'Ombre.",
+      "kamas": 4705,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october14.png"
+    },
+    {
+      "date": "10-15",
+      "item": "Chanvre",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Chanvre récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october15.png"
+    },
+    {
+      "date": "10-16",
+      "item": "Corne du Boufcoul",
+      "quantite": 5,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon de la Caverne du Koulosse.",
+      "kamas": 5563,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october16.png"
+    },
+    {
+      "date": "10-17",
+      "item": "Bois de Noisetier",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Noisetier et deBois de Merisier récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 4859,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october17.png"
+    },
+    {
+      "date": "10-18",
+      "item": "Plastron de Tambouraï",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de l'Armée de brume.",
+      "kamas": 13721,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october18.png"
+    },
+    {
+      "date": "10-19",
+      "item": "Perche",
+      "quantite": 40,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des poissons de tous types est augmentée de 100 %.",
+      "kamas": 4200,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october19.png"
+    },
+    {
+      "date": "10-20",
+      "item": "Pétale de Papier",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans les donjons de la Mémoire d'Orukam et du Souvenir d'Imagiro.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october20.png"
+    },
+    {
+      "date": "10-21",
+      "item": "Poêlée Paysanne",
+      "quantite": 4,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Les quantités d'objets fabriqués par les Chasseurs sont augmentées de 25 %.",
+      "kamas": 8993,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october21.png"
+    },
+    {
+      "date": "10-22",
+      "item": "Silicate",
+      "quantite": 30,
+      "bonusTitre": "Expérience des métiers",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % pour les Bûcherons, les Mineurs et les Alchimistes.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october22.png"
+    },
+    {
+      "date": "10-23",
+      "item": "Symbole des Obscuranti",
+      "quantite": 1,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Dimension Obscure.",
+      "kamas": 20142,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october23.png"
+    },
+    {
+      "date": "10-24",
+      "item": "Fer",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Fer récupérées par les Mineurs sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october24.png"
+    },
+    {
+      "date": "10-25",
+      "item": "Poils de Smilomouth",
+      "quantite": 40,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Faune des Pins Perdus.",
+      "kamas": 8400,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october25.png"
+    },
+    {
+      "date": "10-26",
+      "item": "Dent de Wabbit",
+      "quantite": 9,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Wabbits, Wabbits mutants et Gawde du Wa.",
+      "kamas": 1451,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october26.png"
+    },
+    {
+      "date": "10-27",
+      "item": "Bâton Feuillu",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Sculpteurs économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october27.png"
+    },
+    {
+      "date": "10-28",
+      "item": "Mandragore",
+      "quantite": 40,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Mandragore et de Belladone récupérées par les Alchimistes sont augmentées de 125 %.",
+      "kamas": 5585,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october28.png"
+    },
+    {
+      "date": "10-29",
+      "item": "Malléole de Yomi Givrefoux",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone de la Crevasse Perge.",
+      "kamas": 16140,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october29.png"
+    },
+    {
+      "date": "10-30",
+      "item": "Akaslip d'Akakwa",
+      "quantite": 4,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans les donjons de niveau 120 à 150.",
+      "kamas": 9191,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october30.png"
+    },
+    {
+      "date": "10-31",
+      "item": "Poils de Barbe du Bwork Mage",
+      "quantite": 6,
+      "bonusTitre": "Cadeaux surprises",
+      "bonus": "Des Surprises de Trikortritt ont été ajoutées aux butins des monstres. Lorsqu'elles sont utilisées, elles permettent d'obtenir des Bonbons d'Halouine ou bien de se retrouver transformé en Petite Chauffe-Soutrille.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/october31.png"
+    },
+    {
+      "date": "11-01",
+      "item": "Slip de Troollaraj",
+      "quantite": 1,
+      "bonusTitre": "Points d'expérience et butin en slip",
+      "bonus": "Les gains d'expérience lors des combats contre les monstres et les chances d'obtenir du butin sont augmentés de 50 % pour tous les aventuriers qui sont équipés d'un slip.",
+      "kamas": 7762,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november1.png"
+    },
+    {
+      "date": "11-02",
+      "item": "Groin de Porkzebuth",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans les zones du Port des Ravageurs et de Pandamonium.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november2.png"
+    },
+    {
+      "date": "11-03",
+      "item": "Cape Abilité",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Tailleurs ont 15 % de chances d'économiser des ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november3.png"
+    },
+    {
+      "date": "11-04",
+      "item": "Fibre criminelle",
+      "quantite": 1,
+      "bonusTitre": "Avis de recherche",
+      "bonus": "La vitesse d'apparition des monstres d'Avis de recherche est augmentée de 200 %. .",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november4.png"
+    },
+    {
+      "date": "11-05",
+      "item": "Dent de Vatenbière",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de la Brasserie du roi Dazak.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november5.png"
+    },
+    {
+      "date": "11-06",
+      "item": "Bois de Châtaignier",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois de Châtaignier récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november6.png"
+    },
+    {
+      "date": "11-07",
+      "item": "Pic de Prespic",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les Animaux de la forêt.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november7.png"
+    },
+    {
+      "date": "11-08",
+      "item": "Patte de Li-Fo",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Serviteurs de l'Indicible.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november8.png"
+    },
+    {
+      "date": "11-09",
+      "item": "Foulard du Sparo",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les Pirates naufragés et les Pirates de l'Arche d'Otomaï.",
+      "kamas": 2594,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november9.png"
+    },
+    {
+      "date": "11-10",
+      "item": "Goujon",
+      "quantite": 40,
+      "bonusTitre": "Montures précoces",
+      "bonus": "Toutes les montures qui naissent ce jour auront la capacité Précoce.",
+      "kamas": 197,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november10.png"
+    },
+    {
+      "date": "11-11",
+      "item": "Écaille de Crocodaille",
+      "quantite": 2,
+      "bonusTitre": "Bénédiction de Miss Triste",
+      "bonus": "Miss Triste attend les aventuriers qui veulent se refaire une laideur près de la fontaine du village d'Amakna. Sa bénédiction transforme temporairement en Crocodaille (effet qui disparaît quand un combat est lancé) et en Souffre-Douleur (bonus de 50 Puissance et 10 dommages fixes durant 15 combats).",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november11.png"
+    },
+    {
+      "date": "11-12",
+      "item": "Lanterne de Tourthon",
+      "quantite": 2,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Trithons.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november12.png"
+    },
+    {
+      "date": "11-13",
+      "item": "Graine de Scorbute",
+      "quantite": 6,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon du Laboratoire de Brumen Tinctorias.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november13.png"
+    },
+    {
+      "date": "11-14",
+      "item": "Rune Vi",
+      "quantite": 4,
+      "bonusTitre": "Forgemagie améliorée",
+      "bonus": "Les Joaillomages ont 15 % de chances de ne pas consumer de rune lorsqu'ils tentent d'améliorer un objet.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november14.png"
+    },
+    {
+      "date": "11-15",
+      "item": "Leurnettes",
+      "quantite": 1,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près de la vieille chapelle d'Astrub. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Vols à la charrette.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november15.png"
+    },
+    {
+      "date": "11-16",
+      "item": "Peau de Ramane d'Égoutant",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les Rats Strubiens et les Rats Maknéens.",
+      "kamas": 2111,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november16.png"
+    },
+    {
+      "date": "11-17",
+      "item": "Viande Séchée",
+      "quantite": 5,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande séchée récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 7146,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november17.png"
+    },
+    {
+      "date": "11-18",
+      "item": "Patte de la Gardienne des Égouts",
+      "quantite": 1,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones des Canaux Méphitiques et des Entrailles de Brâkmar.",
+      "kamas": 13545,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november18.png"
+    },
+    {
+      "date": "11-19",
+      "item": "Substrat de Bocage",
+      "quantite": 1,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Bûcherons économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 3562,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november19.png"
+    },
+    {
+      "date": "11-20",
+      "item": "Sang coagulé",
+      "quantite": 2,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 100 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du buton sont augmentés de 25 % dans les zones (hors donjons) des Cavaliers de l'Eliocalypse.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november20.png"
+    },
+    {
+      "date": "11-21",
+      "item": "Ailes de Moskito",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Vermines des champs.",
+      "kamas": 395,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november21.png"
+    },
+    {
+      "date": "11-22",
+      "item": "Griffe de Félygiène",
+      "quantite": 3,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Kanigs des Dents de Pierre.",
+      "kamas": 13391,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november22.png"
+    },
+    {
+      "date": "11-23",
+      "item": "Fragment d'Ectorche",
+      "quantite": 2,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Brûlâmes.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november23.png"
+    },
+    {
+      "date": "11-24",
+      "item": "Avoine",
+      "quantite": 50,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités d'Avoine récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november24.png"
+    },
+    {
+      "date": "11-25",
+      "item": "Laine de Boufmouth légendaire",
+      "quantite": 5,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone des Champs de glace.",
+      "kamas": 7388,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november25.png"
+    },
+    {
+      "date": "11-26",
+      "item": "Poils de Barbe de Dragodinde",
+      "quantite": 1,
+      "bonusTitre": "Double butin",
+      "bonus": "Les aventuriers ont 20 % de chances de générer un second butin sur tous les monstres affrontés dans les donjons.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/vanderivz.png"
+    },
+    {
+      "date": "11-27",
+      "item": "Bois d'If",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois d'If récupérées par les Bûcherons sont augmentées de 125 %.",
+      "kamas": 6289,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november27.png"
+    },
+    {
+      "date": "11-28",
+      "item": "Résidu de Solfataré",
+      "quantite": 3,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Sulfurieux.",
+      "kamas": 2836,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november28.png"
+    },
+    {
+      "date": "11-29",
+      "item": "Kobalte",
+      "quantite": 30,
+      "bonusTitre": "Minerai abondant",
+      "bonus": "Les quantités de Kobalte récupérées par les mineurs sont augmentées de 125 %.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november29.png"
+    },
+    {
+      "date": "11-30",
+      "item": "Laine de Yokaï Givrefoux",
+      "quantite": 3,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 125 % sur les créatures de type Givrefoux.",
+      "kamas": 16140,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/november30.png"
+    },
+    {
+      "date": "12-01",
+      "item": "Œil de Gouligane",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Goules.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december1.png"
+    },
+    {
+      "date": "12-02",
+      "item": "Bouclier du tournesol sauvage",
+      "quantite": 1,
+      "bonusTitre": "Expérience des métiers",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % pour les Bricoleurs, les Forgerons, les Sculpteurs et les Façonneurs.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december2.png"
+    },
+    {
+      "date": "12-03",
+      "item": "Peau de Mansobèse",
+      "quantite": 4,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans la zone du Lac Gelé.",
+      "kamas": 8642,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december3.png"
+    },
+    {
+      "date": "12-04",
+      "item": "Bois d'Oliviolet",
+      "quantite": 40,
+      "bonusTitre": "Bois abondant",
+      "bonus": "Les quantités de Bois récupérées par les Bûcherons de tous niveaux sont augmentées de 100 %.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december4.png"
+    },
+    {
+      "date": "12-05",
+      "item": "Casque de Martoa",
+      "quantite": 6,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 75 % dans la zone de la Carrière d'Astrub.",
+      "kamas": 593,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december5.png"
+    },
+    {
+      "date": "12-06",
+      "item": "Charbon",
+      "quantite": 6,
+      "bonusTitre": "Kolizétons",
+      "bonus": "La quantité de jetons gagnée en Kolizéum est augmentée de 100 %.",
+      "kamas": 2594,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december6.png"
+    },
+    {
+      "date": "12-07",
+      "item": "Étoffe de Dok Alako",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les Koalaks et les Koalaks sauvages.",
+      "kamas": 3474,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december7.png"
+    },
+    {
+      "date": "12-08",
+      "item": "Perce-Neige",
+      "quantite": 10,
+      "bonusTitre": "Cueillette abondante",
+      "bonus": "Les quantités de Perce-Neige récupérées par les Alchimistes sont augmentées de 200 %.",
+      "kamas": 10995,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december8.png"
+    },
+    {
+      "date": "12-09",
+      "item": "Poil de Rat Bontarien",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 100 % dans le donjon du Garde-manger du Rat Blanc.",
+      "kamas": 6662,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december9.png"
+    },
+    {
+      "date": "12-10",
+      "item": "Queue de dragodinde sauvage",
+      "quantite": 6,
+      "bonusTitre": "Efficacité des enclos",
+      "bonus": "Dans les enclos, l'effet des dragofesses est doublé.",
+      "kamas": 2462,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december10.png"
+    },
+    {
+      "date": "12-11",
+      "item": "Pacmabottes",
+      "quantite": 2,
+      "bonusTitre": "Économie d'ingrédients",
+      "bonus": "Les Cordonniers économisent 15 % de leurs ingrédients lorsqu'ils fabriquent des objets.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december11.png"
+    },
+    {
+      "date": "12-12",
+      "item": "Potion de cité : Brâkmar",
+      "quantite": 3,
+      "bonusTitre": "Quête répétable",
+      "bonus": "Une quête répétable spéciale est disponible aujourd'hui près des portes de Brâkmar. Réalisable à partir du niveau 20, elle est indépendante de la quête d'offrande. Nom de la quête : Contrôles anti-baston.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december12.png"
+    },
+    {
+      "date": "12-13",
+      "item": "Dolomite",
+      "quantite": 30,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des minerais de tous types est augmentée de 100 %.",
+      "kamas": 8993,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december13.png"
+    },
+    {
+      "date": "12-14",
+      "item": "Paupière Dorée",
+      "quantite": 1,
+      "bonusTitre": "Challenges augmentés",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans le donjon de la Chambre de Tal Kasha.",
+      "kamas": 21990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december14.png"
+    },
+    {
+      "date": "12-15",
+      "item": "Cuir de Porkass",
+      "quantite": 6,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 75 % dans la zone de la plaine des Porkass.",
+      "kamas": 1517,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december15.png"
+    },
+    {
+      "date": "12-16",
+      "item": "Emballage de Nowel Écarlate",
+      "quantite": 2,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres de Nowel.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december16.png"
+    },
+    {
+      "date": "12-17",
+      "item": "Anguille",
+      "quantite": 40,
+      "bonusTitre": "Pêche abondante",
+      "bonus": "Les quantités d'Anguille et de Dorade Grise récupérées par les Pêcheurs sont augmentées de 125 %.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december17.png"
+    },
+    {
+      "date": "12-18",
+      "item": "Chance d'Ecaflip",
+      "quantite": 1,
+      "bonusTitre": "Challenges des donjons",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 150 % dans tous les donjons.",
+      "kamas": 769,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december18.png"
+    },
+    {
+      "date": "12-19",
+      "item": "Flocon de Neige",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les monstres de Nowel.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december19.png"
+    },
+    {
+      "date": "12-20",
+      "item": "Ebonite",
+      "quantite": 1,
+      "bonusTitre": "Fabrication intensive",
+      "bonus": "Pour chaque objet fabriqué, les Mineurs ont 10 % de chances de créer un second objet.",
+      "kamas": 1187,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december20.png"
+    },
+    {
+      "date": "12-21",
+      "item": "Canine Vampiresque",
+      "quantite": 6,
+      "bonusTitre": "Challenge supplémentaire",
+      "bonus": "Un challenge supplémentaire est généré contre les monstres présents dans les zones du Cimetière d'Amakna et des Cryptes du Cimetière.",
+      "kamas": 989,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december21.png"
+    },
+    {
+      "date": "12-22",
+      "item": "Poisson Pané",
+      "quantite": 40,
+      "bonusTitre": "Apparition des ressources",
+      "bonus": "La vitesse d'apparition des ressources est augmentée de 150 % dans la zone du Port de Madrestam.",
+      "kamas": 879,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december22.png"
+    },
+    {
+      "date": "12-23",
+      "item": "Viande Tendre",
+      "quantite": 6,
+      "bonusTitre": "Gibier abondant",
+      "bonus": "Les quantités de Viande Tendre récupérées par les Chasseurs sont augmentées de 125%.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december23.png"
+    },
+    {
+      "date": "12-24",
+      "item": "Médaille en Chocolat",
+      "quantite": 1,
+      "bonusTitre": "Coffre au trésor",
+      "bonus": "Une quête de chasse au trésor de Milivar est disponible aujourd'hui auprès de Dhain, à la Malle aux trésors. Nom de la quête : Chasse au trésor de Milivar.",
+      "kamas": 1737,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december24.png"
+    },
+    {
+      "date": "12-25",
+      "item": "Joli cadeau de Nowel",
+      "quantite": 4,
+      "bonusTitre": "Cadeaux surprises",
+      "bonus": "Des Cadeaux de Nowel ont été ajoutés aux butins des monstres. Lorsqu'ils sont utilisés, ils permettent d'obtenir des ressources ou d'autres objets aléatoires.",
+      "kamas": 5981,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december25.png"
+    },
+    {
+      "date": "12-26",
+      "item": "Fronde de Boufronde",
+      "quantite": 2,
+      "bonusTitre": "Points d'expérience",
+      "bonus": "Les gains d'expérience sont augmentés de 50 % sur les créatures de type Marteaux-Aigris.",
+      "kamas": 9873,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december26.png"
+    },
+    {
+      "date": "12-27",
+      "item": "Kaokurimono",
+      "quantite": 3,
+      "bonusTitre": "Percepteurs avides",
+      "bonus": "Le butin généré par les Percepteurs est augmenté de 200 % dans les donjons de niveau 160 à 190.",
+      "kamas": 19153,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december27.png"
+    },
+    {
+      "date": "12-28",
+      "item": "Riz",
+      "quantite": 40,
+      "bonusTitre": "Récolte abondante",
+      "bonus": "Les quantités de Seigle et de Riz récupérées par les Paysans sont augmentées de 125 %.",
+      "kamas": 15436,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december28.png"
+    },
+    {
+      "date": "12-29",
+      "item": "Bidule inutile",
+      "quantite": 1,
+      "bonusTitre": "Butin",
+      "bonus": "Les chances d'obtenir du butin sont augmentées de 50 % sur les créatures de type Automates des Brigandins.",
+      "kamas": 2990,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december29.png"
+    },
+    {
+      "date": "12-30",
+      "item": "Bidule Inutile",
+      "quantite": 1,
+      "bonusTitre": null,
+      "bonus": "Drop : +50% sur les Automates des Brigandins.",
+      "kamas": 1561,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december30.png"
+    },
+    {
+      "date": "12-31",
+      "item": "Viande Ladre",
+      "quantite": 6,
+      "bonusTitre": "Anomalies temporelles",
+      "bonus": "Les bonus apportés par les challenges réussis sont augmentés de 75 % dans toutes les zones influencées par une anomalie temporelle. De plus, les gains d'expérience et les chances d'obtenir du butin sont augmentés de 25 % dans la zone de la Forêt des Masques.",
+      "kamas": 2396,
+      "imageUrl": "https://www.dimtopia.com/widget-almanax/offering/december31.png"
+    }
+  ]
+}
