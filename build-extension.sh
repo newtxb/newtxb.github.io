@@ -12,16 +12,18 @@ cd "$(dirname "$0")"
 
 OUT="extension.zip"
 MANIFEST="manifest.json"
-FILES="
+WHITELIST="
 manifest.json
 index.html
 assets/main.css
 assets/main.js
 assets/google-suggest.js
+assets/almanax-data.json
 assets/favicon.png
 assets/icon-16.png
 assets/icon-48.png
 assets/icon-128.png
+assets/img/almanax.svg
 assets/img/banks/american-express.png
 assets/img/banks/boursobank.png
 assets/img/banks/credit-agricole.png
@@ -34,7 +36,38 @@ assets/img/banks/paypal.png
 assets/img/banks/revolut.png
 "
 
-for f in $FILES; do
+BLACKLIST="
+.gitignore
+README.md
+build-extension.sh
+github.json
+service-worker.js
+assets/google-suggest.ext.js
+"
+
+in_list() {
+  needle="$1"
+  list="$2"
+  printf '%s\n' "$list" | grep -Fqx -- "$needle"
+}
+
+UNCATEGORIZED=""
+for f in $(git ls-files); do
+  if in_list "$f" "$WHITELIST" || in_list "$f" "$BLACKLIST"; then
+    continue
+  fi
+  UNCATEGORIZED="$UNCATEGORIZED\n$f"
+done
+
+if [ -n "$UNCATEGORIZED" ]; then
+  echo "Error: uncategorized tracked files found." >&2
+  echo "Each tracked file must be listed in WHITELIST or BLACKLIST in build-extension.sh:" >&2
+  # shellcheck disable=SC2059
+  printf "$UNCATEGORIZED\n" >&2
+  exit 1
+fi
+
+for f in $WHITELIST; do
   if [ ! -f "$f" ]; then
     echo "Missing file: $f" >&2
     exit 1
@@ -55,14 +88,14 @@ echo "Version $OLD_VERSION -> $NEW_VERSION"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
-for f in $FILES; do
+for f in $WHITELIST; do
   mkdir -p "$STAGE/$(dirname "$f")"
   cp "$f" "$STAGE/$f"
 done
 cp assets/google-suggest.ext.js "$STAGE/assets/google-suggest.js"
 
 rm -f "$OUT"
-(cd "$STAGE" && zip -qr "$OLDPWD/$OUT" $FILES)
+(cd "$STAGE" && zip -qr "$OLDPWD/$OUT" $WHITELIST)
 
 echo "Wrote $OUT v$NEW_VERSION ($(du -h "$OUT" | cut -f1)) to Downloads"
 mv "$OUT" "$HOME/Downloads"
