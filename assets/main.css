@@ -1960,6 +1960,33 @@ code {
   gap: 7px;
 }
 
+.sonos-header-links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sonos-header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a6a81;
+  opacity: 0.25;
+  transition: opacity .15s ease-in-out;
+}
+
+.sonos-header-link:hover,
+.sonos-header-link:focus-visible {
+  opacity: 1;
+}
+
+.sonos-header-link-boxed {
+  padding: 1px;
+  border-radius: 5px;
+  background: rgb(0 0 0 / 70%);
+}
+
 .sonos-loader {
   display: none;
   width: 11px;
