@@ -536,10 +536,7 @@ const UnsplashBg = {
     }
   },
 
-  // `applyThemeColor` is false for a freshly fetched image: recolouring the background on
-  // the very load that also reveals the photo reads as two jumps (default -> accent ->
-  // photo). The colour is still stored, so the next visit picks it up from the cache.
-  async preloadAndDisplay(imageUrl, applyThemeColor = true) {
+  async preloadAndDisplay(imageUrl) {
     return new Promise((resolve) => {
       const bgEl = document.querySelector('.background');
       if (bgEl) {
@@ -552,10 +549,7 @@ const UnsplashBg = {
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const themeColor = averageImageColor(img);
-        if (themeColor) {
-          if (applyThemeColor) ThemeColor.set(themeColor);
-          this.setStoredThemeColor(themeColor);
-        }
+        if (themeColor) this.setStoredThemeColor(themeColor);
 
         if (bgEl) {
           bgEl.style.backgroundImage = `url('${imageUrl}')`;
@@ -573,6 +567,11 @@ const UnsplashBg = {
             });
           }, 100);
         }
+
+        // Recolour the body gradient and html background a second after the image
+        // changes, so the theme shift reads as its own gentle step rather than
+        // jumping at the same time as the photo reveal.
+        if (themeColor) setTimeout(() => ThemeColor.set(themeColor), 1000);
 
         resolve({ loaded: true, themeColor });
       };
@@ -667,7 +666,7 @@ const UnsplashBg = {
     const imageUrl = image.urls.full;
     const info = this.buildImageInfo(image, imageUrl, image._searchKeyword || '');
     this.notifySwCacheImage(imageUrl);
-    const { loaded, themeColor } = await this.preloadAndDisplay(imageUrl, false);
+    const { loaded, themeColor } = await this.preloadAndDisplay(imageUrl);
 
     // Cache it
     localStorage.setItem(cacheKey, JSON.stringify({
