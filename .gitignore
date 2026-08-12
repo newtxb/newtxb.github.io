@@ -1,3 +1,4 @@
 extension.zip
 .DS_Store
 /tmp-*
+.codegraph
