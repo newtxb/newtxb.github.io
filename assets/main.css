@@ -3292,15 +3292,29 @@ code {
   gap: 3px;
 }
 
-.almanax-today-pill {
+.almanax-day-pill {
   font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 700;
-  color: #2f6b45;
-  background: rgba(76, 155, 108, 0.16);
   border-radius: 999px;
   padding: 1px 8px;
+  cursor: pointer;
+}
+
+.almanax-day-pill.is-today {
+  color: #2f6b45;
+  background: rgba(76, 155, 108, 0.16);
+}
+
+.almanax-day-pill.is-past {
+  color: #8a6d1a;
+  background: rgba(214, 188, 46, 0.18);
+}
+
+.almanax-day-pill.is-future {
+  color: #5a6a81;
+  background: rgba(103, 122, 145, 0.14);
 }
 
 .almanax-date-text {
@@ -3492,6 +3506,43 @@ code {
 }
 
 .almanax-complete-check svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.almanax-resources-btn {
+  margin-top: 7px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(103, 122, 145, 0.3);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #2c3b52;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 9px 10px;
+  cursor: pointer;
+  transition: background-color .12s ease-in-out, border-color .12s ease-in-out;
+}
+
+.almanax-resources-btn:hover:not(:disabled) {
+  background: rgba(236, 244, 253, 0.95);
+}
+
+.almanax-resources-btn:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.almanax-resources-check {
+  display: inline-flex;
+}
+
+.almanax-resources-check svg {
   width: 15px;
   height: 15px;
   display: block;

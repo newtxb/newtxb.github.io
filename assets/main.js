@@ -4918,11 +4918,23 @@ const UnsplashBg = {
   const prevBtn = document.querySelector('.almanax-prev');
   const nextBtn = document.querySelector('.almanax-next');
   const completeBtn = document.querySelector('.almanax-complete-btn');
-  if (!container || !contentEl || !dateEl || !prevBtn || !nextBtn || !completeBtn) return;
+  const resourcesBtn = document.querySelector('.almanax-resources-btn');
+  if (!container || !contentEl || !dateEl || !prevBtn || !nextBtn || !completeBtn || !resourcesBtn) return;
+
+  // Almanax is an advanced feature: hide the trigger until unlocked, same as
+  // Sonos, Hue and Bankin.
+  const getToken = () => window.homeSettings?.get?.().apiBearerToken || '';
+  const updateTriggerVisibility = () => {
+    container.style.display = getToken() ? '' : 'none';
+  };
+  updateTriggerVisibility();
+  document.addEventListener('settings:apiBearerTokenChanged', updateTriggerVisibility);
 
   const DATA_URL = 'assets/almanax-data.json';
   const STORAGE_KEY = 'almanax-completed-days-v1';
   const SYNC_KEY = 'almanaxCompletedDaysV1';
+  const STORAGE_KEY_RESOURCES = 'almanax-resources-until-v1';
+  const SYNC_KEY_RESOURCES = 'almanaxResourcesUntilV1';
   const isSyncAvailable = IS_EXTENSION
     && typeof chrome !== 'undefined'
     && !!chrome.storage
@@ -4979,6 +4991,49 @@ const UnsplashBg = {
     chrome.storage.sync.set({ [SYNC_KEY]: normalizeCompletionKeys(keys) }, () => resolve());
   });
 
+  const normalizeResourceKey = value =>
+    (typeof value === 'string' && /^\d{2}-\d{2}$/.test(value) ? value : null);
+
+  const readLocalResources = () => {
+    try {
+      const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY_RESOURCES));
+      if (parsed && typeof parsed === 'object') return normalizeResourceKey(parsed.until);
+    } catch (e) {
+      // Ignore malformed local cache.
+    }
+    return null;
+  };
+
+  const writeLocalResources = (value) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY_RESOURCES, JSON.stringify({ until: normalizeResourceKey(value) }));
+    } catch (e) {
+      // Ignore storage failures.
+    }
+  };
+
+  const readSyncResources = () => new Promise((resolve) => {
+    if (!isSyncAvailable) {
+      resolve(null);
+      return;
+    }
+    chrome.storage.sync.get([SYNC_KEY_RESOURCES], (result) => {
+      if (chrome.runtime?.lastError) {
+        resolve(null);
+        return;
+      }
+      resolve(normalizeResourceKey(result?.[SYNC_KEY_RESOURCES]));
+    });
+  });
+
+  const writeSyncResources = (value) => new Promise((resolve) => {
+    if (!isSyncAvailable) {
+      resolve();
+      return;
+    }
+    chrome.storage.sync.set({ [SYNC_KEY_RESOURCES]: normalizeResourceKey(value) }, () => resolve());
+  });
+
   const copyText = async (text) => {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);
@@ -5007,11 +5062,21 @@ const UnsplashBg = {
     });
   };
 
+  const formatShortDate = (date) => {
+    const [month, day] = date.split('-').map(value => Number.parseInt(value, 10));
+    const dateObj = new Date(currentYear, month - 1, day);
+    return dateObj.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+    });
+  };
+
   const dayKey = date => `${currentYear}-${date}`;
 
   let entries = [];
   let currentIndex = 0;
   let completed = new Set();
+  let boughtUntil = null;
   let copyHintResetTimer = null;
 
   const setEmpty = (message) => {
@@ -5027,6 +5092,7 @@ const UnsplashBg = {
       dateEl.textContent = 'Almanax indisponible';
       setEmpty('Aucune donnée Almanax disponible.');
       completeBtn.style.display = 'none';
+      resourcesBtn.style.display = 'none';
       prevBtn.disabled = true;
       nextBtn.disabled = true;
       return;
@@ -5040,12 +5106,26 @@ const UnsplashBg = {
     const isToday = entry.date === todayDate;
 
     dateEl.textContent = '';
+    const pill = document.createElement('span');
+    pill.className = 'almanax-day-pill';
+    pill.title = "Clique pour revenir à aujourd'hui";
+    pill.addEventListener('click', () => {
+      const todayIndex = entries.findIndex(item => item.date === todayDate);
+      if (todayIndex < 0) return;
+      currentIndex = todayIndex;
+      render();
+    });
     if (isToday) {
-      const pill = document.createElement('span');
-      pill.className = 'almanax-today-pill';
+      pill.classList.add('is-today');
       pill.textContent = "Aujourd'hui";
-      dateEl.appendChild(pill);
+    } else if (entry.date < todayDate) {
+      pill.classList.add('is-past');
+      pill.textContent = 'Passée';
+    } else {
+      pill.classList.add('is-future');
+      pill.textContent = 'Bientôt';
     }
+    dateEl.appendChild(pill);
     const dateText = document.createElement('span');
     dateText.className = 'almanax-date-text';
     dateText.textContent = capitalize(formatDate(entry.date));
@@ -5161,12 +5241,42 @@ const UnsplashBg = {
       ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>'
       : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>';
     completeBtn.append(checkIcon, document.createTextNode(completedForDate ? 'Fait pour cette date' : 'Marquer comme fait'));
+
+    // Resources tracking is relevant from today onwards, since the game lets
+    // you buy the required offerings several days ahead.
+    const canTrackResources = entry.date >= todayDate;
+    if (canTrackResources) {
+      resourcesBtn.style.display = '';
+      const ticked = !!boughtUntil && entry.date <= boughtUntil;
+      const isBoughtDate = boughtUntil === entry.date;
+      resourcesBtn.classList.toggle('is-ticked', ticked);
+      // Ticked days before the bought date are locked; only the bought day
+      // itself can be clicked (to reset), and unticked days can be set.
+      resourcesBtn.disabled = ticked && !isBoughtDate;
+      resourcesBtn.textContent = '';
+      const resourcesCheck = document.createElement('span');
+      resourcesCheck.className = 'almanax-resources-check';
+      resourcesCheck.innerHTML = ticked
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>';
+      const resourcesLabel = ticked && !isBoughtDate
+        ? `Ressources achetées jusqu'au ${formatShortDate(boughtUntil)}`
+        : "Ressources achetées jusqu'à ce jour";
+      resourcesBtn.append(resourcesCheck, document.createTextNode(resourcesLabel));
+    } else {
+      resourcesBtn.style.display = 'none';
+    }
   };
 
   const saveCompleted = async () => {
     const keys = [...completed];
     writeLocalCompletion(keys);
     await writeSyncCompletion(keys);
+  };
+
+  const saveResources = async () => {
+    writeLocalResources(boughtUntil);
+    await writeSyncResources(boughtUntil);
   };
 
   const loadData = async () => {
@@ -5207,15 +5317,34 @@ const UnsplashBg = {
     }
   });
 
+  resourcesBtn.addEventListener('click', async () => {
+    if (!entries.length) return;
+    const entry = entries[currentIndex];
+    if (entry.date < todayDate) return;
+    // Clicking the bought day resets the tracker; any other enabled day sets it.
+    boughtUntil = boughtUntil === entry.date ? null : entry.date;
+    render();
+    try {
+      await saveResources();
+    } catch (e) {
+      console.warn('Failed to save Almanax resources', e);
+    }
+  });
+
   try {
-    const [localDone, syncDone] = await Promise.all([
+    const [localDone, syncDone, localRes, syncRes] = await Promise.all([
       Promise.resolve(readLocalCompletion()),
       readSyncCompletion(),
+      Promise.resolve(readLocalResources()),
+      readSyncResources(),
     ]);
     completed = new Set(normalizeCompletionKeys([...localDone, ...syncDone]));
+    boughtUntil = syncRes || localRes;
     await saveCompleted();
+    await saveResources();
   } catch (e) {
     completed = new Set(normalizeCompletionKeys(readLocalCompletion()));
+    boughtUntil = readLocalResources();
   }
 
   try {
