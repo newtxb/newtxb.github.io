@@ -102,12 +102,27 @@ html {
 
 .top-left-triggers {
   position: fixed;
-  top: 16px;
-  left: 18px;
+  top: 0;
+  left: 0;
+  padding: 16px 110px 80px 18px;
   z-index: 22;
   display: flex;
   align-items: flex-start;
   gap: 4px;
+  border-radius: 0 0 120px 0;
+}
+
+.top-left-triggers:not(:hover) .button-trigger {
+  opacity: 0.1;
+  transform: scale(0.95);
+}
+
+.top-left-triggers:hover .button-trigger {
+  opacity: 0.5;
+}
+
+.top-left-triggers:hover .button-trigger:hover {
+  opacity: 1;
 }
 
 .unsplash-info {
@@ -934,6 +949,7 @@ html {
   cursor: pointer;
   transition: transform .12s ease-in-out, opacity .12s ease-in-out;
   opacity: 0.5;
+  transform: scale(0.95);
 }
 
 .settings-trigger::before {
@@ -945,7 +961,7 @@ html {
   background-position: center;
   background-size: 24px 24px;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.76 2h2.48l.44 2.1a8.12 8.12 0 0 1 1.93.8l1.82-1.14 1.75 1.75-1.14 1.82c.32.6.59 1.24.79 1.92L22 10.76v2.48l-2.1.44c-.2.68-.47 1.32-.8 1.93l1.14 1.82-1.75 1.75-1.82-1.14c-.6.32-1.24.59-1.92.79L13.24 22h-2.48l-.44-2.1a8.12 8.12 0 0 1-1.93-.8l-1.82 1.14-1.75-1.75 1.14-1.82a8.02 8.02 0 0 1-.79-1.92L2 13.24v-2.48l2.1-.44c.2-.68.47-1.32.8-1.93L3.76 6.57l1.75-1.75 1.82 1.14c.6-.32 1.24-.59 1.92-.79L10.76 2z'/%3E%3Ccircle cx='12' cy='12' r='2.85'/%3E%3C/svg%3E");
-  opacity: 0.9;
+  opacity: 0.25;
 }
 
 .settings-trigger:hover,
