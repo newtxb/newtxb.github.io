@@ -57,6 +57,15 @@ const DEFAULT_UNSPLASH_KEYWORDS = [
 
 const DEFAULT_UNSPLASH_KEYWORDS_TEXT = DEFAULT_UNSPLASH_KEYWORDS.join(', ');
 
+// Extra keywords come from the unlocked credentials, not the user's keyword field,
+// so they apply even when the user overrides the defaults.
+function unsplashSearchKeywords(settings) {
+  return [
+    ...keywordStringToArray(settings.unsplashKeywords || DEFAULT_UNSPLASH_KEYWORDS_TEXT),
+    ...(settings.unsplashExtraKeywords || []),
+  ];
+}
+
 function clampByte(value) {
   return Math.max(0, Math.min(255, Math.round(value)));
 }
@@ -420,6 +429,9 @@ const PhotoBlacklist = {
 
 const UnsplashBg = {
   ENCRYPTED_CREDS: '0y6Z5ETQz4XPKoWlmPVnY599mr6IfKDfb6SaDtVOat+Q9wI2LpmIDv/DSb78cn/Xoc0DWJKIt9Al7Paf\nEjRhyRJMuwSet9zVGS+x9qojmnnf6HrxUPYZo3gTzN2zlfY+M/KCZd8z0ymjVPfwY9vyg6MVPNiT48TZ\n1gnPJu2r8AKRGDuvJKyAy/pERfz8sY4xrZNOZ/fJsV1wHFDf9cupJBk2Yw=='.replace(/\n/g, ''),
+  // Tried when ENCRYPTED_CREDS fails. Its payload carries its own scope (unsplash_only,
+  // extra_keywords) so this code doesn't reveal what the second password grants.
+  ENCRYPTED_CREDS_ALT: 'aKgMSWR34bUKLoL3fmCfrphwh3nMPANv18xBjjby7KIjWxsYrmieAiculfCUMdTFWdKi/zem/t9j7p+3\nLEFNPCE1vnTgCSsTyOTHeu7TyRy0igzGhofB6S8nZZeIgyTJvK4pf7zcXNt+O+/gS1WpCvOnmWuJKyVh\nB4Ds2ihB3lfKtIac/46vMFxFoDjslUSWQtwtN8sOuGocSQ=='.replace(/\n/g, ''),
   THEME_COLOR_KEY: 'unsplash-theme-color',
 
   currentInfo: null,
@@ -781,6 +793,7 @@ const UnsplashBg = {
     unsplashAuthenticated: false,
     unsplashKeywords: DEFAULT_UNSPLASH_KEYWORDS_TEXT,
     unsplashKeywordsOverridden: false,
+    unsplashExtraKeywords: [],
     // Shared bearer for both the Sonos and Hue reverse proxies (sha1 of the
     // same unlock password); each proxy translates it to its own real
     // backend auth server-side, never forwarding this value onward.
@@ -878,7 +891,7 @@ const UnsplashBg = {
     // Before the password has ever been entered, this checkbox is the
     // general gate to reveal the password field (unlocking Sonos/Hue too,
     // not just Unsplash), so it's labeled generically until then.
-    const advancedUnlocked = !!settings.apiBearerToken;
+    const advancedUnlocked = !!settings.apiBearerToken || !!settings.unsplashAuthenticated;
     if (labels.useUnsplash) {
       labels.useUnsplash.textContent = advancedUnlocked ? 'Use Unsplash backgrounds' : 'Use advanced features';
     }
@@ -995,7 +1008,8 @@ const UnsplashBg = {
     buttons.unlockUnsplash.textContent = 'Unlocking...';
 
     try {
-      const creds = await CryptoUtils.decrypt(UnsplashBg.ENCRYPTED_CREDS, password);
+      const creds = await CryptoUtils.decrypt(UnsplashBg.ENCRYPTED_CREDS, password)
+        .catch(() => CryptoUtils.decrypt(UnsplashBg.ENCRYPTED_CREDS_ALT, password));
 
       // Test the credentials with app-based endpoint
       const testUrl = `https://api.unsplash.com/search/photos?query=test&client_id=${creds.access_key}&per_page=1`;
@@ -1011,11 +1025,12 @@ const UnsplashBg = {
       // Success! Store encrypted credentials in localStorage
       settings.unsplashAuthenticated = true;
       settings.unsplashAccessKey = creds.access_key;
+      settings.unsplashExtraKeywords = creds.extra_keywords || [];
       // Also unlocks Sonos and Hue control — both proxies accept this same
       // bearer and hold their own real backend auth server-side.
-      settings.apiBearerToken = await sha1Hex(password);
+      if (!creds.unsplash_only) settings.apiBearerToken = await sha1Hex(password);
       save();
-      document.dispatchEvent(new CustomEvent('settings:apiBearerTokenChanged'));
+      if (!creds.unsplash_only) document.dispatchEvent(new CustomEvent('settings:apiBearerTokenChanged'));
 
       inputs.unsplashPassword.value = '';
       syncInputs();
@@ -1050,7 +1065,7 @@ const UnsplashBg = {
     UnsplashBg.setLoading(true);
 
     try {
-      const keywords = keywordStringToArray(settings.unsplashKeywords || defaults.unsplashKeywords);
+      const keywords = unsplashSearchKeywords(settings);
 
       const today = new Date().toDateString();
       const cacheKey = `unsplash-bg-${today}`;
@@ -1193,7 +1208,7 @@ const UnsplashBg = {
       if (opaqueLayer) opaqueLayer.remove();
 
       // Load Unsplash image
-      const keywords = keywordStringToArray(settings.unsplashKeywords || DEFAULT_UNSPLASH_KEYWORDS_TEXT);
+      const keywords = unsplashSearchKeywords(settings);
 
       try {
         await UnsplashBg.loadDailyImage(settings.unsplashAccessKey, keywords);
@@ -1212,7 +1227,7 @@ const UnsplashBg = {
   (async () => {
     const settings = window.homeSettings?.get?.() || {};
     if (settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey) {
-      const keywords = keywordStringToArray(settings.unsplashKeywords || DEFAULT_UNSPLASH_KEYWORDS_TEXT);
+      const keywords = unsplashSearchKeywords(settings);
 
       try {
         setUnsplashModeState(true);
