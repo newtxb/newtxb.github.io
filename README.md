@@ -47,6 +47,9 @@ No framework, no build step, no tracking. One HTML file, one stylesheet, one scr
 - **Default**: an animated radial gradient that slowly cycles through hues, with floating particles.
 - **Unsplash mode** (optional): a new photo every day, picked from your own comma-separated search keywords. The photo's average color becomes the page theme color, image details are shown behind the ✨ button (with a link back to Unsplash and a "reload today's photo" action), and recently shown photos are blacklisted (last 30) to avoid repeats.
 
+### 🔲 Google apps
+- Hover the dots (top right, left of the gear) for a Google-style launcher: Account, Gmail, Drive, Docs, Slides, Sheets, Calendar, Gemini, Maps.
+
 ### ⚙️ Settings
 Click the gear (top right) to toggle the date / quote / weather rows, set your username and weather location, and manage Unsplash mode. Everything is stored locally in `localStorage`.
 

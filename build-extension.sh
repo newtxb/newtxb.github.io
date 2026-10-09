@@ -34,6 +34,14 @@ assets/img/banks/n26.png
 assets/img/banks/natixis.png
 assets/img/banks/paypal.png
 assets/img/banks/revolut.png
+assets/img/google/calendar.png
+assets/img/google/docs.png
+assets/img/google/drive.png
+assets/img/google/gemini.png
+assets/img/google/gmail.png
+assets/img/google/maps.png
+assets/img/google/sheets.png
+assets/img/google/slides.png
 "
 
 BLACKLIST="

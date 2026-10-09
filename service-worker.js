@@ -8,6 +8,10 @@ const BANK_LOGOS = [
   'lydia', 'n26', 'natixis', 'paypal', 'revolut',
 ].map(name => `assets/img/banks/${name}.png`);
 
+const GOOGLE_APP_ICONS = [
+  'calendar', 'docs', 'drive', 'gemini', 'gmail', 'maps', 'sheets', 'slides',
+].map(name => `assets/img/google/${name}.png`);
+
 const PRECACHE_URLS = [
   'index.html',
   './',
@@ -17,6 +21,7 @@ const PRECACHE_URLS = [
   // Small enough to be worth having offline, and the Bankin panel looks broken
   // without them
   ...BANK_LOGOS,
+  ...GOOGLE_APP_ICONS,
 ].map(url => new Request(url, { cache: 'no-cache' }));
 
 // Clear everything we have, cache again, and we are ready!
