@@ -355,6 +355,9 @@ const CryptoUtils = {
   }
 };
 
+// Read on each call: the domain only exists once the Settings password is unlocked.
+const proxyApiBase = service => `https://${service}-api.${window.homeSettings?.get?.().apiProxyDomain}/`;
+
 // ---------------------------------------------------------------------------------------------- //
 // PHOTO BLACKLIST MANAGEMENT
 // ---------------------------------------------------------------------------------------------- //
@@ -428,10 +431,10 @@ const PhotoBlacklist = {
 // ---------------------------------------------------------------------------------------------- //
 
 const UnsplashBg = {
-  ENCRYPTED_CREDS: '0y6Z5ETQz4XPKoWlmPVnY599mr6IfKDfb6SaDtVOat+Q9wI2LpmIDv/DSb78cn/Xoc0DWJKIt9Al7Paf\nEjRhyRJMuwSet9zVGS+x9qojmnnf6HrxUPYZo3gTzN2zlfY+M/KCZd8z0ymjVPfwY9vyg6MVPNiT48TZ\n1gnPJu2r8AKRGDuvJKyAy/pERfz8sY4xrZNOZ/fJsV1wHFDf9cupJBk2Yw=='.replace(/\n/g, ''),
+  ENCRYPTED_CREDS: 'u5Ov2da3ZiaDByN3KBcW8KM2kLchEw3y3/EGWcTG5fx2K55NjuxZOLN+Oup+Iw0qb1/Udcoxq82iiQGt\n+Huw51vSRP//8lb2e8b5lWJelcsksL5Ts8LhJ6NNBdeKUAcXymTazXezXxQyZ3J3pSmPZFD92tQUq47d\nBlsf7PMqLzG8Ezt8JV6+qo3W/vUhQCYI+47JEH3HGQQaZ3tZmW2PQyr7eLGZ9faFGAgn5YLozT3zjDcS\nw3uY8s1ly3wIFjFe92UQ/mLTZs/a9tY='.replace(/\n/g, ''),
   // Tried when ENCRYPTED_CREDS fails. Its payload carries its own scope (unsplash_only,
   // extra_keywords) so this code doesn't reveal what the second password grants.
-  ENCRYPTED_CREDS_ALT: 'aKgMSWR34bUKLoL3fmCfrphwh3nMPANv18xBjjby7KIjWxsYrmieAiculfCUMdTFWdKi/zem/t9j7p+3\nLEFNPCE1vnTgCSsTyOTHeu7TyRy0igzGhofB6S8nZZeIgyTJvK4pf7zcXNt+O+/gS1WpCvOnmWuJKyVh\nB4Ds2ihB3lfKtIac/46vMFxFoDjslUSWQtwtN8sOuGocSQ=='.replace(/\n/g, ''),
+  ENCRYPTED_CREDS_ALT: 'eGC7TkpzCqBkQpukwk7kAh73eSpwHRRKPQ7FS2NoZolIC0kp+JUV4DTJbFW9uA8V3oWcq3cIFmX4t/Sx\nLI1adxzzdUHWOYltJtCq0nVPxZvpCbZJfKikQWOISOlLwaH4PwWNhKO15ru92PKCoTRXxLxXIQMk+RAq\nKZnmdW3+I55aZWI3JG4+9eXWNDlaBtxdsf92fAEKMsGEwpG5ZTFuCBonBr/bmp7tVLGo9pjY+DS/TBCj\n/UcYuaClS17tx/4qPhbNafuQ'.replace(/\n/g, ''),
   THEME_COLOR_KEY: 'unsplash-theme-color',
 
   currentInfo: null,
@@ -798,7 +801,15 @@ const UnsplashBg = {
     // same unlock password); each proxy translates it to its own real
     // backend auth server-side, never forwarding this value onward.
     apiBearerToken: '',
+    // Parent domain of those proxies and the Account quick link target. Both
+    // come from the unlocked payload so neither is disclosed in this source.
+    apiProxyDomain: '',
+    accountUrl: '',
+    // Bumped whenever the payloads gain a field, so older unlocks get re-asked.
+    credentialsVersion: 0,
   };
+
+  const CREDENTIALS_VERSION = 2;
 
   const modal = document.querySelector('.settings-modal');
   const trigger = document.querySelector('.settings-trigger');
@@ -861,6 +872,24 @@ const UnsplashBg = {
   const save = () => {
     window.localStorage.setItem(storageKey, JSON.stringify(settings));
   };
+
+  if ((settings.unsplashAuthenticated || settings.apiBearerToken)
+    && settings.credentialsVersion !== CREDENTIALS_VERSION) {
+    settings = {
+      ...settings,
+      unsplashAuthenticated: false,
+      unsplashAccessKey: '',
+      unsplashExtraKeywords: [],
+      apiBearerToken: '',
+    };
+    save();
+  }
+
+  const accountLink = document.querySelector('[data-account-link]');
+  const syncAccountLink = () => {
+    if (accountLink && settings.accountUrl) accountLink.href = settings.accountUrl;
+  };
+  syncAccountLink();
 
   const isUnsplashReady = () => (
     settings.useUnsplash && settings.unsplashAuthenticated && settings.unsplashAccessKey
@@ -1029,7 +1058,11 @@ const UnsplashBg = {
       // Also unlocks Sonos and Hue control — both proxies accept this same
       // bearer and hold their own real backend auth server-side.
       if (!creds.unsplash_only) settings.apiBearerToken = await sha1Hex(password);
+      settings.apiProxyDomain = creds.proxy_domain || '';
+      settings.accountUrl = creds.account_url || '';
+      settings.credentialsVersion = CREDENTIALS_VERSION;
       save();
+      syncAccountLink();
       if (!creds.unsplash_only) document.dispatchEvent(new CustomEvent('settings:apiBearerTokenChanged'));
 
       inputs.unsplashPassword.value = '';
@@ -2896,7 +2929,7 @@ const UnsplashBg = {
   const menu = document.querySelector('.sonos-menu');
   if (!container || !roomsEl || !menu) return;
 
-  const API_BASE = 'https://sonos-api.example.com/some-api-endpoint/';
+  const apiBase = () => proxyApiBase('sonos');
   const POLL_MS = 4000;
   const VOLUME_SEND_DEBOUNCE_MS = 150;
 
@@ -2917,7 +2950,7 @@ const UnsplashBg = {
   updateTriggerVisibility();
   document.addEventListener('settings:apiBearerTokenChanged', updateTriggerVisibility);
 
-  const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
+  const apiUrl = (path) => new URL(path.replace(/^\//, ''), apiBase()).toString();
 
   const api = async (path) => {
     const token = getToken();
@@ -4105,7 +4138,7 @@ const UnsplashBg = {
   const menu = document.querySelector('.hue-menu');
   if (!container || !roomsEl || !menu) return;
 
-  const API_BASE = 'https://hue-api.example.com/some-api-endpoint/';
+  const apiBase = () => proxyApiBase('hue');
   const POLL_MS = 4000;
   const BRIGHTNESS_SEND_DEBOUNCE_MS = 150;
 
@@ -4133,7 +4166,7 @@ const UnsplashBg = {
   updateTriggerVisibility();
   document.addEventListener('settings:apiBearerTokenChanged', updateTriggerVisibility);
 
-  const apiUrl = (path) => new URL(path.replace(/^\//, ''), API_BASE).toString();
+  const apiUrl = (path) => new URL(path.replace(/^\//, ''), apiBase()).toString();
 
   const api = async (path, { method = 'GET', body } = {}) => {
     const token = getToken();
@@ -5384,7 +5417,7 @@ const UnsplashBg = {
   const totalEl = document.querySelector('.bankin-total');
   if (!container || !banksEl || !totalEl) return;
 
-  const API_BASE = 'https://bankin-api.example.com/some-api-endpoint/';
+  const apiBase = () => proxyApiBase('bankin');
   // Bankin' itself only re-syncs each bank a few times a day, so anything more
   // frequent than hourly would just re-download identical balances.
   const CACHE_TTL_MS = 60 * 60 * 1000;
@@ -5421,7 +5454,7 @@ const UnsplashBg = {
   };
   updateTriggerVisibility();
 
-  const apiUrl = path => new URL(String(path).replace(/^\//, ''), API_BASE).toString();
+  const apiUrl = path => new URL(String(path).replace(/^\//, ''), apiBase()).toString();
 
   const api = async (path) => {
     const token = getToken();
@@ -5459,7 +5492,7 @@ const UnsplashBg = {
       const next = payload?.pagination?.next_uri;
       // Only follow pagination that stays on the proxy — the bearer must never
       // be sent to whatever other host a next_uri might name.
-      path = next && new URL(next, API_BASE).origin === new URL(API_BASE).origin ? next : null;
+      path = next && new URL(next, apiBase()).origin === new URL(apiBase()).origin ? next : null;
     }
     return resources;
   };

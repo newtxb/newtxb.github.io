@@ -5,15 +5,15 @@
 // pages CSP to script-src 'self', so a remote <script> tag could never load in the extension
 // anyway).
 //
-// Calls google-api.example.com/some-api-endpoint instead — a reverse proxy in front of Google's
-// endpoint that adds a CORS header, so a plain fetch() works. Authenticated with the same
-// bearer token that unlocks Sonos/Hue control (apiBearerToken, derived from the Settings
-// unlock password) — until unlocked, apiBearerToken is empty, the proxy call fails auth,
-// and the dropdown just silently doesn't appear (search itself still works fine).
+// Calls the google-api reverse proxy instead — in front of Google's endpoint, it adds a CORS
+// header so a plain fetch() works. Its domain (apiProxyDomain) and bearer token
+// (apiBearerToken) both come from the Settings unlock password, same as Sonos/Hue — until
+// unlocked the dropdown just silently doesn't appear (search itself still works fine).
 window.googleSuggest = (q, onResult) => {
-  const token = window.homeSettings?.get?.().apiBearerToken || '';
-  window.fetch(`https://google-api.example.com/some-api-endpoint/complete/search?client=chrome&q=${q}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  const { apiBearerToken: token, apiProxyDomain: domain } = window.homeSettings?.get?.() || {};
+  if (!token || !domain) return;
+  window.fetch(`https://google-api.${domain}/complete/search?client=chrome&q=${q}`, {
+    headers: { Authorization: `Bearer ${token}` },
   })
     .then(res => res.json())
     .then(onResult)
