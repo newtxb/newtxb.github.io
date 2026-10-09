@@ -59,6 +59,7 @@ in_list() {
   printf '%s\n' "$list" | grep -Fqx -- "$needle"
 }
 
+echo "Checking tracked files..."
 UNCATEGORIZED=""
 for f in $(git ls-files); do
   if in_list "$f" "$WHITELIST" || in_list "$f" "$BLACKLIST"; then
@@ -93,6 +94,7 @@ sed "s/\"version\"[[:space:]]*:[[:space:]]*\"$OLD_VERSION\"/\"version\": \"$NEW_
 mv "$MANIFEST.tmp" "$MANIFEST"
 echo "Version $OLD_VERSION -> $NEW_VERSION"
 
+echo "Staging files..."
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
@@ -102,6 +104,22 @@ for f in $WHITELIST; do
 done
 cp assets/google-suggest.ext.js "$STAGE/assets/google-suggest.js"
 
+# Minify the staged JS/CSS in place. The scripts are classic (non-module) scripts sharing
+# globals, which is fine: esbuild's transform mode never renames top-level identifiers.
+echo "Minifying (esbuild):"
+MINIFY=""
+for f in $WHITELIST; do
+  case "$f" in
+    *.js|*.css)
+      echo "  - $f"
+      MINIFY="$MINIFY $STAGE/$f"
+      ;;
+  esac
+done
+# shellcheck disable=SC2086
+npx --yes esbuild@0.25.0 $MINIFY --minify --log-level=warning --outbase="$STAGE" --outdir="$STAGE" --allow-overwrite
+
+echo "Zipping..."
 rm -f "$OUT"
 (cd "$STAGE" && zip -qr "$OLDPWD/$OUT" $WHITELIST)
 
